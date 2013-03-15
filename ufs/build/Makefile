@@ -6,7 +6,6 @@ LIBS   =
 LIBDIR =
 INCDIR = -I../src
 TBDIR  = ../tb
-TB ?= t1.txt
 TBFLAGS ?= 
 
 TARGET = ufs
@@ -29,8 +28,7 @@ clean:
 	@ echo "CLEAN"
 
 run: $(TARGET)
-	@echo RUNNING TEST $(TB)
-	@./$(TARGET) $(TBFLAGS) $(TBDIR)/$(TB)
+	@./$(TARGET) $(TBFLAGS) $(TBDIR)/f.pla $(TBDIR)/g.pla
 
 log: $(TARGET)
 	./$(TARGET) > log

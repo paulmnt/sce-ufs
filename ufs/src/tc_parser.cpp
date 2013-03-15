@@ -1,16 +1,35 @@
 #include "tc_parser.h"
 
+#define _get_char(offset, cf,cg)					\
+	{								\
+		for (int i = 0; i < offset; i++) {			\
+			if (!fpla.good() || !gpla.good())		\
+				cout << "Input format error" << endl;	\
+			fpla >> cf;					\
+			gpla >> cg;					\
+		}							\
+	}
+
 int tc_parser::read_params() {
+	char cf, cg;
+	int l;
 
+	/* Read number of inputs */
+	_get_char(3, cf, cg);
+	if (cf != cg)
+		cout << "Numbers of inputs mismatch" << endl;
+	l = cf - '0';
+	cout << "Number of inputs: " << l << endl;
 
+	return l;
 }
 
+
+
+
+/*
 void tc_parser::dump_file()
 {
-	if (!infile.good()) {
-		cout << "Input format error" << endl;
-		return;
-	}
 	string s;
 	infile >> s;
 	if (s.compare(".i") == 0) {
@@ -35,3 +54,4 @@ void tc_parser::dump_file()
 	}
 }
 
+*/

@@ -28,22 +28,26 @@ using namespace std;
 class tc_parser {
 
 public:
-	tc_parser(char *filename) {
-		infile.open(filename);
-		lits = read_params()
+	tc_parser(char *fnamef, char *fnameg) {
+		fpla.open(fnamef);
+		gpla.open(fnameg);
+		lits = read_params();
 	}
 
 	~tc_parser() {
-		infile.close();
+		fpla.close();
+		gpla.close();
 	}
 
-	void dump_file();
-
+	int get_lits() const {
+		return lits;
+	}
 
 private:
 	int read_params();
 
-	ifstream infile;
+	ifstream fpla;
+	ifstream gpla;
 	int lits;
 
 };
