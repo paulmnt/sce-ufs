@@ -12,8 +12,18 @@ using namespace std;
  */
 class cube {
 public:
+	cube() {
+		len = 0;
+	}
+
 	void add(const char v) {
 		vars.push_back(v);
+		len++;
+	}
+
+	void del(int i) {
+		vars.erase(vars.begin() + i);
+		len--;
 	}
 
 	void print() {
@@ -24,13 +34,25 @@ public:
 	}
 
 	vector<char> vars;
+	int len;
 };
 
 
 class cover {
 public:
+	cover() {
+		len = 0;
+	}
+
 	void add_cube(const cube &c) {
 		cubes.push_back(c);
+		len++;
+	}
+
+
+	void del_column(int j) {
+		for (int i = 0; i < len; i++)
+			cubes[i].del(j);
 	}
 
 	void print() {
@@ -41,6 +63,7 @@ public:
 	}
 
 	vector<cube> cubes;
+	int len;
 };
 
 
@@ -61,7 +84,17 @@ public:
  */
 class level {
 public:
-	vector<node> n;
+	level() {
+		len = 0;
+	}
+
+	void add_node(const node &n) {
+		nodes.push_back(n);
+		len++;
+	}
+
+	vector<node> nodes;
+	int len;
 };
 
 
@@ -69,9 +102,13 @@ class ufs {
 public:
 
 	void covers_to_level();
+	void cofactor(const cover &f, const cover &g,
+		cover &pcof, cover &pcog,
+		cover &ncof, cover &ncog);
 
 	/* The output is the vector of levels */
 	vector<level> out;
+
 };
 
 #endif

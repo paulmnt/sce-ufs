@@ -1,6 +1,6 @@
 TARGET_ARCH = linux64
 CC = g++
-CFLAGS = -Wall
+CPPFLAGS = -Wall -DDEBUG
 
 LIBS   =
 LIBDIR =
@@ -10,18 +10,18 @@ TBFLAGS ?=
 
 TARGET = ufs
 VPATH := ../src
-SRCS = main.cpp tc_parser.cpp
+SRCS = main.cpp tc_parser.cpp ufs.cpp
 HDRS = tc_parser.h ufs.h
 OBJS = $(SRCS:.cpp=.o)
 
 .SUFFIXES: .cpp .cc .o
 $(TARGET): $(OBJS)
-	@$(CC) $(CFLAGS) ${INCDIR} ${LIBDIR} -o $@ $(OBJS) ${LIBS}
+	@$(CC) $(CPPFLAGS) ${INCDIR} ${LIBDIR} -o $@ $(OBJS) ${LIBS}
 
 $(OBJS): $(HDRS)
 
 .cpp.o:
-	@$(CC) $(CFLAGS) ${INCDIR} -c $<
+	@$(CC) $(CPPFLAGS) ${INCDIR} -c $<
 
 clean:
 	@ rm -rf *.o $(TARGET)

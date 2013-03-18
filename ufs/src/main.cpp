@@ -5,7 +5,6 @@
 
 using namespace std;
 
-
 #define FPLA "../tb/f.pla"
 #define GPLA "../tb/g.pla"
 
@@ -39,9 +38,13 @@ int main(int argc, char **argv) {
 	tc_parser in(f1, f2);
 
 	/* Load covers */
-	int lits = in.get_lits();
 	cover F, G;
 	in.read_covers(F, G);
+
+	/* UFS class */
+	ufs u;
+	cover pf, pg, nf, ng;
+	u.cofactor(F, G, pf, pg, nf, ng);
 
 	return 0;
 }
