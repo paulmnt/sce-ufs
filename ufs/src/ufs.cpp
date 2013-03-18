@@ -79,6 +79,7 @@ int ufs::intersect(const cube &c1, const cube &c2)
 
 #ifdef DEBUG
 	assert(!(num % den));
+	cout << "DEBUG: ";
 	cout << "Cubes intersect on " << num / den << " minterms" << endl;
 #endif
 	return num / den;
