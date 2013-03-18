@@ -66,6 +66,7 @@ public:
 		cout << endl;
 	}
 
+
 	vector<cube> cubes;
 	int len;
 };
@@ -104,13 +105,16 @@ public:
 
 class ufs {
 public:
-
-	void covers_to_level();
 	void cofactor(const cover &f, const cover &g,
 		cover &pcof, cover &pcog,
 		cover &ncof, cover &ncog);
 
-	int intersect(const cube &c1, const cube &c2);
+	int common_ones(const cube &c1, const cube &c2);
+
+	/* This does not consider intersection! */
+	int total_ones(const cube &c1, const cube &c2);
+
+	float similarity(const cube &c1, const cube &c2);
 
 	/* The output is the vector of levels */
 	vector<level> out;
