@@ -43,8 +43,12 @@ public:
 		return lits;
 	}
 
+	void read_covers(cover &f, cover &g);
+
 private:
 	int read_params();
+
+	string s1, s2;
 
 	ifstream fpla;
 	ifstream gpla;

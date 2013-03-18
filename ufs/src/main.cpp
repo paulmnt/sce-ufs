@@ -38,9 +38,10 @@ int main(int argc, char **argv) {
 	char *f2 = (char *)GPLA;
 	tc_parser in(f1, f2);
 
-	/* Load covers *//*
-	int lits = in->get_lits();
-	ufs<3> data;*/
+	/* Load covers */
+	int lits = in.get_lits();
+	cover F, G;
+	in.read_covers(F, G);
 
 	return 0;
 }

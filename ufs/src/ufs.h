@@ -2,44 +2,52 @@
 #define __UFS_H__
 
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
 /**
- * Structure for a single cube in a cover
- *
- * @fanin is the input par, which has variable
- * number of entries (@VARS).
- *
- * The fanout is always 1 and there is no need
- * to store it.
+ * Possible values are
+ * '0', '1', '-'
  */
-template <int VARS>
 class cube {
 public:
-	short fanin[VARS];
+	void add(const char v) {
+		vars.push_back(v);
+	}
+
+	void print() {
+		int len = vars.size();
+		for (int i = 0; i < len; i++)
+			cout << vars[i];
+		cout << endl;
+	}
+
+	vector<char> vars;
+};
+
+
+class cover {
+public:
+	void add_cube(const cube &c) {
+		cubes.push_back(c);
+	}
+
+	void print() {
+		int len = cubes.size();
+		for (int i = 0; i < len; i++)
+			cubes[i].print();
+		cout << endl;
+	}
+
+	vector<cube> cubes;
 };
 
 
 /**
- * A cover is a structure containing a vector of
- * multioutput cubes
- *
- * If it represents a cofactor we keep track of
- * the splitting variable @splitvar. If not, we
- * set @splitvar to 0.
+ * A node is a structure containing the information
+ * of a node of the recursion tree.
  */
-template <int VARS>
-class cover {
-public:
-	void add_cube(const cube<VARS> &c)
-	{
-		cubes.push_back(c);
-	}
-
-	vector<cube<VARS> > cubes;
-};
-
 class node {
 public:
 	int id;
@@ -48,26 +56,22 @@ public:
 	int sim;
 };
 
-class levels {
+/**
+ * A level is a vector of nodes
+ */
+class level {
 public:
 	vector<node> n;
 };
 
+
 class ufs {
 public:
-	ufs(const cover<VARS> &c1, const cover<VARS> &c2, const int lits)
-	{
-		F = c1;
-		G = c2;
-
-	}
 
 	void covers_to_level();
 
-	cover<VARS> F;
-	cover<VARS> G;
-
-	vector<levels> out;
+	/* The output is the vector of levels */
+	vector<level> out;
 };
 
 #endif
