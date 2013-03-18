@@ -49,3 +49,37 @@ void ufs::cofactor(const cover &f, const cover &g,
 #endif
 
 }
+
+int ufs::intersect(const cube &c1, const cube &c2)
+{
+	int num = 1 << c1.len;
+	int den = 1;
+	for (int i = 0; i < c1.len; i++) {
+		if (c1.vars[i] != c2.vars[i]) {
+			if ((c1.vars[i] != '-') && (c2.vars[i] != '-')) {
+				// cubes do not intersect
+				num = 0;
+				break;
+			} else {
+				// match on half of the remained products
+				den <<= 1;
+				continue;
+			}
+		} else {
+			if (c1.vars[i] == '-') {
+				// this variable has no effects
+				continue;
+			} else {
+				// products to compare are halved
+				num >>= 1;
+				continue;
+			}
+		}
+	}
+
+#ifdef DEBUG
+	assert(!(num % den));
+	cout << "Cubes intersect on " << num / den << " minterms" << endl;
+#endif
+	return num / den;
+}

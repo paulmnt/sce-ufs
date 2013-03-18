@@ -46,5 +46,7 @@ int main(int argc, char **argv) {
 	cover pf, pg, nf, ng;
 	u.cofactor(F, G, pf, pg, nf, ng);
 
+	u.intersect(F.cubes[0], G.cubes[0]);
+
 	return 0;
 }

@@ -1,6 +1,10 @@
 #ifndef __UFS_H__
 #define __UFS_H__
 
+#ifdef DEBUG
+#include <assert.h>
+#endif
+
 #include <vector>
 #include <iostream>
 
@@ -105,6 +109,8 @@ public:
 	void cofactor(const cover &f, const cover &g,
 		cover &pcof, cover &pcog,
 		cover &ncof, cover &ncog);
+
+	int intersect(const cube &c1, const cube &c2);
 
 	/* The output is the vector of levels */
 	vector<level> out;
