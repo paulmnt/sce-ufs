@@ -10,8 +10,8 @@ TBFLAGS ?=
 
 TARGET = ufs
 VPATH := ../src
-SRCS = main.cpp tc_parser.cpp ufs.cpp tautology.cpp
-HDRS = tc_parser.h ufs.h tautology.h
+SRCS = main.cpp tc_parser.cpp ufs.cpp tautology.cpp coversim.cpp
+HDRS = tc_parser.h ufs.h tautology.h coversim.h
 OBJS = $(SRCS:.cpp=.o)
 
 .SUFFIXES: .cpp .cc .o

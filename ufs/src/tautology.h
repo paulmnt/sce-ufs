@@ -4,9 +4,14 @@
 #include "ufs.h"
 
 /**
- * Simple tatutology checking without recursion
+ * Simple termination rules for
+ * Tatutology Checking
  *
- * SIMPLE TERMINATION RULES
+ * Notice that we do recursion for
+ * similarity checking, but not for
+ * tautology.
+ *
+ * TERMINATION RULES
  * T1:  Universal cube.
  * T2:  Input column all ones/zeros.
  * T3:  Single input dependence.

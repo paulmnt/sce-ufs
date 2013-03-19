@@ -1,19 +1,87 @@
 #include "ufs.h"
-#include "tautology.h"
+#include "coversim.h"
 
-//TODO: tautology checking
-bool ufs::is_tautology(const cover &f)
+int common_ones(const cube &c1, const cube &c2)
 {
-	tautology t;
-	return t.check(f);
+	int num = 1 << c1.len;
+	int den = 1;
+	for (int i = 0; i < c1.len; i++) {
+		if (c1.vars[i] != c2.vars[i]) {
+			if ((c1.vars[i] != '-') && (c2.vars[i] != '-')) {
+				// cubes do not intersect
+				num = 0;
+				break;
+			} else {
+				// match on half of the remained products
+				den <<= 1;
+				continue;
+			}
+		} else {
+			if (c1.vars[i] == '-') {
+				// this variable has no effects
+				continue;
+			} else {
+				// products to compare are halved
+				num >>= 1;
+				continue;
+			}
+		}
+	}
+
+#ifdef DEBUG
+	assert(!(num % den));
+	cout << "DEBUG: ";
+	cout << "Cubes intersect on " << num / den << " minterms" << endl;
+#endif
+	return num / den;
 }
+
+
+int total_ones(const cube &c1, const cube &c2)
+{
+	/* Does not consider intersection! */
+	int num1 = 1 << c1.len;
+	int num2 = 1 << c2.len;
+
+	for (int i = 0; i < c1.len; i++) {
+		if (c1.vars[i] != '-')
+			num1 >>= 1;
+		if (c2.vars[i] != '-')
+			num2 >>= 1;
+	}
+
+#ifdef DEBUG
+	cout << "DEBUG: ";
+	cout << "Cube 1 covers " << num1 << " minterms" << endl;
+	cout << "       Cube 2 covers " << num2 << " minterms" << endl;
+#endif
+	return num1 + num2;
+}
+
+
+/* Similarity between two cubes. Called if B6 applies */
+float cubesim(const cube &c1, const cube &c2)
+{
+	/* Assumes covers are non empty! */
+	int cones = common_ones(c1, c2);
+	int tones = total_ones(c1, c2);
+	int m = 1 << c1.len;
+	int czeros = m - (tones - cones);
+	float sim = (float) (cones + czeros) / m;
+
+#ifdef DEBUG
+	cout << "DEBUG: ";
+	cout << "Cubes similarity is  " << sim << endl;
+#endif
+
+	return sim;
+}
+
 
 void ufs::cofactor(const cover &f, const cover &g,
 		   cover &pcof, cover &pcog,
-		   cover &ncof, cover &ncog)
+		   cover &ncof, cover &ncog, int sv)
 {
-	int sv = 0;
-	//TODO: sv = pick_split_var();
 	/* Fsv */
 	for (int i = 0; i < f.len; i++) {
 		if (f.cubes[i].vars[sv] != '0')
@@ -52,74 +120,8 @@ void ufs::cofactor(const cover &f, const cover &g,
 #endif
 }
 
-int ufs::common_ones(const cube &c1, const cube &c2)
+int ufs::check_rules(const cover &f, const cover &g)
 {
-	int num = 1 << c1.len;
-	int den = 1;
-	for (int i = 0; i < c1.len; i++) {
-		if (c1.vars[i] != c2.vars[i]) {
-			if ((c1.vars[i] != '-') && (c2.vars[i] != '-')) {
-				// cubes do not intersect
-				num = 0;
-				break;
-			} else {
-				// match on half of the remained products
-				den <<= 1;
-				continue;
-			}
-		} else {
-			if (c1.vars[i] == '-') {
-				// this variable has no effects
-				continue;
-			} else {
-				// products to compare are halved
-				num >>= 1;
-				continue;
-			}
-		}
-	}
-
-#ifdef DEBUG
-	assert(!(num % den));
-	cout << "DEBUG: ";
-	cout << "Cubes intersect on " << num / den << " minterms" << endl;
-#endif
-	return num / den;
-}
-
-int ufs::total_ones(const cube &c1, const cube &c2)
-{
-	/* Does not consider intersection! */
-	int num1 = 1 << c1.len;
-	int num2 = 1 << c2.len;
-
-	for (int i = 0; i < c1.len; i++) {
-		if (c1.vars[i] != '-')
-			num1 >>= 1;
-		if (c2.vars[i] != '-')
-			num2 >>= 1;
-	}
-
-#ifdef DEBUG
-	cout << "DEBUG: ";
-	cout << "Cube 1 covers " << num1 << " minterms" << endl;
-	cout << "       Cube 2 covers " << num2 << " minterms" << endl;
-#endif
-	return num1 + num2;
-}
-
-float ufs::similarity(const cube &c1, const cube &c2)
-{
-	int cones = common_ones(c1, c2);
-	int tones = total_ones(c1, c2);
-	int m = 1 << c1.len;
-	int czeros = m - (tones - cones);
-	float sim = (float) (cones + czeros) / m;
-
-#ifdef DEBUG
-	cout << "DEBUG: ";
-	cout << "Cubes similarity is  " << sim << endl;
-#endif
-
-	return sim;
+	coversim csim(use_b7, use_b8, use_m14);
+	return csim.check(f, g);
 }

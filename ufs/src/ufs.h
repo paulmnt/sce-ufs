@@ -130,10 +130,22 @@ public:
  */
 class node {
 public:
+	void print() const {
+		cout << id << ". ";
+		if (splitvar < 0)
+			cout << rule;
+		else
+			cout << "x" << splitvar;
+		if (sim < 0)
+			cout << endl;
+		else
+			cout << " " << sim << endl;
+	}
+
 	int id;
 	int splitvar;
 	string rule;
-	int sim;
+	float sim;
 };
 
 /**
@@ -150,6 +162,11 @@ public:
 		len++;
 	}
 
+	void print() const {
+		for (int i = 0; i < len; i++)
+			nodes[i].print();
+	}
+
 	vector<node> nodes;
 	int len;
 };
@@ -160,79 +177,44 @@ public:
  * This class containes all the methods to run the
  * function similarity evalutation tool.
  *
- * TERMINATION RULES
- * B1:  Both covers are empty.
- * B2:  Both covers are a tautology.
- * B3:  One cover is empty.
- * B4:  One cover is a tautology.
- * B5:  One cover is empty and one is a tautology.
- * B6:  Both covers have a single cube.
- * B7:  One cover has a single cube and the other
- *      has non intersecting cubes.
- *      (Requires the flag --single_disjoint or
- *       --multi_disjoint)
- * B8:  Both covers have multiple non intersecting
- *      cubes. (Requires the flag --multi_disjoint)
- * B9:  Both covers show single input dependence
- *      (same varible)
- * B10: Both covers show single input dependence
- *      (different variables)
- *
- * UNATENESS
- * U1:  Both covers are positive/negative unate
- *      on the same variable with no DCs. Prune the
- *      tree.
- * U2:  Both covers are unate on the same variable
- *      with no DCs, but one is positive, while the
- *      other is negative. Prune the tree.
- * U3:  One cover is positive/negative unate in a
- *      variable Xi. Pick Xi as splitting variable
- *      to einforce B3 for one child.
- *
- * Miscellaneus rules for potential speed up
- * M1:  When a cover has less than X cubes, apply
- *      SCC(). (Requires flag "--scc X")
- *
- * Splitting variable choice
- * Try rule U3 first.
- * Pick a binate variable to try to keep the tree
- * balanced, thus increasing the probability that
- * the simple rule B6 applies.
- *
- * Shannon decomposition:
- * At each level do:
- *  - sum of the similarities of children to obtain
- *    the similarity of the cofactors at the current
- *    level.
- *  - divide by two to report the similarity weight
- *    to the upper level. TODO: CHECK!!!
  */
 class ufs {
 public:
+	ufs(bool b7, bool b8, int m14) {
+		use_b7 = b7;
+		use_b8 = b8;
+		use_m14 = m14;
+		len = 0;
+	}
+
+	/* Returns termination rule number or 0 */
+	int check_rules(const cover &f, const cover &g);
+
+
 	void cofactor(const cover &f, const cover &g,
-		cover &pcof, cover &pcog,
-		cover &ncof, cover &ncog);
+			cover &pcof, cover &pcog,
+			cover &ncof, cover &ncog, int sv);
 
-	/*
-	 * Simple tatutology checking: this check does not
-	 * go through a complete tautology checking, because
-	 * it would be as expensive as making more splitting
-	 * steps. This function just checks for quick rules
-	 * for termination, taken from "Tautology Checking"
-	 * but does not go through recursion.
-	 * Called by rule B2 and B4 and B5
-	 */
-	bool is_tautology(const cover &f);
+	void apply_rule(const string rule, cover &f, cover &g);
 
-	/* Similarity between two cubes. Called by ule B6 */
-	float similarity(const cube &c1, const cube &c2);
-	int total_ones(const cube &c1, const cube &c2);
-	int common_ones(const cube &c1, const cube &c2);
+	float simeval(const string rule, const cover &f, const cover &g);
 
+	void print_levels() const {
+		for (int i = 0; i < len; i++) {
+			cout << "==level " << i + 1 << "==" << endl;
+			out[i].print();
+			if (i != len - 1)
+				cout << endl;
+		}
+	}
 
 	/* The output is the vector of levels */
 	vector<level> out;
+	int len;
 
+private:
+	bool use_b7, use_b8;
+	int use_m14;
 };
 
 #endif

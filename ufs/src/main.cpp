@@ -90,14 +90,10 @@ int main(int argc, char **argv) {
 	in.read_covers(F, G);
 
 	/* UFS */
-	ufs u;
+	ufs u(single_disjoint, multi_disjoint, scc);
 	cover pf(lits), pg(lits), nf(lits), ng(lits);
-	u.cofactor(F, G, pf, pg, nf, ng);
+	u.cofactor(F, G, pf, pg, nf, ng, 0);
 
-	u.similarity(F.cubes[0], G.cubes[0]);
-
-	if (u.is_tautology(F))
-		cout << "F is a tautology" << endl;
 
 	return 0;
 }
