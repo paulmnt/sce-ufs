@@ -201,8 +201,7 @@ public:
 	}
 
 	/* Returns termination rule number or 0 */
-	int check_rules(const cover &f, const cover &g);
-
+	int check_rules();
 
 	void cofactor(int sv);
 

@@ -16,6 +16,7 @@ static int scc = 0;
 static bool verb = false;
 static int flags_count = 1;
 
+/* TODO: implement VERBOSE and other rules! */
 
 /* Returns the index of the argument if found. 0 otherwise */
 static int flag_found(int argc, char **argv, const string &flag) {

@@ -133,8 +133,8 @@ void ufs::cofactor(int sv)
 #endif
 }
 
-int ufs::check_rules(const cover &f, const cover &g)
+int ufs::check_rules()
 {
 	coversim csim(use_b7, use_b8, use_m14);
-	return csim.check(f, g);
+	return csim.check(*f, *g);
 }
