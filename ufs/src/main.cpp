@@ -10,8 +10,14 @@ using namespace std;
 #define GPLA "../tb/g.pla"
 
 
+static bool single_disjoint = false;
+static bool multi_disjoint = false;
+static int scc = 0;
+static int flags_count = 1;
+
+
 /* Returns the index of the argument if found. 0 otherwise */
-int flag_found(int argc, char **argv, const string &flag) {
+static int flag_found(int argc, char **argv, const string &flag) {
 	for (int i = 1; i < argc; i++) {
 		if (flag.compare(argv[i]) == 0)
 			return i;
@@ -19,33 +25,26 @@ int flag_found(int argc, char **argv, const string &flag) {
 	return 0;
 }
 
-
-
-int main(int argc, char **argv) {
-
-	bool single_disjoint = false;
-	bool multi_disjoint = false;
-	int scc = 0;
-	int flags_count = 1;
-
-	cout << "Function Similarity - Unate Recursive Paradigm" << endl << endl;
-
+static int parse_flags(int argc, char **argv)
+{
 	/* Print help */
 	if (flag_found(argc, argv, "--help")) {
 		cout << "Usage: ufs [flags] <input_file_1> <input_file_2>" << endl;
 		cout << "To display options: ufs --help" << endl;
 		cout << endl;
-		return 0;
+		return 2;
 	}
 	/* Handle flags */
 	if (flag_found(argc, argv, "--single_disjoint")) {
 		flags_count++;
 		single_disjoint = true;
-		cout << " INFO: Rule B7 (single disjoint) enabled" << endl;
+		cout << "INFO: Rule B7 (single disjoint) enabled" << endl;
 	}
 	if (flag_found(argc, argv, "--multi_disjoint")) {
 		flags_count++;
+		single_disjoint = true;
 		multi_disjoint = true;
+		cout << "INFO: Rule B7 (single disjoint) enabled" << endl;
 		cout << "INFO: Rule B8 (multi_disjoint) enabled" << endl;
 	}
 	if (int index = flag_found(argc, argv, "--scc")) {
@@ -70,19 +69,29 @@ int main(int argc, char **argv) {
 			cout << "To display options: ufs --help" << endl;
 			return 1;
 	}
+	return 0;
+
+}
+
+int main(int argc, char **argv) {
+
+	cout << "Function Similarity - Unate Recursive Paradigm" << endl << endl;
+	if (parse_flags(argc, argv))
+		return 1;
 
 	/* Open input files and read input # */
 	char *f1 = (char *)FPLA;
 	char *f2 = (char *)GPLA;
 	tc_parser in(f1, f2);
+	int lits = in.get_lits();
 
 	/* Load covers */
-	cover F, G;
+	cover F(lits), G(lits);
 	in.read_covers(F, G);
 
-	/* UFS class */
+	/* UFS */
 	ufs u;
-	cover pf, pg, nf, ng;
+	cover pf(lits), pg(lits), nf(lits), ng(lits);
 	u.cofactor(F, G, pf, pg, nf, ng);
 
 	u.similarity(F.cubes[0], G.cubes[0]);

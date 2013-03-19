@@ -46,19 +46,50 @@ public:
  */
 class cover {
 public:
-	cover() {
+	cover(int l) {
 		len = 0;
+		lits = l;
+		dep.resize(l);
+		ones.resize(l);
+		zeros.resize(l);
+		dcs.resize(l);
+		for (int i = 0; i < l; i++) {
+			dep[i] = 0;
+			ones[i] = 0;
+			zeros[i] = 0;
+			dcs[i] = 0;
+		}
 	}
 
 	void add_cube(const cube &c) {
+		/* Add a cube to the cover */
 		cubes.push_back(c);
 		len++;
+		/* and keep data structure coherent  */
+		for (int i = 0; i < lits; i++) {
+			if (c.vars[i] == '-')
+				dcs[i]++;
+			else {
+				dep[i]++;
+				if (c.vars[i] == '1')
+					ones[i]++;
+				else
+					zeros[i]++;
+			}
+		}
 	}
 
-
 	void del_column(int j) {
-		for (int i = 0; i < len; i++)
+		/* Keep data structure coherent */
+		lits--;
+		dep.erase(dep.begin() + j);
+		ones.erase(ones.begin() + j);
+		zeros.erase(zeros.begin() + j);
+		dcs.erase(dcs.begin() + j);
+		/* then erase column */
+		for (int i = 0; i < len; i++) {
 			cubes[i].del(j);
+		}
 	}
 
 	void print() {
@@ -68,9 +99,20 @@ public:
 		cout << endl;
 	}
 
-
 	vector<cube> cubes;
 	int len;
+
+	/*
+	 * Following vectors must have the size equal
+	 * to the number of literals shown in the cover
+	*/
+	int lits;
+	/* Keep track of dependency */
+	vector<int> dep;
+	/* Keep track of unateness */
+	vector<int> ones;
+	vector<int> zeros;
+	vector<int> dcs;
 };
 
 
@@ -119,16 +161,43 @@ public:
  * B6:  Both covers have a single cube.
  * B7:  One cover has a single cube and the other
  *      has non intersecting cubes.
- *      (Requires the flag --single_disjoint)
+ *      (Requires the flag --single_disjoint or
+ *       --multi_disjoint)
  * B8:  Both covers have multiple non intersecting
  *      cubes. (Requires the flag --multi_disjoint)
  * B9:  Both covers show single input dependence
  *      (same varible)
  * B10: Both covers show single input dependence
  *      (different variables)
-
+ *
+ * UNATENESS
+ * U1:  Both covers are positive/negative unate
+ *      on the same variable with no DCs. Prune the
+ *      tree.
+ * U2:  Both covers are unate on the same variable
+ *      with no DCs, but one is positive, while the
+ *      other is negative. Prune the tree.
+ * U3:  One cover is positive/negative unate in a
+ *      variable Xi. Pick Xi as splitting variable
+ *      to einforce B3 for one child.
+ *
+ * Miscellaneus rules for potential speed up
  * M1:  When a cover has less than X cubes, apply
  *      SCC(). (Requires flag "--scc X")
+ *
+ * Splitting variable choice
+ * Try rule U3 first.
+ * Pick a binate variable to try to keep the tree
+ * balanced, thus increasing the probability that
+ * the simple rule B6 applies.
+ *
+ * Shannon decomposition:
+ * At each level do:
+ *  - sum of the similarities of children to obtain
+ *    the similarity of the cofactors at the current
+ *    level.
+ *  - divide by two to report the similarity weight
+ *    to the upper level. TODO: CHECK!!!
  */
 class ufs {
 public:

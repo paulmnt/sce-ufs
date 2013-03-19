@@ -1,8 +1,11 @@
 #include "ufs.h"
+#include "tautology.h"
 
+//TODO: tautology checking
 bool ufs::is_tautology(const cover &f)
 {
-	
+	tautology t;
+	return t.check(f);
 }
 
 void ufs::cofactor(const cover &f, const cover &g,
@@ -10,7 +13,7 @@ void ufs::cofactor(const cover &f, const cover &g,
 		   cover &ncof, cover &ncog)
 {
 	int sv = 0;
-	//sv = pick_split_var();
+	//TODO: sv = pick_split_var();
 	/* Fsv */
 	for (int i = 0; i < f.len; i++) {
 		if (f.cubes[i].vars[sv] != '0')
