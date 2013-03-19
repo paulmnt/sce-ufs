@@ -1,5 +1,10 @@
 #include "ufs.h"
 
+bool ufs::is_tautology(const cover &f)
+{
+	
+}
+
 void ufs::cofactor(const cover &f, const cover &g,
 		   cover &pcof, cover &pcog,
 		   cover &ncof, cover &ncog)
@@ -95,7 +100,7 @@ int ufs::total_ones(const cube &c1, const cube &c2)
 #ifdef DEBUG
 	cout << "DEBUG: ";
 	cout << "Cube 1 covers " << num1 << " minterms" << endl;
-	cout << "Cube 2 covers " << num2 << " minterms" << endl;
+	cout << "       Cube 2 covers " << num2 << " minterms" << endl;
 #endif
 	return num1 + num2;
 }
@@ -106,8 +111,6 @@ float ufs::similarity(const cube &c1, const cube &c2)
 	int tones = total_ones(c1, c2);
 	int m = 1 << c1.len;
 	int czeros = m - (tones - cones);
-
-	cout << cones + czeros << " " << m << endl;
 	float sim = (float) (cones + czeros) / m;
 
 #ifdef DEBUG

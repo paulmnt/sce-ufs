@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "tc_parser.h"
 #include "ufs.h"
 
@@ -9,18 +10,22 @@ using namespace std;
 #define GPLA "../tb/g.pla"
 
 
-
-bool flag_found(int argc, char **argv, const string &flag) {
+/* Returns the index of the argument if found. 0 otherwise */
+int flag_found(int argc, char **argv, const string &flag) {
 	for (int i = 1; i < argc; i++) {
 		if (flag.compare(argv[i]) == 0)
-			return true;
+			return i;
 	}
-	return false;
+	return 0;
 }
 
 
 
 int main(int argc, char **argv) {
+
+	bool single_disjoint = false;
+	bool multi_disjoint = false;
+	int scc = 0;
 
 	cout << "Function Similarity - Unate Recursive Paradigm" << endl << endl;
 
@@ -30,6 +35,20 @@ int main(int argc, char **argv) {
 		cout << "To display options: ufs --help" << endl;
 		cout << endl;
 		return 0;
+	}
+	if (flag_found(argc, argv, "--single_disjoint")) {
+		single_disjoint = true;
+		cout << " INFO: Rule B7 (single disjoint) enabled" << endl;
+	}
+	if (flag_found(argc, argv, "--multi_disjoint")) {
+		multi_disjoint = true;
+		cout << "INFO: Rule B8 (multi_disjoint) enabled" << endl;
+	}
+	if (int index = flag_found(argc, argv, "--scc")) {
+		stringstream ss(argv[index + 1]);
+		ss >> scc;
+		cout << "INFO: Rule M1 (SCC) enabled on covers with less than ";
+		cout << scc << " cubes" << endl;
 	}
 
 	/* Open input files and read input # */
