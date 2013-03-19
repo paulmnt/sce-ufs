@@ -28,7 +28,7 @@ clean:
 	@ echo "CLEAN"
 
 run: $(TARGET)
-	@./$(TARGET) $(TBFLAGS) $(TBDIR)/f.pla $(TBDIR)/g.pla
+	@./$(TARGET) $(TBFLAGS)
 
 log: $(TARGET)
 	./$(TARGET) > log

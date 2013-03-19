@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
 	bool single_disjoint = false;
 	bool multi_disjoint = false;
 	int scc = 0;
+	int flags_count = 1;
 
 	cout << "Function Similarity - Unate Recursive Paradigm" << endl << endl;
 
@@ -36,19 +37,38 @@ int main(int argc, char **argv) {
 		cout << endl;
 		return 0;
 	}
+	/* Handle flags */
 	if (flag_found(argc, argv, "--single_disjoint")) {
+		flags_count++;
 		single_disjoint = true;
 		cout << " INFO: Rule B7 (single disjoint) enabled" << endl;
 	}
 	if (flag_found(argc, argv, "--multi_disjoint")) {
+		flags_count++;
 		multi_disjoint = true;
 		cout << "INFO: Rule B8 (multi_disjoint) enabled" << endl;
 	}
 	if (int index = flag_found(argc, argv, "--scc")) {
+		flags_count += 2;
+		if (argc <= index + 1) {
+			cout << "ERROR: Flag --scc requires number of cubes" << endl;
+			cout << "To display options: ufs --help" << endl;
+			return 1;
+		}
 		stringstream ss(argv[index + 1]);
 		ss >> scc;
-		cout << "INFO: Rule M1 (SCC) enabled on covers with less than ";
+		if (!scc) {
+			cout << "ERROR: Flag --scc requires number of cubes" << endl;
+			cout << "To display options: ufs --help" << endl;
+			return 1;
+		}
+		cout << "INFO: Rule M1 (SCC) enabled on covers with at most ";
 		cout << scc << " cubes" << endl;
+	}
+	if (argc > flags_count) {
+		cout << "ERROR: unrecognized flags" << endl;
+			cout << "To display options: ufs --help" << endl;
+			return 1;
 	}
 
 	/* Open input files and read input # */
