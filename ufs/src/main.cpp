@@ -13,6 +13,7 @@ using namespace std;
 static bool single_disjoint = false;
 static bool multi_disjoint = false;
 static int scc = 0;
+static bool verb = false;
 static int flags_count = 1;
 
 
@@ -35,6 +36,11 @@ static int parse_flags(int argc, char **argv)
 		return 2;
 	}
 	/* Handle flags */
+	if (flag_found(argc, argv, "--verbose")) {
+		flags_count++;
+		verb = true;
+		cout << "INFO: Verbose mode enabled" << endl;
+	}
 	if (flag_found(argc, argv, "--single_disjoint")) {
 		flags_count++;
 		single_disjoint = true;
@@ -73,6 +79,7 @@ static int parse_flags(int argc, char **argv)
 
 }
 
+
 int main(int argc, char **argv) {
 
 	cout << "Function Similarity - Unate Recursive Paradigm" << endl << endl;
@@ -90,10 +97,8 @@ int main(int argc, char **argv) {
 	in.read_covers(F, G);
 
 	/* UFS */
-	ufs u(single_disjoint, multi_disjoint, scc);
-	cover pf(lits), pg(lits), nf(lits), ng(lits);
-	u.cofactor(F, G, pf, pg, nf, ng, 0);
-
+	ufs u(single_disjoint, multi_disjoint, scc, verb,
+	      &F, &G, lits);
 
 	return 0;
 }

@@ -78,45 +78,58 @@ float cubesim(const cube &c1, const cube &c2)
 }
 
 
-void ufs::cofactor(const cover &f, const cover &g,
-		   cover &pcof, cover &pcog,
-		   cover &ncof, cover &ncog, int sv)
+void ufs::cofactor(int sv)
 {
+	int index = -1;
+	/* Index is the same for every cover */
+	for (int i = 0; i < f->len; i++)
+		if (f->varid[i] == sv) {
+			index = i;
+			break;
+		}
+#ifdef DEBUG
+	if (index < 0) {
+		cout << "ERROR: cofactoring w.r.t. missing variable" << endl;
+		return;
+	} else
+		cout << "DEBUG: Splittin on variable x" << sv << " @ index " << index << endl;
+#endif
+
 	/* Fsv */
-	for (int i = 0; i < f.len; i++) {
-		if (f.cubes[i].vars[sv] != '0')
-			pcof.add_cube(f.cubes[i]);
+	for (int i = 0; i < f->len; i++) {
+		if (f->cubes[i].vars[index] != '0')
+			pcof->add_cube(f->cubes[i]);
 	}
-	pcof.del_column(sv);
+	pcof->del_column(index);
 	/* Fsv' */
-	for (int i = 0; i < f.len; i++) {
-		if (f.cubes[i].vars[sv] != '1')
-			ncof.add_cube(f.cubes[i]);
+	for (int i = 0; i < f->len; i++) {
+		if (f->cubes[i].vars[index] != '1')
+			ncof->add_cube(f->cubes[i]);
 	}
-	ncof.del_column(sv);
+	ncof->del_column(index);
 	/* Gsv */
-	for (int i = 0; i < g.len; i++) {
-		if (g.cubes[i].vars[sv] != '0')
-			pcog.add_cube(g.cubes[i]);
+	for (int i = 0; i < g->len; i++) {
+		if (g->cubes[i].vars[index] != '0')
+			pcog->add_cube(g->cubes[i]);
 	}
-	pcog.del_column(sv);
+	pcog->del_column(index);
 	/* Gsv' */
-	for (int i = 0; i < g.len; i++) {
-		if (g.cubes[i].vars[sv] != '1')
-			ncog.add_cube(g.cubes[i]);
+	for (int i = 0; i < g->len; i++) {
+		if (g->cubes[i].vars[index] != '1')
+			ncog->add_cube(g->cubes[i]);
 	}
-	ncog.del_column(sv);
+	ncog->del_column(index);
 
 #ifdef DEBUG
 	cout << "Splitting variable: x" << sv << endl;
 	cout << "DEBUG: printing positive cofactor of F" << endl;
-	pcof.print();
+	pcof->print();
 	cout << "DEBUG: printing negative cofactor of F" << endl;
-	ncof.print();
+	ncof->print();
 	cout << "DEBUG: printing positive cofactor of G" << endl;
-	pcog.print();
+	pcog->print();
 	cout << "DEBUG: printing negative cofactor of G" << endl;
-	ncog.print();
+	ncog->print();
 #endif
 }
 

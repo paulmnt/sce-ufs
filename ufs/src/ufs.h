@@ -53,11 +53,13 @@ public:
 		ones.resize(l);
 		zeros.resize(l);
 		dcs.resize(l);
+		varid.resize(l);
 		for (int i = 0; i < l; i++) {
 			dep[i] = 0;
 			ones[i] = 0;
 			zeros[i] = 0;
 			dcs[i] = 0;
+			varid[i] = i;
 		}
 	}
 
@@ -121,6 +123,7 @@ public:
 	vector<int> ones;
 	vector<int> zeros;
 	vector<int> dcs;
+	vector<int> varid;
 };
 
 
@@ -180,20 +183,28 @@ public:
  */
 class ufs {
 public:
-	ufs(bool b7, bool b8, int m14) {
+	ufs(bool b7, bool b8, int m14, bool verb,
+		cover *F, cover *G, int l)
+	{
 		use_b7 = b7;
 		use_b8 = b8;
 		use_m14 = m14;
+		use_verb = verb;
 		len = 0;
+		lits = l;
+		f = F;
+		g = G;
+		pcof = new cover(l);
+		pcog = new cover(l);
+		ncof = new cover(l);
+		ncog = new cover(l);
 	}
 
 	/* Returns termination rule number or 0 */
 	int check_rules(const cover &f, const cover &g);
 
 
-	void cofactor(const cover &f, const cover &g,
-			cover &pcof, cover &pcog,
-			cover &ncof, cover &ncog, int sv);
+	void cofactor(int sv);
 
 	void apply_rule(const string rule, cover &f, cover &g);
 
@@ -213,8 +224,19 @@ public:
 	int len;
 
 private:
-	bool use_b7, use_b8;
+	bool use_b7, use_b8, use_verb;
 	int use_m14;
+
+	int lits;
+
+	/*
+	 * These are used as temporary variables during recursion,
+	 * thus we don't need memory to store intermediate covers.
+	 * When verbose mode is enabled the intermediate PLAs are
+	 * printed before the temporary covers are overwritten.
+	 */
+	cover *f, *g;
+	cover *pcof, *pcog, *ncof, *ncog;
 };
 
 #endif
