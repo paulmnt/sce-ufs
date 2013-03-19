@@ -11,19 +11,13 @@
  * T2:  Input column all ones/zeros.
  * T3:  Single input dependence.
  * T4:  Empty cover.
- * TU1: Unateness
+ * TU1: Unateness of the cover.
  */
 
 class tautology {
 public:
 	static bool check(const cover &f);
 
-private:
-	bool check_T1(const cover &f);
-	bool check_T2(const cover &f);
-	bool check_T3(const cover &f);
-	bool check_T4(const cover &f);
-	bool check_TU1(const cover &f);
 };
 
 #endif /* __TAUTOLOGY_H__ */

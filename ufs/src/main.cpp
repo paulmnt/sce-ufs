@@ -96,5 +96,8 @@ int main(int argc, char **argv) {
 
 	u.similarity(F.cubes[0], G.cubes[0]);
 
+	if (u.is_tautology(F))
+		cout << "F is a tautology" << endl;
+
 	return 0;
 }

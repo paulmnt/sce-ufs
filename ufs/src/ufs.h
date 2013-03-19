@@ -30,8 +30,8 @@ public:
 		len--;
 	}
 
-	void print() {
-		int len = vars.size();
+	void print() const
+	{
 		for (int i = 0; i < len; i++)
 			cout << vars[i];
 		cout << endl;
@@ -92,21 +92,29 @@ public:
 		}
 	}
 
-	void print() {
-		int len = cubes.size();
+	void print() const
+	{
 		for (int i = 0; i < len; i++)
 			cubes[i].print();
 		cout << endl;
 	}
 
+	bool empty() const
+	{
+		if (!len)
+			return true;
+		return false;
+	}
+
 	vector<cube> cubes;
 	int len;
+	int lits;
 
 	/*
 	 * Following vectors must have the size equal
 	 * to the number of literals shown in the cover
 	*/
-	int lits;
+
 	/* Keep track of dependency */
 	vector<int> dep;
 	/* Keep track of unateness */
