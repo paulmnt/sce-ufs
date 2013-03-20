@@ -41,6 +41,23 @@ bool disjoint_cubes(const cover &f)
 }
 
 
+/* Single input dependence: return variable index or -1*/
+int single_dep(const cover &f)
+{
+	int dep = 0;
+	int index = -1;
+	for (int i = 0; i < f.lits; i++) {
+		if (f.dep[i]) {
+			dep++;
+			index = i;
+		}
+		if (dep > 1)
+			return -1;
+	}
+	return index;
+}
+
+
 int check_B1_5(const cover &f, const cover &g)
 {
 	if (f.empty()) {
@@ -89,14 +106,140 @@ int check_B6_8(const cover &f, const cover &g, bool b7, bool b8)
 	return 0;
 }
 
-int check_B9_10(const cover &f, const cover &g)
+int check_B9_12(const cover &f, const cover &g, int *sv)
 {
+	int ind1, ind2;
+	ind1 = single_dep(f);
+	if (ind1 >= 0) {
+		ind2 = single_dep(g);
+		if (ind2 < 0) {
+			*sv = ind1;
+			return 12;
+		}
+		if (ind2 == ind1) {
+			if (f.ones[ind1] == g.ones[ind2])
+				return 9;
+			else
+				return 10;
+		}
+		return 11;
+	}
+	ind2 = single_dep(g);
+	if (ind2 >= 0) {
+		*sv = ind2;
+		return -12;
+	}
 	return 0;
 }
 
 
-int check_U11_13(const cover &f, const cover &g)
+
+/* Positive or negative unateness on a variable */
+int posunate_nodc(const cover &f)
 {
+	/*
+	 * TODO: for now we take the first. Cross checking
+	 * all possibilities with the other cover could be
+	 * expensive
+	 */
+	for (int i = 0; i < f.lits; i++)
+		if (f.ones[i] == f.len)
+			return i;
+	return -1;
+
+}
+int negunate_nodc(const cover &f)
+{
+	for (int i = 0; i < f.lits; i++)
+		if (f.zeros[i] == f.len)
+			return i;
+	return -1;
+
+}
+bool posunate_nodc(const cover &f, int index)
+{
+	if (f.ones[index] == f.len)
+		return true;
+	return false;
+}
+bool negunate_nodc(const cover &f, int index)
+{
+	if (f.zeros[index] == f.len)
+		return true;
+	return false;
+}
+
+int check_U13_15(const cover &f, const cover &g, int *sv)
+{
+	int ind1p, ind1n, ind2p, ind2n;
+	ind1p = posunate_nodc(f);
+	ind2p = posunate_nodc(g);
+	ind1n = negunate_nodc(f);
+	ind2n = negunate_nodc(g);
+	if ((ind1p >= 0) && (ind2n >= 0)) {
+		if (ind1p == ind2n)
+			return 14;
+		if (negunate_nodc(g, ind1p))
+			return 14;
+		if (posunate_nodc(f, ind2n))
+			return 14;
+	}
+	if ((ind1n >= 0) && (ind2p >= 0)) {
+		if (ind1n == ind2p)
+			return -14;
+		if (posunate_nodc(g, ind1n))
+			return -14;
+		if (negunate_nodc(f, ind2p))
+			return -14;
+	}
+
+	if ((ind1p >= 0) && (ind2p >= 0)) {
+		if (ind1p == ind2p) {
+			*sv = ind1p;
+			return 13;
+		}
+		if (posunate_nodc(g, ind1p)) {
+			*sv = ind1p;
+			return 13;
+		}
+		if (posunate_nodc(f, ind2p)) {
+			*sv = ind2p;
+			return 13;
+		}
+	}
+
+	if ((ind1n >= 0) && (ind2n >= 0)) {
+		if (ind1n == ind2n) {
+			*sv = ind1n;
+			return 13;
+		}
+		if (negunate_nodc(g, ind1n)) {
+			*sv = ind1n;
+			return 13;
+		}
+		if (negunate_nodc(f, ind2n)) {
+			*sv = ind2n;
+			return 13;
+		}
+	}
+
+	/* Else favour f. Might not be optimal */
+	if ((ind1p >= 0)) {
+		*sv = ind1p;
+		return 15;
+	}
+	if ((ind1n >= 0)) {
+		*sv = ind1p;
+		return 15;
+	}
+	if ((ind2p >= 0)) {
+		*sv = ind1p;
+		return -15;
+	}
+	if ((ind2n >= 0)) {
+		*sv = ind1p;
+		return -15;
+	}
 	return 0;
 }
 
@@ -105,16 +248,20 @@ int check_U11_13(const cover &f, const cover &g)
  * We return negative rule number if the covers f, g
  * are swapped with respect to the rules listed in
  * coversim.h
+ * Sometimes sv is used to store suggested splitting
+ * variable. If no optimal sv can be derived from
+ * the rules, then sv is set to -1
  */
 int coversim::check(const cover &f, const cover &g,
-		    bool b7, bool b8)
+		    bool b7, bool b8, int *sv)
 {
 	/* TODO pick a wise ordering! */
+	*sv = -1;
 	int tmp = check_B1_5(f, g);
 	if (tmp)
 		return tmp;
 
-	tmp = check_B9_10(f, g);
+	tmp = check_B9_12(f, g, sv);
 	if (tmp)
 		return tmp;
 
@@ -122,7 +269,7 @@ int coversim::check(const cover &f, const cover &g,
 	if (tmp)
 		return tmp;
 
-	tmp = check_U11_13(f, g);
+	tmp = check_U13_15(f, g, sv);
 	if (tmp)
 		return tmp;
 

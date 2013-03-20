@@ -68,7 +68,7 @@ static int parse_flags(int argc, char **argv)
 			cout << "To display options: ufs --help" << endl;
 			return 1;
 		}
-		cout << "INFO: Rule M1 (SCC) enabled on covers with at most ";
+		cout << "INFO: Rule M16 (SCC) enabled on covers with at most ";
 		cout << scc << " cubes" << endl;
 	}
 	if (argc > flags_count) {
@@ -101,7 +101,8 @@ int main(int argc, char **argv) {
 	ufs u(single_disjoint, multi_disjoint, scc, verb,
 	      &F, &G, lits);
 
-	u.check_rules(F, G);
+	int sv;
+	u.check_rules(F, G, &sv);
 
 	return 0;
 }

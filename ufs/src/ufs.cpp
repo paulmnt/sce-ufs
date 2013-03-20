@@ -143,14 +143,16 @@ void ufs::cofactor(const cover &f, const cover &g,
 #endif
 }
 
-int ufs::check_rules(const cover &f, const cover &g)
+int ufs::check_rules(const cover &f, const cover &g, int *sv)
 {
 	int rule;
 	coversim csim(use_b7, use_b8);
-	rule = csim.check(f, g, use_b7, use_b8);
+	rule = csim.check(f, g, use_b7, use_b8, sv);
 
 #ifdef DEBUG
 	cout << "DEBUG: matching rule " << rule << endl;
+	if (*sv >= 0)
+		cout << "Suggested splitting var: " << *sv << endl;
 #endif
 
 	return rule;

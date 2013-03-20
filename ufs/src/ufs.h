@@ -185,12 +185,12 @@ public:
  */
 class ufs {
 public:
-	ufs(bool b7, bool b8, int m14, bool verb,
+	ufs(bool b7, bool b8, int m16, bool verb,
 		cover *c1, cover *c2, int l)
 	{
 		use_b7 = b7;
 		use_b8 = b8;
-		use_m14 = m14;
+		use_m16 = m16;
 		use_verb = verb;
 		len = 0;
 		lits = l;
@@ -199,7 +199,7 @@ public:
 	}
 
 	/* Returns termination rule number or 0 */
-	int check_rules(const cover &f, const cover &g);
+	int check_rules(const cover &f, const cover &g, int *sv);
 
 	void cofactor(const cover &f, const cover &g,
 		cover &pcof, cover &pcog,
@@ -229,7 +229,7 @@ private:
 	bool use_verb;
 
 	/* TODO: SCC not implemented and not required */
-	int use_m14;
+	int use_m16;
 
 	int lits;
 

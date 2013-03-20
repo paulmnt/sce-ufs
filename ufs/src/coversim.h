@@ -20,27 +20,34 @@
  * B8:  Both covers have multiple non intersecting
  *      cubes. (Requires the flag --multi_disjoint)
  * B9:  Both covers show single input dependence
- *      (same varible)
+ *      (same varible and same value)
  * B10: Both covers show single input dependence
+ *      (same varible but different value)
+ * B11: Both covers show single input dependence
  *      (different variables)
+ * B12: f shows single input dependence
+ *      (this rule does not terminate, but tells
+ *       which is the next best slitting variable
+ *       to terminate at the next step)
  *
  * UNATENESS
- * U11: Both covers are positive/negative unate
+ * U13: Both covers are positive/negative unate
  *      on the same variable with no DCs. Prune the
- *      tree.
- * U12: Both covers are unate on the same variable
- *      with no DCs, but one is positive, while the
- *      other is negative. Prune the tree.
- * U13  f is positive/negative unate in a
- *      variable Xi. Pick Xi as splitting variable
- *      to einforce B3 for one child.
+ *      tree (B1 applies on a child).
+ * U14: Both covers are unate on the same variable
+ *      with no DCs, but f is positive, while g
+ *      is negative. This is a termination rule as well
+ *      so try it first!
+ * U15  f is positive/negative unate in a
+ *      variable Xi with no Dcs. Pick Xi as splitting
+ *      variable to einforce B3 for one child.
  *
  * Miscellaneus rules for potential speed up
- * M14: When a cover has less than X cubes, apply
+ * M16: When a cover has less than X cubes, apply
  *      SCC(). (Requires flag "--scc X")
  *
  * Splitting variable choice
- * Try rule U3 first.
+ * Try rules B12, U13-15 first.
  * Pick a binate variable to try to keep the tree
  * balanced, thus increasing the probability that
  * the simple rule B6 applies.
@@ -62,7 +69,7 @@ public:
 		use_b8 = b8;
 	}
 	/* Return rule to be applied or 0 */
-	int check(const cover &f, const cover &g, bool b7, bool b8);
+	int check(const cover &f, const cover &g, bool b7, bool b8, int *sv);
 
 private:
 	bool use_b7, use_b8;
