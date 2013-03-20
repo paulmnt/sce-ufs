@@ -152,7 +152,7 @@ int ufs::check_rules(const cover &f, const cover &g, int *sv)
 #ifdef DEBUG
 	cout << "DEBUG: matching rule " << rule << endl;
 	if (*sv >= 0)
-		cout << "Suggested splitting var: " << *sv << endl;
+		cout << "       Suggested splitting var: " << *sv << endl;
 #endif
 
 	return rule;
@@ -188,7 +188,13 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 	int sim;
 
 	switch (rule) {
-	case 1: break;
+	case 1: //B1
+		cur.splitvar = sv;
+		cur.rule = "B1";
+		sim = 1;
+		cur.sim = sim;
+		break;
+
 	case 2: break;
 	case 3: break;
 	case -3: break;

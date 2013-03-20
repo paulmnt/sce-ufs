@@ -101,6 +101,7 @@ int main(int argc, char **argv) {
 	ufs u(single_disjoint, multi_disjoint, scc, verb, lits);
 
 	u.simeval(F, G);
+	u.print_levels();
 
 	return 0;
 }
