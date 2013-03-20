@@ -98,11 +98,9 @@ int main(int argc, char **argv) {
 	in.read_covers(F, G);
 
 	/* UFS */
-	ufs u(single_disjoint, multi_disjoint, scc, verb,
-	      &F, &G, lits);
+	ufs u(single_disjoint, multi_disjoint, scc, verb, lits);
 
-	int sv;
-	u.check_rules(F, G, &sv);
+	u.simeval(F, G);
 
 	return 0;
 }

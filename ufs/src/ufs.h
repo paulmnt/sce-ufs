@@ -136,7 +136,6 @@ public:
 class node {
 public:
 	void print() const {
-		cout << id << ". ";
 		if (splitvar < 0)
 			cout << rule;
 		else
@@ -147,7 +146,6 @@ public:
 			cout << " " << sim << endl;
 	}
 
-	int id;
 	int splitvar;
 	string rule;
 	float sim;
@@ -168,8 +166,10 @@ public:
 	}
 
 	void print() const {
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < len; i++) {
+			cout << i << ". ";
 			nodes[i].print();
+		}
 	}
 
 	vector<node> nodes;
@@ -185,17 +185,15 @@ public:
  */
 class ufs {
 public:
-	ufs(bool b7, bool b8, int m16, bool verb,
-		cover *c1, cover *c2, int l)
+	ufs(bool b7, bool b8, int m16, bool verb, int l)
 	{
+		current_level = 0;
 		use_b7 = b7;
 		use_b8 = b8;
 		use_m16 = m16;
 		use_verb = verb;
 		len = 0;
 		lits = l;
-		F = c1;
-		G = c2;
 	}
 
 	/* Returns termination rule number or 0 */
@@ -207,7 +205,7 @@ public:
 
 	void apply_rule(const string rule, cover &f, cover &g);
 
-	float simeval(const string rule, const cover &f, const cover &g);
+	float simeval(const cover &f, const cover &g);
 
 	void print_levels() const {
 		for (int i = 0; i < len; i++) {
@@ -223,6 +221,8 @@ public:
 	int len;
 
 private:
+	int current_level;
+
 	bool use_b7, use_b8;
 
 	/* TODO: implement verbose! */
@@ -233,13 +233,12 @@ private:
 
 	int lits;
 
-	/*
-	 * These are used as temporary variables during recursion,
-	 * thus we don't need memory to store intermediate covers.
-	 * When verbose mode is enabled the intermediate PLAs are
-	 * printed before the temporary covers are overwritten.
-	 */
-	cover *F, *G;
+	/* Private recursive function */
+	float similarity(const cover &f, const cover &g, int levelid);
+	void add_level(level l) {
+		out.push_back(l);
+		len++;
+	}
 };
 
 

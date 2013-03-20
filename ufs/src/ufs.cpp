@@ -157,3 +157,78 @@ int ufs::check_rules(const cover &f, const cover &g, int *sv)
 
 	return rule;
 }
+
+/* Pick a variable, which is binate for both or pick the first var */
+static int pick_binate(const cover &f, const cover &g)
+{
+	for (int i = 0; i < f.lits; i++) {
+		if (f.ones[i] && f.zeros[i] &&
+		    g.ones[i] && g.zeros[i])
+			return i;
+	}
+	return 0;
+}
+
+
+float ufs::similarity(const cover &f, const cover &g, int levelid)
+{
+	/* Recursive function */
+
+	// Increase number of levels if necessary
+	level l;
+	if (levelid >= len)
+		add_level(l);
+
+	int sv;
+	node cur;
+	out[levelid].add_node(cur);
+	int cur_lits = f.lits;
+	cover pcof(cur_lits), pcog(cur_lits), ncof(cur_lits), ncog(cur_lits);
+	int rule = check_rules(f, g, &sv);
+	int sim;
+
+	switch (rule) {
+	case 1: break;
+	case 2: break;
+	case 3: break;
+	case -3: break;
+	case 4: break;
+	case -4: break;
+	case 5: break;
+	case -5: break;
+	case 6: break;
+	case 7: break;
+	case -7: break;
+	case 8: break;
+	case 9: break;
+	case 10: break;
+	case 11: break;
+	case 12: break;
+	case -12: break;
+	case 13: break;
+	case 14: break;
+	case 15: break;
+	case -15: break;
+	default:
+		sv = pick_binate(f, g);
+		cur.splitvar = sv;
+		cur.rule = "split";
+		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
+		sim = 0.5 * (similarity(pcof, pcog, levelid + 1) +
+			     similarity(ncof, ncog, levelid + 1));
+		cur.sim = sim;
+		break;
+	}
+
+	return sim;
+}
+
+
+float ufs::simeval(const cover &f, const cover &g)
+{
+	/* Recursive function */
+	level lev;
+	add_level(lev);
+
+	return similarity(f, g, 0);
+}
