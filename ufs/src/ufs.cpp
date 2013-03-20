@@ -135,6 +135,13 @@ void ufs::cofactor(int sv)
 
 int ufs::check_rules()
 {
+	int rule;
 	coversim csim(use_b7, use_b8, use_m14);
-	return csim.check(*f, *g);
+	rule = csim.check(*f, *g);
+
+#ifdef DEBUG
+	cout << "DEBUG: matching rule " << rule << endl;
+#endif
+
+	return rule;
 }
