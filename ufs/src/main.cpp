@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
 	ufs u(single_disjoint, multi_disjoint, scc, verb,
 	      &F, &G, lits);
 
-	u.check_rules();
+	u.check_rules(F, G);
 
 	return 0;
 }

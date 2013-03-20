@@ -13,117 +13,76 @@ bool is_tautology(const cover &f)
 {
 	tautology t;
 	return t.check(f);
+
 }
 
 
 
-bool check_B1(const cover &f, const cover &g)
+int check_B1_5(const cover &f, const cover &g)
 {
-	if (f.empty() && g.empty())
-		return true;
-	else
-		return false;
+	if (f.empty()) {
+		if (g.empty())
+			return 1;
+		if (is_tautology(g))
+			return 5;
+		return 3;
+	}
+	if (g.empty()) {
+		if (is_tautology(f))
+			return -5;
+		return -3;
+	}
+	if (is_tautology(f)) {
+		if (is_tautology(g))
+			return 2;
+		return 4;
+	}
+	if (is_tautology(g))
+		return -4;
+	return 0;
 }
 
-bool check_B2(const cover &f, const cover &g)
+int check_B6_8(const cover &f, const cover &g, bool b7, bool b8)
 {
-	if (is_tautology(f) && is_tautology(g))
-		return true;
-	else
-		return false;
+	return 0;
 }
 
-bool check_B3(const cover &f, const cover &g)
+int check_B9_10(const cover &f, const cover &g)
 {
-	return false;
+	return 0;
 }
 
-bool check_B4(const cover &f, const cover &g)
+
+int check_U11_13(const cover &f, const cover &g)
 {
-	return false;
-}
-
-bool check_B5(const cover &f, const cover &g)
-{
-	return false;
-}
-
-bool check_B6(const cover &f, const cover &g)
-{
-	return false;
-}
-
-bool check_B7(const cover &f, const cover &g)
-{
-	return false;
-}
-
-bool check_B8(const cover &f, const cover &g)
-{
-	return false;
-}
-
-bool check_B9(const cover &f, const cover &g)
-{
-	return false;
-}
-
-bool check_B10(const cover &f, const cover &g)
-{
-	return false;
-}
-
-bool check_U11(const cover &f, const cover &g)
-{
-	return false;
-}
-
-bool check_U12(const cover &f, const cover &g)
-{
-	return false;
-}
-
-bool check_U13(const cover &f, const cover &g)
-{
-	return false;
-}
-
-bool check_M14(const cover &f, const cover &g)
-{
-	return false;
+	return 0;
 }
 
 
-int coversim::check(const cover &f, const cover &g)
+/*
+ * We return negative rule number if the covers f, g
+ * are swapped with respect to the rules listed in
+ * coversim.h
+ */
+int coversim::check(const cover &f, const cover &g,
+		    bool b7, bool b8)
 {
 	/* TODO pick a wise ordering! */
-	if (check_B1(f, g))
-		return 1;
-	if (check_B2(f, g))
-		return 2;
-	if (check_B3(f, g))
-		return 3;
-	if (check_B4(f, g))
-		return 4;
-	if (check_B5(f, g))
-		return 5;
-	if (check_B6(f, g))
-		return 6;
-	if (check_B7(f, g))
-		return 7;
-	if (check_B8(f, g))
-		return 8;
-	if (check_B9(f, g))
-		return 9;
-	if (check_B10(f, g))
-		return 10;
-	if (check_U11(f, g))
-		return 11;
-	if (check_U12(f, g))
-		return 12;
-	if (check_U13(f, g))
-		return 13;
-	if (check_M14(f, g))
-		return 14;
+	int tmp = check_B1_5(f, g);
+	if (tmp)
+		return tmp;
+
+	tmp = check_B9_10(f, g);
+	if (tmp)
+		return tmp;
+
+	tmp = check_B6_8(f, g, b7, b8);
+	if (tmp)
+		return tmp;
+
+	tmp = check_U11_13(f, g);
+	if (tmp)
+		return tmp;
+
 	return 0;
 }

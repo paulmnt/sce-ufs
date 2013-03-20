@@ -10,14 +10,13 @@
  * TERMINATION RULES
  * B1:  Both covers are empty.
  * B2:  Both covers are a tautology.
- * B3:  One cover is empty.
- * B4:  One cover is a tautology.
- * B5:  One cover is empty and one is a tautology.
+ * B3:  f is empty.
+ * B4:  f is a tautology.
+ * B5:  f is empty and g is a tautology.
  * B6:  Both covers have a single cube.
- * B7:  One cover has a single cube and the other
- *      has non intersecting cubes.
- *      (Requires the flag --single_disjoint or
- *       --multi_disjoint)
+ * B7:  f has a single cube and g has non
+ *      intersecting cubes. (Requires the
+ *      flag --single_disjoint or --multi_disjoint)
  * B8:  Both covers have multiple non intersecting
  *      cubes. (Requires the flag --multi_disjoint)
  * B9:  Both covers show single input dependence
@@ -32,7 +31,7 @@
  * U12: Both covers are unate on the same variable
  *      with no DCs, but one is positive, while the
  *      other is negative. Prune the tree.
- * U13  One cover is positive/negative unate in a
+ * U13  f is positive/negative unate in a
  *      variable Xi. Pick Xi as splitting variable
  *      to einforce B3 for one child.
  *
@@ -58,13 +57,12 @@
 class coversim {
 public:
 
-	coversim(bool b7, bool b8, int m14) {
+	coversim(bool b7, bool b8) {
 		use_b7 = b7;
 		use_b8 = b8;
-		use_m14 = m14;
 	}
 	/* Return rule to be applied or 0 */
-	int check(const cover &f, const cover &g);
+	int check(const cover &f, const cover &g, bool b7, bool b8);
 
 private:
 	bool use_b7, use_b8;

@@ -88,6 +88,7 @@ public:
 		ones.erase(ones.begin() + j);
 		zeros.erase(zeros.begin() + j);
 		dcs.erase(dcs.begin() + j);
+		varid.erase(varid.begin() + j);
 		/* then erase column */
 		for (int i = 0; i < len; i++) {
 			cubes[i].del(j);
@@ -184,7 +185,7 @@ public:
 class ufs {
 public:
 	ufs(bool b7, bool b8, int m14, bool verb,
-		cover *F, cover *G, int l)
+		cover *c1, cover *c2, int l)
 	{
 		use_b7 = b7;
 		use_b8 = b8;
@@ -192,18 +193,16 @@ public:
 		use_verb = verb;
 		len = 0;
 		lits = l;
-		f = F;
-		g = G;
-		pcof = new cover(l);
-		pcog = new cover(l);
-		ncof = new cover(l);
-		ncog = new cover(l);
+		F = c1;
+		G = c2;
 	}
 
 	/* Returns termination rule number or 0 */
-	int check_rules();
+	int check_rules(const cover &f, const cover &g);
 
-	void cofactor(int sv);
+	void cofactor(const cover &f, const cover &g,
+		cover &pcof, cover &pcog,
+		cover &ncof, cover &ncog, int sv);
 
 	void apply_rule(const string rule, cover &f, cover &g);
 
@@ -223,7 +222,12 @@ public:
 	int len;
 
 private:
-	bool use_b7, use_b8, use_verb;
+	bool use_b7, use_b8;
+
+	/* TODO: implement verbose! */
+	bool use_verb;
+
+	/* TODO: SCC not implemented and not required */
 	int use_m14;
 
 	int lits;
@@ -234,8 +238,7 @@ private:
 	 * When verbose mode is enabled the intermediate PLAs are
 	 * printed before the temporary covers are overwritten.
 	 */
-	cover *f, *g;
-	cover *pcof, *pcog, *ncof, *ncog;
+	cover *F, *G;
 };
 
 #endif

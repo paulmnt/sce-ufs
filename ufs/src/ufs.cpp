@@ -3,6 +3,7 @@
 
 int common_ones(const cube &c1, const cube &c2)
 {
+	/* Cubes length is always the same */
 	int num = 1 << c1.len;
 	int den = 1;
 	for (int i = 0; i < c1.len; i++) {
@@ -78,12 +79,14 @@ float cubesim(const cube &c1, const cube &c2)
 }
 
 
-void ufs::cofactor(int sv)
+void ufs::cofactor(const cover &f, const cover &g,
+		cover &pcof, cover &pcog,
+		cover &ncof, cover &ncog, int sv)
 {
 	int index = -1;
 	/* Index is the same for every cover */
-	for (int i = 0; i < f->len; i++)
-		if (f->varid[i] == sv) {
+	for (int i = 0; i < f.lits; i++)
+		if (f.varid[i] == sv) {
 			index = i;
 			break;
 		}
@@ -96,48 +99,48 @@ void ufs::cofactor(int sv)
 #endif
 
 	/* Fsv */
-	for (int i = 0; i < f->len; i++) {
-		if (f->cubes[i].vars[index] != '0')
-			pcof->add_cube(f->cubes[i]);
+	for (int i = 0; i < f.len; i++) {
+		if (f.cubes[i].vars[index] != '0')
+			pcof.add_cube(f.cubes[i]);
 	}
-	pcof->del_column(index);
+	pcof.del_column(index);
 	/* Fsv' */
-	for (int i = 0; i < f->len; i++) {
-		if (f->cubes[i].vars[index] != '1')
-			ncof->add_cube(f->cubes[i]);
+	for (int i = 0; i < f.len; i++) {
+		if (f.cubes[i].vars[index] != '1')
+			ncof.add_cube(f.cubes[i]);
 	}
-	ncof->del_column(index);
+	ncof.del_column(index);
 	/* Gsv */
-	for (int i = 0; i < g->len; i++) {
-		if (g->cubes[i].vars[index] != '0')
-			pcog->add_cube(g->cubes[i]);
+	for (int i = 0; i < g.len; i++) {
+		if (g.cubes[i].vars[index] != '0')
+			pcog.add_cube(g.cubes[i]);
 	}
-	pcog->del_column(index);
+	pcog.del_column(index);
 	/* Gsv' */
-	for (int i = 0; i < g->len; i++) {
-		if (g->cubes[i].vars[index] != '1')
-			ncog->add_cube(g->cubes[i]);
+	for (int i = 0; i < g.len; i++) {
+		if (g.cubes[i].vars[index] != '1')
+			ncog.add_cube(g.cubes[i]);
 	}
-	ncog->del_column(index);
+	ncog.del_column(index);
 
 #ifdef DEBUG
 	cout << "Splitting variable: x" << sv << endl;
 	cout << "DEBUG: printing positive cofactor of F" << endl;
-	pcof->print();
+	pcof.print();
 	cout << "DEBUG: printing negative cofactor of F" << endl;
-	ncof->print();
+	ncof.print();
 	cout << "DEBUG: printing positive cofactor of G" << endl;
-	pcog->print();
+	pcog.print();
 	cout << "DEBUG: printing negative cofactor of G" << endl;
-	ncog->print();
+	ncog.print();
 #endif
 }
 
-int ufs::check_rules()
+int ufs::check_rules(const cover &f, const cover &g)
 {
 	int rule;
-	coversim csim(use_b7, use_b8, use_m14);
-	rule = csim.check(*f, *g);
+	coversim csim(use_b7, use_b8);
+	rule = csim.check(f, g, use_b7, use_b8);
 
 #ifdef DEBUG
 	cout << "DEBUG: matching rule " << rule << endl;
