@@ -1,3 +1,5 @@
+#include "ufs.h"
+
 #ifndef __TC_PARSER_H__
 #define __TC_PARSER_H__
 
@@ -5,8 +7,6 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-
-#include "ufs.h"
 
 using namespace std;
 

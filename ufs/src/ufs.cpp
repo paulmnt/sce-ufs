@@ -1,6 +1,15 @@
 #include "ufs.h"
 #include "coversim.h"
 
+/*
+ * The following functions implement cubes similarity:
+ *
+ * common_ones: looks for intersections.
+ * total_ones : sums the number of minterms covered by
+ *              the cubes not taking into account that
+ *              they might intersect.
+ * cubesim    : calculates similarity between the cubes 
+ */
 int common_ones(const cube &c1, const cube &c2)
 {
 	/* Cubes length is always the same */
@@ -37,7 +46,6 @@ int common_ones(const cube &c1, const cube &c2)
 	return num / den;
 }
 
-
 int total_ones(const cube &c1, const cube &c2)
 {
 	/* Does not consider intersection! */
@@ -58,7 +66,6 @@ int total_ones(const cube &c1, const cube &c2)
 #endif
 	return num1 + num2;
 }
-
 
 /* Similarity between two cubes. Called if B6 applies */
 float cubesim(const cube &c1, const cube &c2)

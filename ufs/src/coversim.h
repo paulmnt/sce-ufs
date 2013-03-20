@@ -1,8 +1,8 @@
-#ifndef __COVERSIM_H__
-#define __COVERSIM_H__
-
 #include "ufs.h"
 #include "tautology.h"
+
+#ifndef __COVERSIM_H__
+#define __COVERSIM_H__
 
 /**
  * Rules for Function Similarity Evaluation

@@ -10,6 +10,7 @@
 
 using namespace std;
 
+
 /**
  * Possible values are
  * '0', '1', '-'
@@ -240,5 +241,6 @@ private:
 	 */
 	cover *F, *G;
 };
+
 
 #endif

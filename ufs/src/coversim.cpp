@@ -13,9 +13,32 @@ bool is_tautology(const cover &f)
 {
 	tautology t;
 	return t.check(f);
-
 }
 
+
+ /* Cubes intersection evaluation */
+bool intersect(const cube &c1, const cube &c2)
+{
+	/* Cubes length is always the same */
+	for (int i = 0; i < c1.len; i++) {
+		if (c1.vars[i] == c2.vars[i])
+			continue;
+		if ((c1.vars[i] == '-') || (c2.vars[i] == '-'))
+			continue;
+		return false;
+	}
+	return true;
+}
+/* Disjoint cubes in a cover */
+bool disjoint_cubes(const cover &f)
+{
+	for (int i = 0; i < f.len; i++) {
+		for (int j = i + 1; j < f.len; j++)
+			if (intersect(f.cubes[i], f.cubes[j]))
+				return false;
+	}
+	return true;
+}
 
 
 int check_B1_5(const cover &f, const cover &g)
@@ -44,6 +67,25 @@ int check_B1_5(const cover &f, const cover &g)
 
 int check_B6_8(const cover &f, const cover &g, bool b7, bool b8)
 {
+	/* Notice that if b8 is true, then b7 is true as well! */
+	if (f.len == 1) {
+		if (g.len ==1)
+			return 6;
+		if (!b7)
+			return 0;
+		if (disjoint_cubes(g))
+			return 7;
+		return 0;
+	}
+	if (!b7)
+		return 0;
+	if (g.len == 1)
+		if (disjoint_cubes(f))
+			return -7;
+	if (!b8)
+		return 0;
+	if (disjoint_cubes(f) && disjoint_cubes(g))
+		return 8;
 	return 0;
 }
 
