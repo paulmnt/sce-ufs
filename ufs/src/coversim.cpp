@@ -224,21 +224,27 @@ int check_U13_15(const cover &f, const cover &g, int *sv)
 	}
 
 	/* Else favour f. Might not be optimal */
-	if ((ind1p >= 0)) {
-		*sv = ind1p;
-		return 15;
+	if (f.len > 1) {
+		// Not single cube
+		if ((ind1p >= 0)) {
+			*sv = ind1p;
+			return 15;
+		}
+		if ((ind1n >= 0)) {
+			*sv = ind1n;
+			return 15;
+		}
 	}
-	if ((ind1n >= 0)) {
-		*sv = ind1n;
-		return 15;
-	}
-	if ((ind2p >= 0)) {
-		*sv = ind2p;
-		return -15;
-	}
-	if ((ind2n >= 0)) {
-		*sv = ind2n;
-		return -15;
+	if (g.len > 1) {
+		// Not single cube
+		if ((ind2p >= 0)) {
+			*sv = ind2p;
+			return -15;
+		}
+		if ((ind2n >= 0)) {
+			*sv = ind2n;
+			return -15;
+		}
 	}
 	return 0;
 }
