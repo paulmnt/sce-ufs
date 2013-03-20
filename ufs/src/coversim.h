@@ -35,7 +35,7 @@
  *      on the same variable with no DCs. Prune the
  *      tree (B1 applies on a child).
  * U14: Both covers are unate on the same variable
- *      with no DCs, but f is positive, while g
+ *      with no DCs, but one is positive, while the other
  *      is negative. This is a termination rule as well
  *      so try it first!
  * U15  f is positive/negative unate in a

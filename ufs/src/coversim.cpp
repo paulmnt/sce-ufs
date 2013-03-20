@@ -186,11 +186,11 @@ int check_U13_15(const cover &f, const cover &g, int *sv)
 	}
 	if ((ind1n >= 0) && (ind2p >= 0)) {
 		if (ind1n == ind2p)
-			return -14;
+			return 14;
 		if (posunate_nodc(g, ind1n))
-			return -14;
+			return 14;
 		if (negunate_nodc(f, ind2p))
-			return -14;
+			return 14;
 	}
 
 	if ((ind1p >= 0) && (ind2p >= 0)) {
@@ -229,15 +229,15 @@ int check_U13_15(const cover &f, const cover &g, int *sv)
 		return 15;
 	}
 	if ((ind1n >= 0)) {
-		*sv = ind1p;
+		*sv = ind1n;
 		return 15;
 	}
 	if ((ind2p >= 0)) {
-		*sv = ind1p;
+		*sv = ind2p;
 		return -15;
 	}
 	if ((ind2n >= 0)) {
-		*sv = ind1p;
+		*sv = ind2n;
 		return -15;
 	}
 	return 0;
