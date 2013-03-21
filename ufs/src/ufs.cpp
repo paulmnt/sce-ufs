@@ -426,9 +426,53 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 
 	case 14: break;
 
-	case 12:  //B12: we apply B3 ona child and B4 on the other
-	case -12: //B12
-	case 13:  //U13: prune one kid by applying B1
+	case 12:  //B12: we apply B3 on a child and B4 on the other
+		sv = f.varid[sv];
+		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
+		if (pcof.empty()) {
+			sim = 1 - ((float) onset(pcog) / (1 << pcog.lits));
+			sim += (float) onset(ncog) / (1 << ncog.lits);
+		} else {
+			sim = 1 - ((float) onset(ncog) / (1 << ncog.lits));
+			sim += (float) onset(pcog) / (1 << pcog.lits);
+		}
+		sim *= 0.5;
+		cur.splitvar = -1;
+		cur.rule = "B12";
+		cur.sim = sim;
+		break;
+
+	case -12: //B12: we apply B3 on a child and B4 on the other
+		sv = f.varid[sv];
+		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
+		if (pcog.empty()) {
+			sim = 1 - ((float) onset(pcof) / (1 << pcof.lits));
+			sim += (float) onset(ncof) / (1 << ncof.lits);
+		} else {
+			sim = 1 - ((float) onset(ncof) / (1 << ncof.lits));
+			sim += (float) onset(pcof) / (1 << pcog.lits);
+		}
+		sim *= 0.5;
+		cur.splitvar = -1;
+		cur.rule = "B12";
+		cur.sim = sim;
+		break;
+
+	case 13: //U13: prune one kid by applying B1
+		sv = f.varid[sv];
+		cur.splitvar = sv;
+		cur.rule = "split";
+		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
+		if (prune == 2)
+			// Covers are positive unate no DCs on sv. Prune right kid
+			sim = similarity(pcof, pcog, levelid + 1, 2 * nodeid -1);
+		else
+			// Covers are negative unate no DCs on sc. Prune left kig
+			sim = similarity(ncof, ncog, levelid + 1, 2 * nodeid);
+		sim = 0.5 * (1 + sim);
+		cur.sim = sim;
+		break;
+
 	case 15:  //U15: prune one kif by applying B3
 	case -15: //U15:
 		sv = f.varid[sv];
