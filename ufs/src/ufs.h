@@ -167,7 +167,7 @@ public:
 
 	void print() const {
 		for (int i = 0; i < len; i++) {
-			cout << i << ". ";
+			cout << i + 1 << ". ";
 			nodes[i].print();
 		}
 	}

@@ -1,5 +1,6 @@
 #include "ufs.h"
 #include "coversim.h"
+#include "tautology.h"
 
 /*
  * The following functions implement cubes similarity:
@@ -8,7 +9,8 @@
  * total_ones : sums the number of minterms covered by
  *              the cubes not taking into account that
  *              they might intersect.
- * cubesim    : calculates similarity between the cubes 
+ * total_ones : minterms covered by a single cube
+ * cubesim    : calculates similarity between the cubes
  */
 int common_ones(const cube &c1, const cube &c2)
 {
@@ -67,6 +69,18 @@ int total_ones(const cube &c1, const cube &c2)
 	return num1 + num2;
 }
 
+int total_ones(const cube &c)
+{
+	int num = 1 << c.len;
+	for (int i = 0; i < c.len; i++)
+		if (c.vars[i] != '-')
+			num >>= 1;
+
+	cout << "ones in this cube: " << num << endl;
+	return num;
+}
+
+
 /* Similarity between two cubes. Called if B6 applies */
 float cubesim(const cube &c1, const cube &c2)
 {
@@ -85,6 +99,57 @@ float cubesim(const cube &c1, const cube &c2)
 	return sim;
 }
 
+
+/*
+ * The following are auxiliary functions to evaluate
+ * similarity of covers when termination rules apply
+ */
+
+/* Single cover cofactor */
+void single_cofactor(const cover &f, cover &pcof, cover &ncof)
+{
+	/* Always cofactor with respect to the first variable */
+	int index = 0;
+
+	/* Fsv */
+	for (int i = 0; i < f.len; i++) {
+		if (f.cubes[i].vars[index] != '0')
+			pcof.add_cube(f.cubes[i]);
+	}
+	pcof.del_column(index);
+	/* Fsv' */
+	for (int i = 0; i < f.len; i++) {
+		if (f.cubes[i].vars[index] != '1')
+			ncof.add_cube(f.cubes[i]);
+	}
+	ncof.del_column(index);
+
+	pcof.print();
+	ncof.print();
+
+}
+
+/* onset returns the size of the ONset of a cover */
+int onset(const cover &f)
+{
+	tautology t;
+	if (f.empty())
+		return 0;
+	if (t.check(f))
+		return (1 << f.lits);
+
+	switch(f.len) {
+	case 1:
+		return total_ones(f.cubes[0]);
+	case 2:
+		return (total_ones(f.cubes[0], f.cubes[1]) -
+			common_ones(f.cubes[0], f.cubes[1]));
+	default:
+		cover pcof(f.lits), ncof(f.lits);
+		single_cofactor(f, pcof, ncof);
+		return (onset(pcof) + onset(ncof));
+	}
+}
 
 void ufs::cofactor(const cover &f, const cover &g,
 		cover &pcof, cover &pcog,
@@ -181,11 +246,10 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 
 	int sv;
 	node cur;
-	out[levelid].add_node(cur);
 	int cur_lits = f.lits;
 	cover pcof(cur_lits), pcog(cur_lits), ncof(cur_lits), ncog(cur_lits);
 	int rule = check_rules(f, g, &sv);
-	int sim;
+	float sim;
 
 	switch (rule) {
 	case 1: //B1
@@ -195,8 +259,20 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 		cur.sim = sim;
 		break;
 
-	case 2: break;
-	case 3: break;
+	case 2: //B2
+		cur.splitvar = sv;
+		cur.rule = "B2";
+		sim = 1;
+		cur.sim = sim;
+		break;
+
+	case 3: //B3
+		cur.splitvar = sv;
+		cur.rule = "B3";
+		sim = 1 - ((float) onset(g) / (1 << g.lits));
+		cur.sim = sim;
+		break;
+
 	case -3: break;
 	case 4: break;
 	case -4: break;
@@ -226,6 +302,7 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 		break;
 	}
 
+	out[levelid].add_node(cur);
 	return sim;
 }
 
