@@ -127,7 +127,7 @@ int check_B9_12(const cover &f, const cover &g, int *sv)
 	ind2 = single_dep(g);
 	if (ind2 >= 0) {
 		*sv = ind2;
-		return 12;
+		return -12;
 	}
 	return 0;
 }
@@ -169,7 +169,7 @@ bool negunate_nodc(const cover &f, int index)
 	return false;
 }
 
-int check_U13_15(const cover &f, const cover &g, int *sv)
+int check_U13_15(const cover &f, const cover &g, int *sv, int *prune)
 {
 	int ind1p, ind1n, ind2p, ind2n;
 	ind1p = posunate_nodc(f);
@@ -196,14 +196,17 @@ int check_U13_15(const cover &f, const cover &g, int *sv)
 	if ((ind1p >= 0) && (ind2p >= 0)) {
 		if (ind1p == ind2p) {
 			*sv = ind1p;
+			*prune = 2; //right kid pruned (neg cofactors empty) B1
 			return 13;
 		}
 		if (posunate_nodc(g, ind1p)) {
 			*sv = ind1p;
+			*prune = 2; //right kid pruned (neg cofactors empty) B1
 			return 13;
 		}
 		if (posunate_nodc(f, ind2p)) {
 			*sv = ind2p;
+			*prune = 2; //right kid pruned (neg cofactors empty) B1
 			return 13;
 		}
 	}
@@ -211,14 +214,17 @@ int check_U13_15(const cover &f, const cover &g, int *sv)
 	if ((ind1n >= 0) && (ind2n >= 0)) {
 		if (ind1n == ind2n) {
 			*sv = ind1n;
+			*prune = 1; //left kid pruned (pos cofactors empty) B1
 			return 13;
 		}
 		if (negunate_nodc(g, ind1n)) {
 			*sv = ind1n;
+			*prune = 1; //left kid pruned (pos cofactors empty) B1
 			return 13;
 		}
 		if (negunate_nodc(f, ind2n)) {
 			*sv = ind2n;
+			*prune = 1; //left kid pruned (pos cofactors empty) B1
 			return 13;
 		}
 	}
@@ -228,10 +234,12 @@ int check_U13_15(const cover &f, const cover &g, int *sv)
 		// Not single cube
 		if ((ind1p >= 0)) {
 			*sv = ind1p;
+			* prune = 2; //right kid pruned (1 neg cofactor is empty) B3
 			return 15;
 		}
 		if ((ind1n >= 0)) {
 			*sv = ind1n;
+			* prune = 2; //right kid pruned (1 neg cofactor is empty) B3
 			return 15;
 		}
 	}
@@ -239,10 +247,12 @@ int check_U13_15(const cover &f, const cover &g, int *sv)
 		// Not single cube
 		if ((ind2p >= 0)) {
 			*sv = ind2p;
+			*prune = 1; //left kid pruned (1 pos cofactor is empty) B3
 			return -15;
 		}
 		if ((ind2n >= 0)) {
 			*sv = ind2n;
+			*prune = 1; //left kid pruned (1 pos cofactor is empty) B3
 			return -15;
 		}
 	}
@@ -259,10 +269,15 @@ int check_U13_15(const cover &f, const cover &g, int *sv)
  * the rules, then sv is set to -1
  */
 int coversim::check(const cover &f, const cover &g,
-		    bool b7, bool b8, int *sv)
+		    bool b7, bool b8, int *sv, int *prune)
 {
-	/* TODO pick a wise ordering! */
 	*sv = -1;
+	 /*
+	  * Tells which child can be pruned. Which termination rules
+	  * applies on the pruned child depends on which rule match
+	  * is returned
+	  */
+	*prune = 0;
 	int tmp = check_B1_5(f, g);
 	if (tmp)
 		return tmp;
@@ -275,7 +290,7 @@ int coversim::check(const cover &f, const cover &g,
 	if (tmp)
 		return tmp;
 
-	tmp = check_U13_15(f, g, sv);
+	tmp = check_U13_15(f, g, sv, prune);
 	if (tmp)
 		return tmp;
 

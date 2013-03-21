@@ -270,11 +270,11 @@ void ufs::cofactor(const cover &f, const cover &g,
 #endif
 }
 
-int ufs::check_rules(const cover &f, const cover &g, int *sv)
+int ufs::check_rules(const cover &f, const cover &g, int *sv, int *prune)
 {
 	int rule;
 	coversim csim(use_b7, use_b8);
-	rule = csim.check(f, g, use_b7, use_b8, sv);
+	rule = csim.check(f, g, use_b7, use_b8, sv, prune);
 
 #ifdef DEBUG
 	cout << "DEBUG: matching rule " << rule << endl;
@@ -311,6 +311,7 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 		add_level(l);
 
 	int sv;
+	int prune;
 	node cur;
 	cur.nodeid = nodeid;
 	int cur_lits = f.lits;
@@ -321,7 +322,7 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 	ncof.varid = f.varid;
 	ncog.varid = f.varid;
 
-	int rule = check_rules(f, g, &sv);
+	int rule = check_rules(f, g, &sv, &prune);
 	float sim;
 
 	switch (rule) {
@@ -425,10 +426,11 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 
 	case 14: break;
 
-	case 12:  //B12: not a termination rule!
-	case 13:  //U13: not a termination rule!
-	case 15:  //U15: not a termination rule!
-	case -15: //U15: not a termination rule!
+	case 12:  //B12: we apply B3 ona child and B4 on the other
+	case -12: //B12
+	case 13:  //U13: prune one kid by applying B1
+	case 15:  //U15: prune one kif by applying B3
+	case -15: //U15:
 		sv = f.varid[sv];
 		cur.splitvar = sv;
 		cur.rule = "split";

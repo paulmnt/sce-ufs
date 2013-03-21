@@ -26,21 +26,21 @@
  * B11: Both covers show single input dependence
  *      (different variables)
  * B12: f shows single input dependence
- *      (this rule does not terminate, but tells
- *       which is the next best slitting variable
- *       to terminate at the next step)
+ *      Both children can be pruned and we terminate
+ *      because one f cofactor will be empty, while
+ *      the other will be a tautology.
  *
  * UNATENESS
  * U13: Both covers are positive/negative unate
- *      on the same variable with no DCs. Prune the
- *      tree (B1 applies on a child).
+ *      on the same variable with no DCs.
+ *      B1 applies on a child. *PRUNE*
  * U14: Both covers are unate on the same variable
  *      with no DCs, but one is positive, while the other
  *      is negative. This is a termination rule as well
  *      so try it first!
  * U15  f is positive/negative unate in a
  *      variable Xi with no Dcs. Pick Xi as splitting
- *      variable to einforce B3 for one child.
+ *      variable to einforce B3 for one child. *PRUNE*
  *
  * Miscellaneus rules for potential speed up
  * M16: When a cover has less than X cubes, apply
@@ -69,7 +69,7 @@ public:
 		use_b8 = b8;
 	}
 	/* Return rule to be applied or 0 */
-	int check(const cover &f, const cover &g, bool b7, bool b8, int *sv);
+	int check(const cover &f, const cover &g, bool b7, bool b8, int *sv, int *prune);
 
 private:
 	bool use_b7, use_b8;

@@ -255,7 +255,7 @@ public:
 	}
 
 	/* Returns termination rule number or 0 */
-	int check_rules(const cover &f, const cover &g, int *sv);
+	int check_rules(const cover &f, const cover &g, int *sv, int *prune);
 
 	void cofactor(const cover &f, const cover &g,
 		cover &pcof, cover &pcog,
