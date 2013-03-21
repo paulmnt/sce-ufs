@@ -94,6 +94,9 @@ public:
 		for (int i = 0; i < len; i++) {
 			cubes[i].del(j);
 		}
+		/* When there are no variables, it's empty! */
+		if (!lits)
+			len = 0;
 	}
 
 	void print() const

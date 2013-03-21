@@ -124,19 +124,27 @@ void single_cofactor(const cover &f, cover &pcof, cover &ncof)
 	}
 	ncof.del_column(index);
 
+#ifdef DEBUG
+	cout << "DEBUG: printing single cofactor" << endl;
 	pcof.print();
 	ncof.print();
-
+#endif
 }
 
 /* onset returns the size of the ONset of a cover */
 int onset(const cover &f)
 {
+	/*
+	 * A simple recursion on a single cover in the
+	 * most general case
+	 */
 	tautology t;
 	if (f.empty())
 		return 0;
 	if (t.check(f))
 		return (1 << f.lits);
+	if (f.lits == 1)
+		return (1 << (f.lits - 1));
 
 	switch(f.len) {
 	case 1:
@@ -149,6 +157,32 @@ int onset(const cover &f)
 		single_cofactor(f, pcof, ncof);
 		return (onset(pcof) + onset(ncof));
 	}
+}
+
+
+/* single disjoint similarity. Rule B7 */
+float sdsim(const cube &c, const cover &f)
+{
+	int cones = 0;
+	for (int i = 0; i < f.len; i++)
+		cones += common_ones(c, f.cubes[i]);
+
+	cover tmp = f;
+	tmp.add_cube(c);
+	int tones = onset(tmp);
+	int m = 1 << c.len;
+	int czeros = m - tones;
+	float sim = (float) (cones + czeros) / m;
+
+#ifdef DEBUG
+	cout << "DEBUG: ";
+	cout << "single disjoint similarity is  " << sim << endl;
+	cout << "       CONES: " << cones << endl;
+	cout << "       TONES: " << tones << endl;
+	cout << "       CZEROS: " << czeros << endl;
+
+#endif
+	return sim;
 }
 
 void ufs::cofactor(const cover &f, const cover &g,
@@ -273,13 +307,48 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 		cur.sim = sim;
 		break;
 
-	case -3: break;
-	case 4: break;
-	case -4: break;
-	case 5: break;
-	case -5: break;
-	case 6: break;
-	case 7: break;
+	case -3: //B3
+		cur.splitvar = sv;
+		cur.rule = "B3";
+		sim = 1 - ((float) onset(f) / (1 << g.lits));
+		cur.sim = sim;
+		break;
+
+	case 4: //B4
+		cur.splitvar = sv;
+		cur.rule = "B4";
+		sim = (float) onset(g) / (1 << g.lits);
+		cur.sim = sim;
+		break;
+
+	case -4: //B4
+		cur.splitvar = sv;
+		cur.rule = "B4";
+		sim = (float) onset(f) / (1 << g.lits);
+		cur.sim = sim;
+		break;
+
+	case 5: //B5
+		cur.splitvar = sv;
+		cur.rule = "B5";
+		sim = 0;
+		cur.sim = sim;
+		break;
+
+	case 6: //B6
+		cur.splitvar = sv;
+		cur.rule = "B6";
+		sim = cubesim(f.cubes[0], g.cubes[0]);
+		cur.sim = sim;
+		break;
+
+	case 7: //B7
+		cur.splitvar = sv;
+		cur.rule = "B7";
+		sim = sdsim(f.cubes[0], g);
+		cur.sim = sim;
+		break;
+
 	case -7: break;
 	case 8: break;
 	case 9: break;

@@ -69,7 +69,7 @@ int check_B1_5(const cover &f, const cover &g)
 	}
 	if (g.empty()) {
 		if (is_tautology(f))
-			return -5;
+			return 5;
 		return -3;
 	}
 	if (is_tautology(f)) {
