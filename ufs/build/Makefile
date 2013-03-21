@@ -1,6 +1,7 @@
 TARGET_ARCH = linux64
 CC = g++
-CPPFLAGS = -Wall -DDEBUG
+CPPFLAGS = -Wall
+#-DDEBUG
 
 LIBS   =
 LIBDIR =
@@ -10,8 +11,8 @@ TBFLAGS ?=
 
 TARGET = ufs
 VPATH := ../src
-SRCS = main.cpp tc_parser.cpp ufs.cpp tautology.cpp coversim.cpp
-HDRS = tc_parser.h ufs.h tautology.h coversim.h
+SRCS = main.cpp tc_parser.cpp ufs.cpp tautology.cpp coversim.cpp printplas.cpp
+HDRS = tc_parser.h ufs.h tautology.h coversim.h printplas.h
 OBJS = $(SRCS:.cpp=.o)
 
 .SUFFIXES: .cpp .cc .o
@@ -24,7 +25,7 @@ $(OBJS): $(HDRS)
 	@$(CC) $(CPPFLAGS) ${INCDIR} -c $<
 
 clean:
-	@ rm -rf *.o $(TARGET)
+	@ rm -rf *.o $(TARGET) all-PLAs recursionTree.txt
 	@ echo "CLEAN"
 
 run: $(TARGET)

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include "tc_parser.h"
 #include "ufs.h"
 
@@ -8,7 +9,7 @@ using namespace std;
 
 #define FPLA "../tb/f.pla"
 #define GPLA "../tb/g.pla"
-
+#define TREE "recursionTree.txt"
 
 static bool single_disjoint = false;
 static bool multi_disjoint = false;
@@ -100,8 +101,13 @@ int main(int argc, char **argv) {
 	/* UFS */
 	ufs u(single_disjoint, multi_disjoint, scc, verb, lits);
 
-	u.simeval(F, G);
-	u.print_levels();
+	float sim = u.simeval(F, G);
+	cout << "Function similarity is " << sim << endl;
+
+	/* Print output */
+	ofstream of(TREE);
+	u.print_levels(of);
+	of.close();
 
 	return 0;
 }

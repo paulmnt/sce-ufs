@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -35,7 +36,15 @@ public:
 	{
 		for (int i = 0; i < len; i++)
 			cout << vars[i];
-		cout << endl;
+		cout << " 1" << endl;
+	}
+
+
+	void print(ofstream &of) const
+	{
+		for (int i = 0; i < len; i++)
+			of << vars[i];
+		of << " 1" << endl;
 	}
 
 	vector<char> vars;
@@ -103,23 +112,13 @@ public:
 	{
 		for (int i = 0; i < len; i++)
 			cubes[i].print();
-		/*
-		cout << "VARIDs: ";
-		for (int i = 0; i < lits; i++) {
-			cout << varid[i] << " ";
-		}
+		cout << endl;
+	}
 
-		cout << "ONES: ";
-		for (int i = 0; i < lits; i++) {
-			cout << ones[i] << " ";
-		}
-		cout << endl;
-		cout << "ZEROS: ";
-		for (int i = 0; i < lits; i++) {
-			cout << zeros[i] << " ";
-		}
-		*/
-		cout << endl;
+	void print(ofstream &of) const
+	{
+		for (int i = 0; i < len; i++)
+			cubes[i].print(of);
 	}
 
 	bool empty() const
@@ -165,6 +164,17 @@ public:
 			cout << " " << sim << endl;
 	}
 
+	void print(ofstream &of) const {
+		if (splitvar < 0)
+			of << rule;
+		else
+			of << "x" << splitvar;
+		if (sim < 0)
+			of << endl;
+		else
+			of << " " << sim << endl;
+	}
+
 	int splitvar;
 	string rule;
 	float sim;
@@ -198,6 +208,23 @@ public:
 		}
 		while (nodeid - 1 < 1 << levelid) {
 			cout << nodeid << ". null" << endl;
+			nodeid++;
+		}
+	}
+
+	void print(ofstream &of) const {
+		int nodeid = 1;
+		for (int i = 0; i < len; i++) {
+			for (int j = nodeid; j < nodes[i].nodeid; j++) {
+				of << j << ". null" << endl;
+				nodeid++;
+			}
+			of << nodeid << ". ";
+			nodes[i].print(of);
+			nodeid++;
+		}
+		while (nodeid - 1 < 1 << levelid) {
+			of << nodeid << ". null" << endl;
 			nodeid++;
 		}
 	}
@@ -244,6 +271,16 @@ public:
 				cout << endl;
 		}
 	}
+
+	void print_levels(ofstream &of) const {
+		for (int i = 0; i < len; i++) {
+			of << "==level " << i + 1 << "==" << endl;
+			out[i].print(of);
+			if (i != len - 1)
+				of << endl;
+		}
+	}
+
 
 	/* The output is the vector of levels */
 	vector<level> out;

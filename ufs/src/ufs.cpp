@@ -1,6 +1,7 @@
 #include "ufs.h"
 #include "coversim.h"
 #include "tautology.h"
+#include "printplas.h"
 
 /*
  * The following functions implement cubes similarity:
@@ -450,6 +451,12 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 	}
 
 	out[levelid].add_node(cur);
+
+	if (use_verb) {
+		printplas p;
+		p.print(levelid + 1, nodeid, f, g);
+	}
+
 	return sim;
 }
 
