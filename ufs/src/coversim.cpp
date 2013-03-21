@@ -239,7 +239,7 @@ int check_U13_15(const cover &f, const cover &g, int *sv, int *prune)
 		}
 		if ((ind1n >= 0)) {
 			*sv = ind1n;
-			* prune = 2; //right kid pruned (1 neg cofactor is empty) B3
+			* prune = 1; //left kid pruned (1 pos cofactor is empty) B3
 			return 15;
 		}
 	}
@@ -247,7 +247,7 @@ int check_U13_15(const cover &f, const cover &g, int *sv, int *prune)
 		// Not single cube
 		if ((ind2p >= 0)) {
 			*sv = ind2p;
-			*prune = 1; //left kid pruned (1 pos cofactor is empty) B3
+			*prune = 2; //rigth kid pruned (1 neg cofactor is empty) B3
 			return -15;
 		}
 		if ((ind2n >= 0)) {

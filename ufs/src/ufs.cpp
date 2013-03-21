@@ -473,14 +473,39 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 		cur.sim = sim;
 		break;
 
-	case 15:  //U15: prune one kif by applying B3
-	case -15: //U15:
+	case 15:  //U15: prune one kid by applying B3
 		sv = f.varid[sv];
+		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
+		if (prune == 2) {
+			// Cover f is positive unate no DCs on sv. Prune right kid
+			sim = similarity(pcof, pcog, levelid + 1, 2 * nodeid -1);
+			sim += 1 - ((float) onset(ncog) / (1 << ncog.lits));
+		} else {
+			// Cover f is negative unate no DCs on sc. Prune left kid
+			sim = similarity(ncof, ncog, levelid + 1, 2 * nodeid);
+			sim += 1 - ((float) onset(pcog) / (1 << pcog.lits));
+		}
+		sim *= 0.5;
 		cur.splitvar = sv;
 		cur.rule = "split";
+		cur.sim = sim;
+		break;
+
+	case -15: //U15: prune one kid by applying B3
+		sv = f.varid[sv];
 		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
-		sim = 0.5 * (similarity(pcof, pcog, levelid + 1, 2 * nodeid -1) +
-			     similarity(ncof, ncog, levelid + 1, 2 * nodeid));
+		if (prune == 2) {
+			// Cover g is positive unate no DCs on sv. Prune right kid
+			sim = similarity(pcof, pcog, levelid + 1, 2 * nodeid -1);
+			sim += 1 - ((float) onset(ncof) / (1 << ncof.lits));
+		} else {
+			// Cover f is negative unate no DCs on sc. Prune left kid
+			sim = similarity(ncof, ncog, levelid + 1, 2 * nodeid);
+			sim += 1 - ((float) onset(pcof) / (1 << pcof.lits));
+		}
+		sim *= 0.5;
+		cur.splitvar = sv;
+		cur.rule = "split";
 		cur.sim = sim;
 		break;
 
