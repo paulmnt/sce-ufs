@@ -168,6 +168,7 @@ public:
 	int splitvar;
 	string rule;
 	float sim;
+	int nodeid;
 };
 
 /**
@@ -185,14 +186,25 @@ public:
 	}
 
 	void print() const {
+		int nodeid = 1;
 		for (int i = 0; i < len; i++) {
-			cout << i + 1 << ". ";
+			for (int j = nodeid; j < nodes[i].nodeid; j++) {
+				cout << j << ". null" << endl;
+				nodeid++;
+			}
+			cout << nodeid << ". ";
 			nodes[i].print();
+			nodeid++;
+		}
+		while (nodeid - 1 < 1 << levelid) {
+			cout << nodeid << ". null" << endl;
+			nodeid++;
 		}
 	}
 
 	vector<node> nodes;
 	int len;
+	int levelid;
 };
 
 /**
@@ -221,8 +233,6 @@ public:
 	void cofactor(const cover &f, const cover &g,
 		cover &pcof, cover &pcog,
 		cover &ncof, cover &ncog, int sv);
-
-	void apply_rule(const string rule, cover &f, cover &g);
 
 	float simeval(const cover &f, const cover &g);
 
@@ -253,7 +263,7 @@ private:
 	int lits;
 
 	/* Private recursive function */
-	float similarity(const cover &f, const cover &g, int levelid);
+	float similarity(const cover &f, const cover &g, int levelid, int nodeid);
 	void add_level(level l) {
 		out.push_back(l);
 		len++;

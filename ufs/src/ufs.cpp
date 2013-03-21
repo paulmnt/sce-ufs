@@ -299,17 +299,19 @@ static int pick_binate(const cover &f, const cover &g)
 }
 
 
-float ufs::similarity(const cover &f, const cover &g, int levelid)
+float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 {
 	/* Recursive function */
 
 	// Increase number of levels if necessary
 	level l;
+	l.levelid = levelid;
 	if (levelid >= len)
 		add_level(l);
 
 	int sv;
 	node cur;
+	cur.nodeid = nodeid;
 	int cur_lits = f.lits;
 	cover pcof(cur_lits), pcog(cur_lits), ncof(cur_lits), ncog(cur_lits);
 	/* Import variable ids for splitting */
@@ -430,8 +432,8 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 		cur.splitvar = sv;
 		cur.rule = "split";
 		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
-		sim = 0.5 * (similarity(pcof, pcog, levelid + 1) +
-			     similarity(ncof, ncog, levelid + 1));
+		sim = 0.5 * (similarity(pcof, pcog, levelid + 1, 2 * nodeid -1) +
+			     similarity(ncof, ncog, levelid + 1, 2 * nodeid));
 		cur.sim = sim;
 		break;
 
@@ -441,8 +443,8 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 		cur.splitvar = sv;
 		cur.rule = "split";
 		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
-		sim = 0.5 * (similarity(pcof, pcog, levelid + 1) +
-			     similarity(ncof, ncog, levelid + 1));
+		sim = 0.5 * (similarity(pcof, pcog, levelid + 1, 2 * nodeid -1) +
+			     similarity(ncof, ncog, levelid + 1, 2 * nodeid));
 		cur.sim = sim;
 		break;
 	}
@@ -458,5 +460,5 @@ float ufs::simeval(const cover &f, const cover &g)
 	level lev;
 	add_level(lev);
 
-	return similarity(f, g, 0);
+	return similarity(f, g, 0, 1);
 }
