@@ -36,6 +36,9 @@ static int parse_flags(int argc, char **argv)
 		cout << endl;
 		cout << " --help            : Displays options" << endl;
 		cout << endl;
+		cout << " --verbose         : Enables verbose mode and prints all" << endl;
+		cout << "                     the intermediate PLAs into all-PLAs" << endl;
+		cout << endl;
 		cout << " --single_disjoint : Enables rule B7 to terminate if one" << endl;
 		cout << "                     cover has a single cube, while the" << endl;
 		cout << "                     other has non intersecting cubes." << endl;

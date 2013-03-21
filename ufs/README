@@ -1,0 +1,14 @@
+BUILD:
+$> cd build
+$> make
+
+Open the Makefile and add the flag -DDEBUG to $(CPPFLAGS) if you want to enable debug messages
+
+RUN:
+$> ./ufs
+or show options:
+$> ./ufs --help
+
+PLAS EXPECTED INPUT PATHS
+./tb/f.pla
+./tb/g.pla
