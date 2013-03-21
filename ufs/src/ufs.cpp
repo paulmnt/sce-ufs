@@ -159,7 +159,6 @@ int onset(const cover &f)
 	}
 }
 
-
 /* single disjoint similarity. Rule B7 */
 float sdsim(const cube &c, const cover &f)
 {
@@ -184,6 +183,34 @@ float sdsim(const cube &c, const cover &f)
 #endif
 	return sim;
 }
+
+/* multi disjoint similarity. Rule B8 */
+float mdsim(const cover &f, const cover &g)
+{
+	int cones = 0;
+	for (int i = 0; i < f.len; i++)
+		for (int j = 0; j < g.len; j++)
+			cones += common_ones(f.cubes[i], g.cubes[j]);
+
+	int m = 1 << f.lits;
+	cover tmp = f;
+	for (int i = 0; i < g.len; i++)
+		tmp.add_cube(g.cubes[i]);
+	int tones = onset(tmp);
+	int czeros = m - tones;
+	float sim = (float) (cones + czeros) / m;
+
+#ifdef DEBUG
+	cout << "DEBUG: ";
+	cout << "single disjoint similarity is  " << sim << endl;
+	cout << "       CONES: " << cones << endl;
+	cout << "       TONES: " << tones << endl;
+	cout << "       CZEROS: " << czeros << endl;
+
+#endif
+	return sim;
+}
+
 
 void ufs::cofactor(const cover &f, const cover &g,
 		cover &pcof, cover &pcog,
@@ -349,8 +376,20 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 		cur.sim = sim;
 		break;
 
-	case -7: break;
-	case 8: break;
+	case -7: //B7
+		cur.splitvar = sv;
+		cur.rule = "B7";
+		sim = sdsim(g.cubes[0], f);
+		cur.sim = sim;
+		break;
+
+	case 8: //B8
+		cur.splitvar = sv;
+		cur.rule = "B8";
+		sim = mdsim(f, g);
+		cur.sim = sim;
+		break;
+
 	case 9: break;
 	case 10: break;
 	case 11: break;
