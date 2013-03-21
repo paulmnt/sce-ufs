@@ -33,7 +33,18 @@ static int parse_flags(int argc, char **argv)
 	/* Print help */
 	if (flag_found(argc, argv, "--help")) {
 		cout << "Usage: ufs [flags] <input_file_1> <input_file_2>" << endl;
-		cout << "To display options: ufs --help" << endl;
+		cout << endl;
+		cout << " --help            : Displays options" << endl;
+		cout << endl;
+		cout << " --single_disjoint : Enables rule B7 to terminate if one" << endl;
+		cout << "                     cover has a single cube, while the" << endl;
+		cout << "                     other has non intersecting cubes." << endl;
+		cout << endl;
+		cout << " --multi_disjoint  : Enables rule B8 to terminate if both" << endl;
+		cout << "                     covers have non intersecting cubes." << endl;
+		cout << endl;
+		cout << " --scc X           : (Not Implemented) SCC on covers with" << endl;
+		cout << "                     at most X cubes before rule checking" << endl;
 		cout << endl;
 		return 2;
 	}
@@ -71,6 +82,8 @@ static int parse_flags(int argc, char **argv)
 		}
 		cout << "INFO: Rule M16 (SCC) enabled on covers with at most ";
 		cout << scc << " cubes" << endl;
+		cout << "      Rule M16 is not actually implemented in this version";
+		cout << " because not a requirement" << endl;
 	}
 	if (argc > flags_count) {
 		cout << "ERROR: unrecognized flags" << endl;
