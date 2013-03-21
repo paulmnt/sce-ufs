@@ -32,7 +32,7 @@ static int parse_flags(int argc, char **argv)
 {
 	/* Print help */
 	if (flag_found(argc, argv, "--help")) {
-		cout << "Usage: ufs [flags] <input_file_1> <input_file_2>" << endl;
+		cout << "Usage: ufs [flags]" << endl;
 		cout << endl;
 		cout << " --help            : Displays options" << endl;
 		cout << endl;
