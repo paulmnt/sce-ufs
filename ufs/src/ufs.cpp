@@ -390,10 +390,36 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 		cur.sim = sim;
 		break;
 
-	case 9: break;
-	case 10: break;
-	case 11: break;
-	case 12: break;
+	case 9: //B9
+		cur.splitvar = sv;
+		cur.rule = "B9";
+		sim = 1;
+		cur.sim = sim;
+		break;
+
+	case 10: //B10
+		cur.splitvar = sv;
+		cur.rule = "B10";
+		sim = 0;
+		cur.sim = sim;
+		break;
+
+	case 11: //B11
+		cur.splitvar = sv;
+		cur.rule = "B11";
+		sim = 0.5;
+		cur.sim = sim;
+		break;
+
+	case 12: //B12: not a termination rule!
+		cur.splitvar = sv;
+		cur.rule = "split";
+		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
+		sim = 0.5 * (similarity(pcof, pcog, levelid + 1) +
+			     similarity(ncof, ncog, levelid + 1));
+		cur.sim = sim;
+		break;
+
 	case -12: break;
 	case 13: break;
 	case 14: break;

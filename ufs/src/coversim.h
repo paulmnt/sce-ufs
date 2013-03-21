@@ -20,9 +20,9 @@
  * B8:  Both covers have multiple non intersecting
  *      cubes. (Requires the flag --multi_disjoint)
  * B9:  Both covers show single input dependence
- *      (same varible and same value)
+ *      (same variable and same value)
  * B10: Both covers show single input dependence
- *      (same varible but different value)
+ *      (same variable but different value)
  * B11: Both covers show single input dependence
  *      (different variables)
  * B12: f shows single input dependence
