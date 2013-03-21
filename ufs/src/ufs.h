@@ -103,6 +103,22 @@ public:
 	{
 		for (int i = 0; i < len; i++)
 			cubes[i].print();
+		/*
+		cout << "VARIDs: ";
+		for (int i = 0; i < lits; i++) {
+			cout << varid[i] << " ";
+		}
+
+		cout << "ONES: ";
+		for (int i = 0; i < lits; i++) {
+			cout << ones[i] << " ";
+		}
+		cout << endl;
+		cout << "ZEROS: ";
+		for (int i = 0; i < lits; i++) {
+			cout << zeros[i] << " ";
+		}
+		*/
 		cout << endl;
 	}
 

@@ -288,10 +288,13 @@ int ufs::check_rules(const cover &f, const cover &g, int *sv)
 static int pick_binate(const cover &f, const cover &g)
 {
 	for (int i = 0; i < f.lits; i++) {
-		if (f.ones[i] && f.zeros[i] &&
-		    g.ones[i] && g.zeros[i])
+		if ((f.ones[i] > 0) && (f.zeros[i] > 0) &&
+		    (g.ones[i] > 0) && (g.zeros[i] > 0))
 			return i;
 	}
+#ifdef DEBUG
+	cout << "DEBUG: pick_binate found no common binate variables";
+#endif
 	return 0;
 }
 
@@ -309,6 +312,12 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 	node cur;
 	int cur_lits = f.lits;
 	cover pcof(cur_lits), pcog(cur_lits), ncof(cur_lits), ncog(cur_lits);
+	/* Import variable ids for splitting */
+	pcof.varid = f.varid;
+	pcog.varid = f.varid;
+	ncof.varid = f.varid;
+	ncog.varid = f.varid;
+
 	int rule = check_rules(f, g, &sv);
 	float sim;
 
@@ -411,7 +420,13 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 		cur.sim = sim;
 		break;
 
-	case 12: //B12: not a termination rule!
+	case 14: break;
+
+	case 12:  //B12: not a termination rule!
+	case 13:  //U13: not a termination rule!
+	case 15:  //U15: not a termination rule!
+	case -15: //U15: not a termination rule!
+		sv = f.varid[sv];
 		cur.splitvar = sv;
 		cur.rule = "split";
 		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
@@ -420,13 +435,9 @@ float ufs::similarity(const cover &f, const cover &g, int levelid)
 		cur.sim = sim;
 		break;
 
-	case -12: break;
-	case 13: break;
-	case 14: break;
-	case 15: break;
-	case -15: break;
 	default:
 		sv = pick_binate(f, g);
+		sv = f.varid[sv];
 		cur.splitvar = sv;
 		cur.rule = "split";
 		cofactor(f, g, pcof, pcog, ncof, ncog, sv);

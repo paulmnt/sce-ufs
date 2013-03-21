@@ -127,7 +127,7 @@ int check_B9_12(const cover &f, const cover &g, int *sv)
 	ind2 = single_dep(g);
 	if (ind2 >= 0) {
 		*sv = ind2;
-		return -12;
+		return 12;
 	}
 	return 0;
 }
