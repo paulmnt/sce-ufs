@@ -76,8 +76,9 @@ int total_ones(const cube &c)
 	for (int i = 0; i < c.len; i++)
 		if (c.vars[i] != '-')
 			num >>= 1;
-
-	cout << "ones in this cube: " << num << endl;
+#ifdef DEBUG
+	cout << "DEBUG: ones in this cube: " << num << endl;
+#endif
 	return num;
 }
 
