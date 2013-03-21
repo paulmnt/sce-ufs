@@ -1,7 +1,6 @@
 TARGET_ARCH = linux64
 CC = g++
-CPPFLAGS = -Wall
-#-DDEBUG
+CPPFLAGS = -Wall -DDEBUG
 
 LIBS   =
 LIBDIR =
