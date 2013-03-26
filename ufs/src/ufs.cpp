@@ -425,7 +425,13 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 		cur.sim = sim;
 		break;
 
-	case 14: break;
+	case 14://B14
+		cur.splitvar = sv;
+		cur.rule = "B14";
+		sim = 1 - ((float) (onset(f) + onset(g)) / (1 << f.lits));
+		cur.sim = sim;
+		break;
+
 
 	case 12:  //B12: we apply B3 on a child and B4 on the other
 		sv = f.varid[sv];
