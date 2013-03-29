@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
 	/* UFS */
 	ufs u(single_disjoint, multi_disjoint, scc, verb, lits);
 
-	float sim = u.simeval(F, G);
+	double sim = u.simeval(F, G);
 	cout << "Function similarity is " << sim << endl;
 
 	/* Print output */

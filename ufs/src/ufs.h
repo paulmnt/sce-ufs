@@ -177,7 +177,7 @@ public:
 
 	int splitvar;
 	string rule;
-	float sim;
+	double sim;
 	int nodeid;
 };
 
@@ -261,7 +261,7 @@ public:
 		cover &pcof, cover &pcog,
 		cover &ncof, cover &ncog, int sv);
 
-	float simeval(const cover &f, const cover &g);
+	double simeval(const cover &f, const cover &g);
 
 	void print_levels() const {
 		for (int i = 0; i < len; i++) {
@@ -300,7 +300,7 @@ private:
 	int lits;
 
 	/* Private recursive function */
-	float similarity(const cover &f, const cover &g, int levelid, int nodeid);
+	double similarity(const cover &f, const cover &g, int levelid, int nodeid);
 	void add_level(level l) {
 		out.push_back(l);
 		len++;

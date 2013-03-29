@@ -76,6 +76,7 @@ int total_ones(const cube &c)
 	for (int i = 0; i < c.len; i++)
 		if (c.vars[i] != '-')
 			num >>= 1;
+
 #ifdef DEBUG
 	cout << "DEBUG: ones in this cube: " << num << endl;
 #endif
@@ -84,14 +85,14 @@ int total_ones(const cube &c)
 
 
 /* Similarity between two cubes. Called if B6 applies */
-float cubesim(const cube &c1, const cube &c2)
+double cubesim(const cube &c1, const cube &c2)
 {
 	/* Assumes covers are non empty! */
 	int cones = common_ones(c1, c2);
 	int tones = total_ones(c1, c2);
 	int m = 1 << c1.len;
 	int czeros = m - (tones - cones);
-	float sim = (float) (cones + czeros) / m;
+	double sim = (double) (cones + czeros) / m;
 
 #ifdef DEBUG
 	cout << "DEBUG: ";
@@ -146,7 +147,7 @@ int onset(const cover &f)
 	if (t.check(f))
 		return (1 << f.lits);
 	if (f.lits == 1)
-		return (1 << (f.lits - 1));
+		return 1; //(1 << (f.lits - 1));
 
 	switch(f.len) {
 	case 1:
@@ -162,7 +163,7 @@ int onset(const cover &f)
 }
 
 /* single disjoint similarity. Rule B7 */
-float sdsim(const cube &c, const cover &f)
+double sdsim(const cube &c, const cover &f)
 {
 	int cones = 0;
 	for (int i = 0; i < f.len; i++)
@@ -173,7 +174,7 @@ float sdsim(const cube &c, const cover &f)
 	int tones = onset(tmp);
 	int m = 1 << c.len;
 	int czeros = m - tones;
-	float sim = (float) (cones + czeros) / m;
+	double sim = (double) (cones + czeros) / m;
 
 #ifdef DEBUG
 	cout << "DEBUG: ";
@@ -187,7 +188,7 @@ float sdsim(const cube &c, const cover &f)
 }
 
 /* multi disjoint similarity. Rule B8 */
-float mdsim(const cover &f, const cover &g)
+double mdsim(const cover &f, const cover &g)
 {
 	int cones = 0;
 	for (int i = 0; i < f.len; i++)
@@ -200,7 +201,7 @@ float mdsim(const cover &f, const cover &g)
 		tmp.add_cube(g.cubes[i]);
 	int tones = onset(tmp);
 	int czeros = m - tones;
-	float sim = (float) (cones + czeros) / m;
+	double sim = (double) (cones + czeros) / m;
 
 #ifdef DEBUG
 	cout << "DEBUG: ";
@@ -301,7 +302,7 @@ static int pick_binate(const cover &f, const cover &g)
 }
 
 
-float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
+double ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 {
 	/* Recursive function */
 
@@ -324,7 +325,7 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 	ncog.varid = f.varid;
 
 	int rule = check_rules(f, g, &sv, &prune);
-	float sim;
+	double sim;
 
 	switch (rule) {
 	case 1: //B1
@@ -344,28 +345,28 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 	case 3: //B3
 		cur.splitvar = sv;
 		cur.rule = "B3";
-		sim = 1 - ((float) onset(g) / (1 << g.lits));
+		sim = ((double) ((1 << g.lits) - onset(g)) / (1 << g.lits));
 		cur.sim = sim;
 		break;
 
 	case -3: //B3
 		cur.splitvar = sv;
 		cur.rule = "B3";
-		sim = 1 - ((float) onset(f) / (1 << g.lits));
+		sim = 1 - ((double) onset(f) / (1 << f.lits));
 		cur.sim = sim;
 		break;
 
 	case 4: //B4
 		cur.splitvar = sv;
 		cur.rule = "B4";
-		sim = (float) onset(g) / (1 << g.lits);
+		sim = (double) onset(g) / (1 << g.lits);
 		cur.sim = sim;
 		break;
 
 	case -4: //B4
 		cur.splitvar = sv;
 		cur.rule = "B4";
-		sim = (float) onset(f) / (1 << g.lits);
+		sim = (double) onset(f) / (1 << g.lits);
 		cur.sim = sim;
 		break;
 
@@ -428,7 +429,7 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 	case 14://B14
 		cur.splitvar = sv;
 		cur.rule = "B14";
-		sim = 1 - ((float) (onset(f) + onset(g)) / (1 << f.lits));
+		sim = 1 - ((double) (onset(f) + onset(g)) / (1 << f.lits));
 		cur.sim = sim;
 		break;
 
@@ -437,11 +438,11 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 		sv = f.varid[sv];
 		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
 		if (pcof.empty()) {
-			sim = 1 - ((float) onset(pcog) / (1 << pcog.lits));
-			sim += (float) onset(ncog) / (1 << ncog.lits);
+			sim = 1 - ((double) onset(pcog) / (1 << pcog.lits));
+			sim += (double) onset(ncog) / (1 << ncog.lits);
 		} else {
-			sim = 1 - ((float) onset(ncog) / (1 << ncog.lits));
-			sim += (float) onset(pcog) / (1 << pcog.lits);
+			sim = 1 - ((double) onset(ncog) / (1 << ncog.lits));
+			sim += (double) onset(pcog) / (1 << pcog.lits);
 		}
 		sim *= 0.5;
 		cur.splitvar = -1;
@@ -453,11 +454,11 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 		sv = f.varid[sv];
 		cofactor(f, g, pcof, pcog, ncof, ncog, sv);
 		if (pcog.empty()) {
-			sim = 1 - ((float) onset(pcof) / (1 << pcof.lits));
-			sim += (float) onset(ncof) / (1 << ncof.lits);
+			sim = 1 - ((double) onset(pcof) / (1 << pcof.lits));
+			sim += (double) onset(ncof) / (1 << ncof.lits);
 		} else {
-			sim = 1 - ((float) onset(ncof) / (1 << ncof.lits));
-			sim += (float) onset(pcof) / (1 << pcog.lits);
+			sim = 1 - ((double) onset(ncof) / (1 << ncof.lits));
+			sim += (double) onset(pcof) / (1 << pcog.lits);
 		}
 		sim *= 0.5;
 		cur.splitvar = -1;
@@ -486,11 +487,11 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 		if (prune == 2) {
 			// Cover f is positive unate no DCs on sv. Prune right kid
 			sim = similarity(pcof, pcog, levelid + 1, 2 * nodeid -1);
-			sim += 1 - ((float) onset(ncog) / (1 << ncog.lits));
+			sim += 1 - ((double) onset(ncog) / (1 << ncog.lits));
 		} else {
 			// Cover f is negative unate no DCs on sc. Prune left kid
 			sim = similarity(ncof, ncog, levelid + 1, 2 * nodeid);
-			sim += 1 - ((float) onset(pcog) / (1 << pcog.lits));
+			sim += 1 - ((double) onset(pcog) / (1 << pcog.lits));
 		}
 		sim *= 0.5;
 		cur.splitvar = sv;
@@ -504,11 +505,11 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 		if (prune == 2) {
 			// Cover g is positive unate no DCs on sv. Prune right kid
 			sim = similarity(pcof, pcog, levelid + 1, 2 * nodeid -1);
-			sim += 1 - ((float) onset(ncof) / (1 << ncof.lits));
+			sim += 1 - ((double) onset(ncof) / (1 << ncof.lits));
 		} else {
 			// Cover f is negative unate no DCs on sc. Prune left kid
 			sim = similarity(ncof, ncog, levelid + 1, 2 * nodeid);
-			sim += 1 - ((float) onset(pcof) / (1 << pcof.lits));
+			sim += 1 - ((double) onset(pcof) / (1 << pcof.lits));
 		}
 		sim *= 0.5;
 		cur.splitvar = sv;
@@ -539,7 +540,7 @@ float ufs::similarity(const cover &f, const cover &g, int levelid, int nodeid)
 }
 
 
-float ufs::simeval(const cover &f, const cover &g)
+double ufs::simeval(const cover &f, const cover &g)
 {
 	/* Recursive function */
 	level lev;
