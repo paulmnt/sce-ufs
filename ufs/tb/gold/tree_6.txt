@@ -1,0 +1,22 @@
+==level 1==
+1. x4 0.999252
+
+==level 2==
+1. x9 0.998505
+2. null
+
+==level 3==
+1. x0 0.999084
+2. null
+3. null
+4. null
+
+==level 4==
+1. B14 0.998474
+2. null
+3. null
+4. null
+5. null
+6. null
+7. null
+8. null

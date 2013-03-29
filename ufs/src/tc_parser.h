@@ -32,7 +32,10 @@ public:
 	tc_parser(char *fnamef, char *fnameg) {
 		fpla.open(fnamef);
 		gpla.open(fnameg);
-		lits = read_params();
+		if (!fpla.good() || !gpla.good())
+			lits = -1;
+		else
+			lits = read_params();
 	}
 
 	~tc_parser() {

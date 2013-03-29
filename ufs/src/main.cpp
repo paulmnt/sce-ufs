@@ -7,10 +7,14 @@
 
 using namespace std;
 
+/*
 #define FPLA "../tb/f.pla"
 #define GPLA "../tb/g.pla"
+ */
 #define TREE "recursionTree.txt"
 
+static char *FPLA;
+static char *GPLA;
 static bool single_disjoint = false;
 static bool multi_disjoint = false;
 static int scc = 0;
@@ -32,7 +36,7 @@ static int parse_flags(int argc, char **argv)
 {
 	/* Print help */
 	if (flag_found(argc, argv, "--help")) {
-		cout << "Usage: ufs [flags]" << endl;
+		cout << "Usage: ufs [flags] <pla_file_1> <pla_file_2>" << endl;
 		cout << endl;
 		cout << " --help            : Displays options" << endl;
 		cout << endl;
@@ -88,11 +92,14 @@ static int parse_flags(int argc, char **argv)
 		cout << "      Rule M16 is not actually implemented in this version";
 		cout << " because not a requirement" << endl;
 	}
-	if (argc > flags_count) {
-		cout << "ERROR: unrecognized flags" << endl;
+	if (argc != flags_count + 2) {
+		cout << "ERROR: Unrecognized flag or input files not specified." << endl;
 			cout << "To display options: ufs --help" << endl;
+			cout << "Usage: ufs [flags] <pla_file_1> <pla_file_2>" << endl;
 			return 1;
 	}
+	FPLA = argv[argc - 2];
+	GPLA = argv[argc - 1];
 	return 0;
 
 }
@@ -101,7 +108,10 @@ static int parse_flags(int argc, char **argv)
 int main(int argc, char **argv) {
 
 	cout << "Function Similarity - Unate Recursive Paradigm" << endl << endl;
-	if (parse_flags(argc, argv))
+	int pf = parse_flags(argc, argv);
+	if (pf ==2)
+		return 0;
+	if (pf)
 		return 1;
 
 	/* Open input files and read input # */
@@ -109,6 +119,10 @@ int main(int argc, char **argv) {
 	char *f2 = (char *)GPLA;
 	tc_parser in(f1, f2);
 	int lits = in.get_lits();
+	if (lits < 0) {
+		cout << "ERROR: Bad input file path" << endl;
+		return 1;
+	}
 
 	/* Load covers */
 	cover F(lits), G(lits);
@@ -124,6 +138,9 @@ int main(int argc, char **argv) {
 	ofstream of(TREE);
 	u.print_levels(of);
 	of.close();
+	ofstream test("print_sim.txt");
+	test << sim << endl;
+	test.close();
 
 	return 0;
 }
