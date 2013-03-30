@@ -34,14 +34,14 @@ the program:
     recursive function. The latter takes the parsed covers and performs three
     basic steps:
     \begin{enumerate}
-      \item Chek if a termination rule applies; It is worth to notice that the
+      \item Check if a termination rule applies; It is worth to notice that the
         rules are checked in order of complexity, so that the faster rules will
         match first. Also, most of the rules have running time linear in the
         number of literals or in the number of cubes in the covers.
-        We implemented alaso a few rules with quadratic complexity, however,
+        We implemented also a few rules with quadratic complexity, however,
         these are not enabled by default.
       \item If not, then split the covers and do two recursive calls on the
-        positive and nefative cofactor;
+        positive and negative cofactor;
       \item If yes, then evaluate the similarity of the current cofactors and
         return.
       \item During the recursion, if the \texttt{verbose mode} is enabled, all
@@ -61,7 +61,7 @@ the program:
 The similarity between two functions represents the percentage of input patterns,
 among the complete set of possible input vectors, for which the functions give
 the same output.
-For this tool we assume that the functions are completely speciefied (i.e. the
+For this tool we assume that the functions are completely specified (i.e. the
 don't care set, or DC-set, is empty).
 A brute force approach to this problem, involves the generation of the truth
 tables, starting from the covers, which has exponential complexity. A classic
@@ -85,7 +85,7 @@ Notice that the function $FSim$ takes covers as input, but returns the similarit
 of the functions they represent. Variable $x$ is a generic splitting variable.
 This simple rule is always correct, because when we split the cover, with respect
 to a variable, we obtain two cofactors which no longer depend on the splitting
-variable and contain informations about one half of the original cover.
+variable and contain information about one half of the original cover.
 
 \subsection{Termination Rules}
 
@@ -99,7 +99,7 @@ of an extra recursive call.
     return 1.
   \item {\bf B2}: Both covers are a tautology. Again we return 1, however,
     tautology checking can be quite expensive, therefore, we chose not to
-    implement the complete recursive algorithm. Instead, we just try to mathc
+    implement the complete recursive algorithm. Instead, we just try to match
     tautology checking termination rules and let our main recursion continue.
     In fact, if one of the covers is truly a tautology, this rule should probably
     match anyway within a few recursion, while if none of the cofactors ends
@@ -116,7 +116,7 @@ of an extra recursive call.
     is worth the effort, because this rule terminates the main recursion.
   \item {\bf B4}: One cover is a tautology. This rule is complimentary to rule B3
     and we need to return the ON-set cardinality of the cover which is not a
-    tautology, divided by the number of possible imput vectors.
+    tautology, divided by the number of possible input vectors.
   \item {\bf B5}: One cover is empty and the other is a tautology. This rule gives
     a trivial answer, which is that the similarity to be returned is 0.
   \item {\bf B6}: Both covers have a single cube. In this case we can easily
@@ -134,7 +134,7 @@ of an extra recursive call.
     intersecting the single cube of the first cover, with every cube of the
     other. Notice that if the cubes in the second cover had intersections, then
     complexity would be exponential.
-    Unfortunately, the problem of checking wether the cubes intersect or not
+    Unfortunately, the problem of checking whether the cubes intersect or not
     has quadratic complexity, thus we chose to let this rule as an option, which
     can be enabled by adding the flag \texttt{--single\_disjoint} to the command
     line when starting the tool.
@@ -146,12 +146,12 @@ of an extra recursive call.
     is enabled as well.
   \item {\bf B9}: Both covers show single input dependence with respect to
     the same variable (same value). If this rule matches it means that the
-    covers are not tautology therfore the two covers look exactly the same,
+    covers are not tautology therefore the two covers look exactly the same,
     but for the number of rows. Notice that there is no guarantee that the
     initial covers or the cofactors don't have duplicated or redundant
-    cubes. In this case we obviousely return 1.
+    cubes. In this case we obviously return 1.
   \item {\bf B9}: Both covers show single input dependence with respect to
-    the same variable (but different value). This is complementary to rool
+    the same variable (but different value). This is complementary to rule
     B9 and we just return 0.
   \item {\bf B11}: Both covers show single input dependence, but with respect
     to different variables. In this case it does not matter whether the variable
@@ -186,9 +186,9 @@ allows to prune the recursion tree.
 \begin{itemize}
   \item {\bf U13}: Both covers are positive/negative unate on the same variable with
     no DCs. In other words, this means that both covers have either all 1's or all
-    0's on the same culumn. If we chose the variable bound to that column, then
+    0's on the same column. If we chose the variable bound to that column, then
     rule B1 applies to a pair of cofactors and we can prune one branch of the
-    recursionon.
+    recursion.
   \item {\bf U14}: Both covers are unate on the same variable with no DCs, but one
     is positive unate, while the other is negative unate. This is a termination rule
     because it implies that the covers do not share any ON-set minterm; thus we just
@@ -206,7 +206,7 @@ because it terminated the recursion.
 \subsection{Splitting Variable}
 
 When none of the rules above applies, we pick a binate variable as splitting
-variable, to try keeping the tree balanced. This choice aims to favour rule B6,
+variable, to try keeping the tree balanced. This choice aims to favor rule B6,
 which is very quick to check and requires a simple calculation: getting the
 similarity of two cubes.
 
@@ -232,7 +232,7 @@ Our program can easily handle large input files, with covers that have many
 cubes. However, a major constraint is given with the number of variables.
 The total number of input patterns, in fact, is exponential in the number
 of variables, but the integer type, for instance, is encoded with 32 bits,
-thus we can'r represent numbers larger than $2^{32} - 1$.
+thus we can represent numbers larger than $2^{32} - 1$.
 A second issue that could occur when we have a large number of input variables
 is that the similarity could be too close to 1 or 0, thus it can't be represented
 even using double precision floating point numbers.
@@ -241,13 +241,13 @@ even using double precision floating point numbers.
 
 The tool we propose performs a fast Function Similarity Evaluation starting
 from two given covers in PLA format which share the same support.
-As a further improvement to the tool we envision to implement a functio
+As a further improvement to the tool we envision to implement a function
 that performs SCC over the covers. This step could be expensive, but
 removing all redundant cubes could dramatically reduce the total
 recursive calls, thus speeding up the algorithm. Given the complexity
-of SCC, the user should be able to set a threashold on the size of the
+of SCC, the user should be able to set a threshold on the size of the
 covers, so that the tools performs it only when the cover is small
-enough. This is a semplification ruele ({\bf M1}) which was not a
+enough. This is a simplification rule ({\bf M1}) which was not a
 requirement for this version of the tool.
 
 %\bibliographystyle{abbrv}
