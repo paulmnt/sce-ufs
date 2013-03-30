@@ -58,7 +58,7 @@
  *    the similarity of the cofactors at the current
  *    level.
  *  - divide by two to report the similarity weight
- *    to the upper level. TODO: CHECK!!!
+ *    to the upper level.
  */
 
 class coversim {

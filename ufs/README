@@ -1,14 +1,71 @@
-BUILD:
-$> cd build
-$> make
+GROUP:
+	Kshitij Bhardwaj - kb2673@columbia.edu
+	Paolo Mantovani - pm2613@columbia.edu
 
-Open the Makefile and add the flag -DDEBUG to $(CPPFLAGS) if you want to enable debug messages
+PROGRAM BASIC INFO:
+	- Language is C++
+	- No special requirements. The tool can be compiled with g++ and it was tested on CLIC machines
 
-RUN:
-$> ./ufs
-or show options:
-$> ./ufs --help
 
-PLAS EXPECTED INPUT PATHS
-./tb/f.pla
-./tb/g.pla
+LIST OF FOLDERS AND INSTRUCTIONS:
+
+./build
+	- contains the Makefile and the executable.
+	- when verbose mode is enabled the tool will create the folder all-PLAs within this directory.
+
+	- to build the tool:
+	     $> cd build
+	     $> make
+
+	- to build with DEBUG printouts enabled: decomment the -DDEBUG flag and add it to $(CPPFLAGS) the Makefile.
+
+	- to show the tool help
+	     $> make help
+	     or
+	     $> make
+	     $> ./ufs --help
+
+	     The tool will show the following:
+	     Usage: ufs [flags] <pla_file_1> <pla_file_2>
+
+	      --help            : Displays options
+
+	      --verbose         : Enables verbose mode and prints all
+              			  the intermediate PLAs into all-PLAs
+
+	      --single_disjoint : Enables rule B7 to terminate if one
+                     		  cover has a single cube, while the
+                     		  other has non intersecting cubes.
+
+	      --multi_disjoint  : Enables rule B8 to terminate if both
+              			  covers have non intersecting cubes.
+
+	      --scc X           : (Not Implemented) SCC on covers with
+                     		  at most X cubes before rule checking
+
+
+	      - Notice that scc is a simplification rule, which we though of, but was not a requirement.
+
+
+	- to run the regression test
+	     $> make test
+
+	- to run the tool with custom input files
+	     $> ./ufs [options] <input_file_1> <input_file_1>
+	     for example
+	     $> ./ufs --verbose ../tb/f1.pla ../tb/g1.pla
+
+	- to clean the folder
+	     $> make clean
+
+
+./doc
+	- contains the tex and the Makefile of the write up
+
+./src
+	- contains source (*.cpp) files and header files (*.h) of the tool.
+
+./tb
+	- contains the input PLAs for the regression test.
+
+

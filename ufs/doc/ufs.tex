@@ -19,322 +19,236 @@ Kshitij Bhardwaj \ \ \ \ Paolo Mantovani\\
 
 \begin{abstract}
 This tool evaluates the similarity of two functions, which have the same support,
-given two covers representing the functions. It
+given two covers representing the functions. The tool kernel is a divide and
+conquer algorithm which recursively splits the covers with respect to a variable
+by producing positive and negative cofactors, until a termination rules applies.
 
-The main purpose of this project is to evaluate the efficiency and
-performance improvements that can be obtained by integrating hardware
-accelerators within a system framework, based on a tiled Network on Chip (NoC)
-and designed using High Level Synthesis (HLS) tools.
-In particular, we show that a hardware accelerator, synthesized from
-SystemC and integrated into the SoC, can outperform a processor, with comparable
-parallelism, executing the same algorithm in software.
-We report experimental results for both level of abstraction: System level and
-RT level.
-\end{abstract}
-
-\keywords{SoC Design, Hardware Accelerator, High Level Synthesis}
-
-\section{Introduction}
-It is well known that hardware accelerators are widely integrated in modern
-embedded systems. The classic RTL design flow, though, does not seem to be
-suitable any more for a fast design of a complex and heterogeneous system.
-In this project we exploit the case study of an image processing algorithm
-(the \emph{JPEG decoder}) to evaluate a complete design flow, which begins
-form a specification, written by a third party in a high level language, and
-finishes with a synthesizable RTL hardware implementation of the same algorithm.
-Intermediate steps allow to validate the design at different level of abstraction
-and to estimate its performance within a complete system framework.
-
- 
-The structure of the report follows the phases of the project.
-In section \ref{sec:nof} we start by analyzing the system framework provided.
-Section \ref{sec:jpeg} introduces the JPEG decoder and the CHStone \cite{chstone}
-benchmark suite. Then we briefly describe the porting from plain C to SystemC and 
-the accelerator structure. At the end of the section we report the results obtained
-by running Cadence HLS tool \emph{CtoS}.
-In section \ref{sec:eval} we report the experimental results and finally in section
-\ref{sec:end} we conclude with the lessons learned and with strengths and weaknesses
-of this design flow.
-
-\section{SoC Framework for {\subsecit plug \& play} }
-\label{sec:nof}
-
-The starting point of the project is a tiled based NoC designed in SystemC.
-It can host multi-core processor tiles, composed by 4 ``MIPS like`` cores with level
-1 and level 2 caches, described at the RTL, and hardware accelerator tiles,
-with dedicated ``scratch pad'' memory. Each tile has also a Network Interface (NI),
-which provides a uniform protocol to connect third party accelerators, assuming
-that they are wrapped within a Transaction Level Modeling (TLM) module, with TLM FIFO
-for data I/O transfers. The NI handles the communication through the NoC by implementing
-software primitives for explicit message passing communication among the tiles.
-The processor tiles have therefore the capability to delegate the available
-accelerators to complete certain tasks. The details about the network protocol
-and the implementation of the tiles are described in \cite{cota}.
-
-\section{CHStone JPEG decoder}
-\label{sec:jpeg}
-
-The algorithm chosen to be accelerated is the JPEG decoder from the CHStone
-\cite{chstone} benchmark suite. The choice of the CHStone is motivated mainly by
-the fact that these benchmarks are explicitly meant to test the efficiency of
-HLS tools. Also, the source code is plain C and it includes the
-test vectors, therefore it can be easily compiled for the MIPS like core
-available within the NoC, which doesn't support an OS. Among the algorithms of
-the suite, the JPEG was the best candidate, because of its complexity.
-Considering, in fact, the communication overhead deriving from the NoC and the
-NI, we must assume that an accelerator will be more efficient, in terms of
-performance vs. power, only if the computational complexity of the task is large
-enough. For small and simple algorithms, instead, a pure software
-implementation, which does not require data transfer through the NoC is expected
-to be more efficient.
-Moreover we derive the TLM SystemC accelerator from the C code,
-because existing implementations of SystemC accelerators are usually not
-suitable for being executed in software, without strongly modifying the kernel
-of the algorithm. Our purpose, in fact, is not to build a state of the art
-accelerator, but to prove that through this new design flow we can increase
-productivity and performance, guaranteeing at the same time a significant power
-saving.
-
-\subsection{Software implementation}
-
-We shortly describe CHStone JPEG decoder structure. The first function call
-parses the information contained in the JPEG header, which has undefined size.
-It is therefore compulsory to load all the coefficients and to build a few tables
-before starting the decoding process.
-Special characters, called markers, identify the beginning of different sections,
-which provide basic information about the picture (such as the size), the coefficient
-used for compression and quantization, quality parameters and finally the
-compressed data. The other functions implement the baseline JPEG decoder and
-use the information provided in the header to reconstruct the original RGB
-table (notice that the compression is ``lossy``). The complete JPEG standard is included
-in \cite{jpeg}.
-
-A small test vector was statically included within the CHStone code.
-In order to obtain significant experimental results, however, we wrote a small
-preprocessor that parses different and bigger images and outputs a configuration
-header for the test bench used for simulations.
-
-\subsection{SystemC implementation}
-
-In this section we list the major changes applied to the CHStone code, during the 
-porting process to synthesizable SystemC.
-Fig.~\ref{fig:jpgdec} is a block diagram representation of the SystemC code, intended
-to help in understanding the interaction between the processes and how the accelerator is
-interfaced to the standard TLM FIFO for being plugged to the NoC.
-Porting to SystemC included the following steps:
+The program is written in \texttt{C++}, which compiles to fast native executable
+and the code consists of a main function, which calls the basic components of
+the program:
 \begin{itemize}
- \item Split of the sequential C function into smaller concurrent behaviors, which
-are synchronized through \emph{sc\_signals} and a handshake protocol.
-Data transfers are enabled by shared local memories which act as temporary scratch pads.
- \item Conversion of global variables into shared attributes of the module,
-which are accessible by every process declared within the System-C module.
- \item Replacement of all the pointers with array indexes declared as member variables.
-This allows the HLS tool to parse and build the code correctly.
- \item Enabling the overlap of I/O transfers and computation. This allows to decode bigger
-images, because the picture does not need to be stored entirely within th accelerator.
- \item Generation of the output file header.
- \item Implementation of the TLM wrapper to connect the accelerator to its test
-bench. The TLM interface is also required to integrate the accelerator into the
-NoC.
- \item Implementation of a configurable test bench, which can feed the
-accelerator with different input images and checks the output, with respect to a
-golden output provided.
- \item Optimization of loops to enable further options for design space
-exploration with the HLS tool.
+  \item {\bf The parser}: takes two PLA files as input, which describe the two
+    covers, each of which has the same number of input variables and a single
+    output;
+  \item {\bf Function Similarity}: is the heart of the program, containing the
+    recursive function. The latter takes the parsed covers and performs three
+    basic steps:
+    \begin{enumerate}
+      \item Chek if a termination rule applies; It is worth to notice that the
+        rules are checked in order of complexity, so that the faster rules will
+        match first. Also, most of the rules have running time linear in the
+        number of literals or in the number of cubes in the covers.
+        We implemented alaso a few rules with quadratic complexity, however,
+        these are not enabled by default.
+      \item If not, then split the covers and do two recursive calls on the
+        positive and nefative cofactor;
+      \item If yes, then evaluate the similarity of the current cofactors and
+        return.
+      \item During the recursion, if the \texttt{verbose mode} is enabled, all
+        the intermediate PLA files are saved to disk. The local variables and
+        the arguments passed to the recursive function are small enough not to
+        incur in a memory fault.
+    \end{enumerate}
+  \item {\bf The printer}: is responsible for invoking the methods for printing
+    the recursion tree and the PLA files if \texttt{verbose} is active.
 \end{itemize}
 
-\subsection{From SystemC to RTL}
-
-\begin{table}[b]
-\centering
-\begin{tabular}{|l|rrrr|}
-\hline
- & \textbf{Memory} & \textbf{Logic} & \textbf{TLM} & \textbf{Total} \\
-\textbf{area $mm^{2}$} & 0.9786 & 0.1139 & 0.0099 & 1.1020 \\ 
-\textbf{power $mW$}    & 47.495 & 274.99 & 1.3222 & 323.81 \\
-\hline
-\end{tabular}
-\caption{\footnotesize High Level Synthesis of the JPEG decoder, constrained with a 1GHz clock frequency}
-\label{tab:rc}
-\end{table}
-
-\begin{table*}[t]
-\centering
-\begin{tabular}{l|rcc|c|ccc}
-\hline
-\textbf{Image} & \textbf{Weight} & \textbf{Size} & \textbf{Compression} & \textbf{RTL ACC only} & \textbf{VP only} & \textbf{VP with ACC} & \textbf{VP Speedup} \\
-\hline
-chstone & 5.1K   & 90x59     & 32.67\% & 327521   & 12799005   & 9707851   & 1.31\\ 
-lena    & 6.6K   & 256x256   & 3.44\%  & 2588629  & 67969104   & 24297449  & 2.79\\
-fire    & 12.0K  & 340x340   & 3.54\%  & 4671280  & 122417017  & 38520484  & 3.17\\
-orange  & 27.0k  & 800x496   & 2.32\%  & 15476731 & 393519047  & 110264509 & 3.56\\
-moon    & 40.0k  & 900x900   & 1.69\%  & 31481890 & 784515821  & 218384556 & 3.59\\
-fish    & 107.0k & 1152x864  & 3.67\%  & 39859785 & 1037381360 & 270253629 & 3.84\\
-flower  & 85.0k  & 1600x1200 & 1.51\%  & 73838862 & 1830097863 & 502503637 & 3.64\\
-hdcol   & 166.0k & 1920x1080 & 2.73\%  & 81696290 & 2086998030 & 550907798 & 3.78\\
-\hline
-\end{tabular}
-\caption{\footnotesize Jpeg decoder tests, using a set of images, ordered by size.
-We report latency, in terms of clock cycles for the RTL version, simulated through
-CtoS, for the CHStone software, running on the ARM modeled in the Rabbits VP, and
-for the accelerated version, also running on the Rabbits VP.}
-\label{tab:lat}
-\end{table*}
-
-After coding and testing the accelerator with the fast SystemC simulations,
-we used our code as input for CtoS, which is able to generate RTL verilog.
-CtoS implementation was set to be ''target aware'', thus the tool is allowed
-to add resources taken from the standard cell library and states (i.e. it increases
-the latency), in order to meet the timing constraints.
-Since we aim to integrate the accelerator into the existing SoC, the given constraints
-are the technology (\emph{32 nm PD-SOI}) and the target clock frequency (1 GHz).
-
-The most difficult aspect in configuring the HLS is dealing with arrays which need to
-be mapped as static ram blocks, when their size is not feasible for registers.
-All the buffers, drawn in light blue in Fig.~\ref{fig:jpgdec} have been mapped
-to vendor static ram memories, whose liberty file and verilog view are provided by
-a memory generator for the same technology used for synthesis.
-
-The need of a significant number of memories, reduces the possibility for design space
-exploration, because the HLS tool is very conservative while scheduling memory accesses.
-Also memory ports are limited and the buffer chain represented in Fig.~\ref{fig:jpgdec} was
-carefully designed to avoid conflicts between processes for memory accesses.
-
-After scheduling we ran a more precise synthesis tool on the generated RTL and we obtained
-area and performance reported in Table~\ref{tab:rc}. The most relevant information provided
-is that almost 89\% of the area is memory. This is actually common for hardware accelerators,
-because they generally target a single application which operates on large amount of data.
-
-\section{Evaluation}
-\label{sec:eval}
-
-In this section we first focus on the high-level simulation of the accelerator,
-integrated in a modified version of the Rabbits Virtual Platform (VP) framework
-\cite{rabbits, cota}. The platform models the SoC described in Sec.~\ref{sec:nof},
-even if the available processor model for Rabbits is a state of the art ARMv6 core,
-instead of the ``MIPS R2000'' provided at the RTL level.
-Actually for our case study the two processors reported a similar IPC, probably
-because of the small instruction level parallelism offered by the algorithm.
-Also, we are aware of the fact that RTL simulation is cycle accurate, whereas VP is 
-not.
-Nevertheless simulating on Rabbits allowed us to compare the process of decoding
-big images, taking into account the overhead of a real system (i.e. OS, device driver,
-communication, memory latency). Such a simulation, when the picture size grows,
-is not feasible at the RTL level, because the running time explodes.
-
-We then report data concerning the RTL simulations.
-
-Table~\ref{tab:lat} summarizes simulation results with respect to the JPEG weight, the image
-size and the compression ratio.
-
-\subsection{System Level}
-
-Firstly we try to obtain a baseline as a comparison for our JPEG decoder evaluation.
-Therefore we compile the CHStone original C code for the VP ARM processor and we
-run it for different image sizes and compression ratios. The column \emph{VP only}
-in Table~\ref{tab:lat} reports the cycles measured\footnote{Rabbits is not cycle accurate}
-during this simulations.
-
-The setup for the next step is the following.
-In addition to the TLM interface, we include in our SystemC a few configuration registers,
-accessible by the NI, which will be written by a message sent from the processor
-tile, when the core is asking the accelerator for some service.
-Similarly, the core can poll another register to check whether new data are available
-to be retrieved and stored in its local L2 cache.
-Another small logic block, required to plug in the accelerator is a data width adapter.
-Its task is on one hand to collect data from the messages' payload and to build the 64
-B data token for the JPEG decoder when feeding its input. On the other hand, this logic
-receives the output data token from the decoder and must prepare the message payload for
-the NI.
-
-We then need to write and compile a piece of code for the ARM processor.
-This software routine initializes the accelerator and starts transferring
-data from memory to the decoder, using DMA. A second thread polls the
-accelerator, waiting for output data to be ready.
-To enhance simulation speed, the output is retrieved and then discarded,
-without saving the bmp file.
-
-Fig.~\ref{fig:lat_vpacc} presents the latency of the accelerated JPEG on the VP.
-Clearly the number of clock cycles grows linearly with the image size, which is
-consistent with the expected asymptotic running time of the algorithm.
-The offset is attributable to the initialization and communication overhead.
-The graph shown in Fig.~\ref{fig:speedup_vpacc} displays finally the speedup
-of the accelerated simulation with respect to the baseline described above.
-Although the trend seems to be logarithmic, the points deviate significantly
-from the curve. The reason is because compression ratio (JPEG weight) depends
-also on the specific information and features of the original picture.
-Obviously, the more details have to be encoded, the less efficient will be 
-the algorithm.
-A second issue that deserves attention is the fact that when the size of the
-picture grows too much, while the compression ratio is very low (good compression),
-the overhead for moving data can dominate the overall latency.
-
-As an anticipation to the next section, we remark that the reported speedup
-is a lower bound, because we do not capture all the micro-architectural optimizations
-included in the final RTL implementation.
+\end{abstract}
 
 
+\section{Function Similarity}
 
-\subsection{Register Transfer level}
+The similarity between two functions represents the percentage of input patterns,
+among the complete set of possible input vectors, for which the functions give
+the same output.
+For this tool we assume that the functions are completely speciefied (i.e. the
+don't care set, or DC-set, is empty).
+A brute force approach to this problem, involves the generation of the truth
+tables, starting from the covers, which has exponential complexity. A classic
+solution is to follow the ``Divide et Impera'' technique, that means to split
+the problem into smaller subproblems until a trivial and fast termination
+step can be applies.
+
+\subsection{Shannon Decomposition}
+
+When no termination rule matches the current covers, the program produces
+cofactors to split the problem. The following equation shows how we can
+recover the similarity of the original functions, given the similarity of the
+cofactors:
+
+\begin{equation}
+  \label{eq:shannon}
+  FSim(F, G) = \frac{FSim(F_{x}, G_{x}) + FSim(F_{x'}, G_{x'}}{2}
+\end{equation}
+
+Notice that the function $FSim$ takes covers as input, but returns the similarity
+of the functions they represent. Variable $x$ is a generic splitting variable.
+This simple rule is always correct, because when we split the cover, with respect
+to a variable, we obtain two cofactors which no longer depend on the splitting
+variable and contain informations about one half of the original cover.
+
+\subsection{Termination Rules}
+
+A handful set of termination rules is key to speed up the program and reduce
+the number of recursive calls. However, too complex rules have been discarded,
+because the cost for checking if they match is often times higher than the cost
+of an extra recursive call.
+
+\begin{itemize}
+  \item {\bf B1}: Both covers are empty. This is the simplest rule and we just
+    return 1.
+  \item {\bf B2}: Both covers are a tautology. Again we return 1, however,
+    tautology checking can be quite expensive, therefore, we chose not to
+    implement the complete recursive algorithm. Instead, we just try to mathc
+    tautology checking termination rules and let our main recursion continue.
+    In fact, if one of the covers is truly a tautology, this rule should probably
+    match anyway within a few recursion, while if none of the cofactors ends
+    up being a tautology, we waste lot of time doing recursive cofactoring on
+    covers, just to prove that they are not a tautology and we cannot terminate
+    the main recursion.
+  \item {\bf B3}: One cover is empty. In this case we just need to return the
+    size of the OFF-set of the non empty cover, divided by the total number of
+    possible input patterns. To get the OFF-set cardinality, we actually count
+    the number of elements in the ON-set, because the given covers contain cubes
+    which cover the ON-set. This operation is not trivial and in the most general
+    case requires to apply again the divide and conquer technique on the non
+    empty cover. This time doing a recursion to calculate the ON-set cardinality
+    is worth the effort, because this rule terminates the main recursion.
+  \item {\bf B4}: One cover is a tautology. This rule is complimentary to rule B3
+    and we need to return the ON-set cardinality of the cover which is not a
+    tautology, divided by the number of possible imput vectors.
+  \item {\bf B5}: One cover is empty and the other is a tautology. This rule gives
+    a trivial answer, which is that the similarity to be returned is 0.
+  \item {\bf B6}: Both covers have a single cube. In this case we can easily
+    calculate the cardinality of the ON-sets of the two covers, by simply
+    looking at the number of don't cares in the input part of the cubes.
+    Moreover, we can quickly calculate the intersection of the two cubes, thus
+    deriving in linear time both common zeros and common ones. The sum of common
+    zeros and common ones, divided by total number of minterms gives the similarity
+    of the covers.
+  \item {\bf B7}: One cover has a single cube and g has non intersecting cubes.
+    Assuming we can check that a cover has only non intersecting cubes, then this
+    rules extends rule B6: the size of the ON-set of the cover with multiple
+    cubes is obtained by summing up the number of minterms covered by each of
+    its cubes, while the intersection between the two covers is calculated by
+    intersecting the single cube of the first cover, with every cube of the
+    other. Notice that if the cubes in the second cover had intersections, then
+    complexity would be exponential.
+    Unfortunately, the problem of checking wether the cubes intersect or not
+    has quadratic complexity, thus we chose to let this rule as an option, which
+    can be enabled by adding the flag \texttt{--single\_disjoint} to the command
+    line when starting the tool.
+  \item {\bf B8}: Both covers have multiple non intersecting cubes. This rule
+    extends further rules B6 and B7. Intuitively this is the most powerful
+    of the three and it could save many recursive calls at the cost of two
+    quadratic checks. Again we chose to leave it as an option, enabled by
+    the flag \texttt{--multi\_disjoint}. When this rule is enabled, rule B7
+    is enabled as well.
+  \item {\bf B9}: Both covers show single input dependence with respect to
+    the same variable (same value). If this rule matches it means that the
+    covers are not tautology therfore the two covers look exactly the same,
+    but for the number of rows. Notice that there is no guarantee that the
+    initial covers or the cofactors don't have duplicated or redundant
+    cubes. In this case we obviousely return 1.
+  \item {\bf B9}: Both covers show single input dependence with respect to
+    the same variable (but different value). This is complementary to rool
+    B9 and we just return 0.
+  \item {\bf B11}: Both covers show single input dependence, but with respect
+    to different variables. In this case it does not matter whether the variable
+    is shown in its positive or complemented form. The similarity of the
+    two functions is exactly 0.5, because in this special condition the two
+    covers have half of in ON-set in common and half of the OFF-set in common.
+  \item {\bf B12}: One cover shows single input dependence. This rule is not
+    trivial, but it allows early termination, by performing one last cofactoring
+    with respect to the variable on which one cover has single input dependence.
+    In fact, we obtain one empty cofactor and a tautology, thus rules B3 and
+    B4 apply on the cofactors.
+\end{itemize}
+
+A wise ordering of the rules checking can speed up the algorithm in most cases,
+because rules with a fast check and, even more important, which allow to terminate
+quickly, will match first. Also, we combine the checking of similar rules, to
+avoid repeated calculations and we chose the following ordering:
+\begin{enumerate}
+  \item Check rules from B1 to B5;
+  \item Check rules from B9 to B12;
+  \item Check rules from B6 to B8 (depends on which are enabled);
+  \item Check unateness conditions for termination or pruning. This set of rules
+    is presented in the next section.
+\end{enumerate}
+
+\subsection{Unateness Conditions}
+
+For function similarity, having simply a condition of unateness, does not help to
+improve the speed of the algorithm, however, there are a few special cases, which
+allows to prune the recursion tree.
+
+\begin{itemize}
+  \item {\bf U13}: Both covers are positive/negative unate on the same variable with
+    no DCs. In other words, this means that both covers have either all 1's or all
+    0's on the same culumn. If we chose the variable bound to that column, then
+    rule B1 applies to a pair of cofactors and we can prune one branch of the
+    recursionon.
+  \item {\bf U14}: Both covers are unate on the same variable with no DCs, but one
+    is positive unate, while the other is negative unate. This is a termination rule
+    because it implies that the covers do not share any ON-set minterm; thus we just
+    need to calculate the cardinality of the two ON-sets to obtain the number of
+    common zeros, which divided by the total number of combinations gives the
+    similarity of the functions.
+  \item {\bf U15}: One cover is positive/negative unate in a variable Xi with no Dcs.
+    If we pick Xi as splitting variable then rule B3 applies to a pair of cofactor
+    and we can therefore prune one branch of the recursion.
+\end{itemize}
+
+Again the ordering is important, therefore we check first if rules U14 applies,
+because it terminated the recursion.
+
+\subsection{Splitting Variable}
+
+When none of the rules above applies, we pick a binate variable as splitting
+variable, to try keeping the tree balanced. This choice aims to favour rule B6,
+which is very quick to check and requires a simple calculation: getting the
+similarity of two cubes.
+
+\section{Regression Test}
+
+To test our program we implemented a script in the \texttt{Makefile} that
+executes the program with a bunch of input PLAs and checks the result against a
+golden output, which we calculated manually for most of the inputs.
+The test suite includes also a larger example, with 20 input variables,
+which we couldn't test manually.
+
+Other trivial input files, not included in the test suite, have been used to
+test the rules on by one, right after we implemented it.
+
+The regression script allowed us to build the program in an incremental way,
+checking that any additional feature we added did not compromise the
+previous functionality.
 
 
-The setup for the RTL simulation should be similar to the one described in the previous
-section for the System level. The system and the hardware wrapper for the accelerator
-are still conceptually the same, but the simulation at this level is cycle accurate
-and running time is considerably slow. Therefore we were able to run the software
-CHStone on the processor tile only using the smallest image available. The co-simulation
-of the accelerator and the rest of the system was split into two separate simulations:
-using a dummy accelerator, that fetches the input and loops back to the output, we measured the
-communication overhead for initializing the accelerator, sending and receiving the packets;
-from CtoS console, we then ran the RTL simulations of the decoder with different pictures, but
-connecting a test bench to the TLM FIFO. Also, being the processor different, we needed to
-recompile the CHStone for the baseline and the software routine used with the dummy accelerator.
+\subsection{Covers with a large support}
 
-The graph in Fig.\ref{fig:lat_rtl} shows the growth of the latency, with respect to the
-picture size. Not surprisingly, we obtain again a linear trend, but it is worth to notice
-that the coefficient measured for the System Level simulation is more than six times larger.
-This is due to two main reasons: first it confirms that the micro-architectural optimization
-allowed by the HLS tool is relevant to the performance gain achievable; second we must
-consider that the test bench is able to push inputs to the queue at the maximum sustainable
-rate for the accelerator, while the VP might not. We couldn't measure the communication
-throughput between the core and the accelerator, but we can assume that occasionally the
-decoder could be stalled, waiting for the next data token.
+Our program can easily handle large input files, with covers that have many
+cubes. However, a major constraint is given with the number of variables.
+The total number of input patterns, in fact, is exponential in the number
+of variables, but the integer type, for instance, is encoded with 32 bits,
+thus we can'r represent numbers larger than $2^{32} - 1$.
+A second issue that could occur when we have a large number of input variables
+is that the similarity could be too close to 1 or 0, thus it can't be represented
+even using double precision floating point numbers.
 
+\section{Conclusions and Possible improvements}
 
-As mentioned, we could measure the running time for the software version only with the
-smallest picture, which is the one included in CHStone code. Thus we could calculate
-the accelerator speedup for this picture, which is 18.4\texttimes. Clearly the RTL implementation
-exploits micro-architectural optimization, but if we were able to simulate different
-inputs, we could better analyze the impact of the picture size and check
-whether the speedup still grows with a logarithmic trend. Enhancing simulation speed
-for the overall SoC is left as a future work.
-At the RT level we were also allowed to measure the energy consumed by
-the accelerated execution, including both processor and accelerator tiles energy,
-with respect to the energy of software simulation with the processor only.
-The energy saving is remarkable and stands above 90\%. It is also worth to mention
-that about two thirds of the overall energy is imputable to communication.
-
-
-\section{Conclusions}
-\label{sec:end}
-
-In this project we implemented a hardware accelerator for JPEG decoding in SystemC.
-We exploit this case study in order to evaluate a design flow that takes advantage
-of a preexisting SoC infrastructure, also designed in SystemC and equipped with an RTL
-implementation of a processor tile. The design was then synthesized through a HLS
-tool, in order to estimate area and power consumption. Finally we measured through simulation
-the speedup at different level of abstraction (and therefore different accuracy),
-proving the effectiveness of the design flow and the potential benefits achievable
-with a heterogeneous SoC with hardware specific accelerators.
-
-Despite the well promising results, a weakness of this flow consists in the slow RTL
-simulation, which do not allow a complete analysis of performance for large test vectors.
-Also the HLS tool is not enough flexible when dealing with memories and design optimization
-was considerably limited. Finally we should mention that many features of SystemC,
-which enhance simulation speed and allow a quick porting of the code from another
-high level language, are lost when the designer needs to target the synthesizable subset of
-SystemC.
-
+The tool we propose performs a fast Function Similarity Evaluation starting
+from two given covers in PLA format which share the same support.
+As a further improvement to the tool we envision to implement a functio
+that performs SCC over the covers. This step could be expensive, but
+removing all redundant cubes could dramatically reduce the total
+recursive calls, thus speeding up the algorithm. Given the complexity
+of SCC, the user should be able to set a threashold on the size of the
+covers, so that the tools performs it only when the cover is small
+enough. This is a semplification ruele ({\bf M1}) which was not a
+requirement for this version of the tool.
 
 %\bibliographystyle{abbrv}
 %\bibliography{ref}
