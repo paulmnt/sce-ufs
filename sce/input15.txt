@@ -1,0 +1,10 @@
+.5
+.7
+
+f1 = abc + dea + afg
+f2 = gac + cdf + fea
+f3 = abfcd + fab + def
+f4 = abf + gfa + ge
+f5 = e + fg + d
+
+.e

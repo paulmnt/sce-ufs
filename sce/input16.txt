@@ -1,0 +1,11 @@
+.5
+.7
+
+f1 = abc
+f2 = abf
+f3 = abde
+f4 = adegcfb
+f5 = bcfe
+
+.e
+

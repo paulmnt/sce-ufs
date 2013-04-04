@@ -1,0 +1,10 @@
+.5
+.8
+
+f1 = deg + abfe + ha
+f2 = decf + abd + ag
+f3 = deag + decb + acf
+f4 = abg + agh + bcg
+f5 = g + h + acfe
+
+.e

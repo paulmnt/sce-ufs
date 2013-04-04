@@ -1,0 +1,8 @@
+.3
+.7
+
+f1 = abcf + adef + de + aceg
+f2 = acdef + defg
+f3 = bcd + acef
+
+.e

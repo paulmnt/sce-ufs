@@ -1,0 +1,9 @@
+.3
+.10 
+
+f1 = abcf + adefj + dehj + aceg
+f2 = acdef + defg + h
+f3 = bcd + acef + i
+
+.e
+

@@ -1,0 +1,8 @@
+.3
+.9
+
+f1 = ab + c
+f2 = abc + gh + af
+f3 = d + ef + ghi
+
+.e

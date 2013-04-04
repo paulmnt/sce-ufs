@@ -1,0 +1,10 @@
+.5
+.8
+
+f1 = acd + feg + agbf + abcdefg
+f2 = cdef + fhea + cdfe
+f3 = abc + adbcf + def
+f4 = acfgh + aebd + deh
+f5 = heaf + heb + agh
+
+.e

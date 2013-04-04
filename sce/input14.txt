@@ -1,0 +1,10 @@
+.5
+.7
+
+f1 = a + b + c
+f2 = ab + cd + def
+f3 = gedf + bcade + f
+f4 = a + b + abcf
+f5 = bed + def + af + agb + aef
+
+.e

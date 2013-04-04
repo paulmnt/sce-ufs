@@ -1,0 +1,9 @@
+.3
+.6 
+
+f1 = ace + bce + de + f
+f2 = ad + bd + cde + fe
+f3 = abc
+
+.e
+

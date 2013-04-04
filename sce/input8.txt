@@ -1,0 +1,25 @@
+.20
+.26
+
+f1 = ab + bc + cd + de + ef
+f2 = fg + gh + hi + ij + jk
+f3 = kl + lm + mn + op + pq
+f4 = qr + rs + st + tu + uv
+f5 = uv + vw + wy + yx + xz
+f6 = ab + bc + cd + de + ef
+f7 = fg + gh + hi + ij + jk
+f8 = kl + lm + mn + op + pq
+f9 = qr + rs + st + tu + uv
+f10 = uv + vw + wy + yx + xz
+f11 = ab + bc + cd + de + ef
+f12 = fg + gh + hi + ij + jk
+f13 = kl + lm + mn + op + pq
+f14 = qr + rs + st + tu + uv
+f15 = uv + vw + wy + yx + xz
+f16 = ab + bc + cd + de + ef
+f17 = fg + gh + hi + ij + jk
+f18 = kl + lm + mn + op + pq
+f19 = qr + rs + st + tu + uv
+f20 = uv + vw + wy + yx + xz
+
+.e

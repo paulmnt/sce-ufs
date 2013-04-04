@@ -36,7 +36,7 @@ log: $(TARGET)
 	./$(TARGET) $(TB) > run_log
 
 test: $(TARGET)
-	@(for i in 1 2 3 4 5 6 7; do 							\
+	@(for i in 1 2 3 4 5 6 7 8; do 							\
 		echo test $$i; 								\
 		./$(TARGET) ../tb/f$$i.pla ../tb/g$$i.pla;				\
 		diff recursionTree.txt ../tb/gold/tree_$$i.txt || echo TEST $$i FAILED; \

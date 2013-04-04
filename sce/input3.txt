@@ -1,0 +1,8 @@
+.2
+.6 
+
+f1 = abcf + abdef
+f2 = abcde
+
+.e
+

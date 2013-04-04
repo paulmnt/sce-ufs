@@ -1,0 +1,30 @@
+
+
+Group: Kshitij Bhardwaj amd Paolo Mantovani
+
+Platform used: CS lab machines
+
+The output files are expected in the same folder as the README file
+and other source code files.
+
+To compile:
+
+./compile-script.sh
+
+(To allow the script to execute: chmod 777 compile-script.sh)
+
+
+To run:
+
+./run input.txt <command>
+
+where <command> is
+
+-pc : to output list of cubes to a file called cubes_list.txt
+-pv : to output list of variables to a file called vars_list.txt
+-pm : to output the cube-variable matrix to a file called matrix.txt
+-ppr : to output the prime rectangles to a file called prime_rects.txt
+
+restricted.txt, which contains restricted prime rectangles and
+the final optimal solution is always output and does not require
+any command.

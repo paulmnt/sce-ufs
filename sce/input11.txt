@@ -1,0 +1,25 @@
+.20
+.26
+
+f1 = abcdefghijkmnopqrstuvwxyz + abcdeghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxy + abcdefghijkmnopqrstuvwxyz + bcdefghijklmnopqrstuvwxyz
+f2 = abcdefghijlnopqrstuvwxyz + abcdefhijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklnopqrstuvwxyz + acdefghijklmnopqrstuvwxyz
+f3 = abcdefghijklmopqrstuvwxyz + abcdefgijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmopqrstuvwxyz + abdefghijklmnopqrstuvwxyz
+f4 = abcdefghijklmnpqrstuvwxyz + abcdefghjklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnpqrstuvwxyz + abcefghijklmnopqrstuvwxyz
+f5 = abcdefghijklmnoqrstuvwxyz + abcdefghiklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnoqrstuvwxyz + abcdfghijklmnopqrstuvwxyz
+f6 = abcdefghijklmnoprstuvwxyz + abcdefghijlmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnoprstuvwxyz + abcdeghijklmnopqrstuvwxyz
+f7 = abcdefghijklmnopqstuvwxyz + abcdefghijkmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnopqstuvwxyz + abcdefhijklmnopqrstuvwxyz
+f8 = abcdefghijklmnopqrtuvwxyz + abcdefghijklnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnopqrtuvwxyz + abcdefgijklmnopqrstuvwxyz
+f9 = abcdefghijklmnopqrsuvwxyz + abcdefghijklmopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnopqrsuvwxyz + abcdefghjklmnopqrstuvwxyz
+f10 = abcdefghijklmnopqrstvwxyz + abcdefghijklmnpqrstuvwxyz + bcdefghijklmnopqrstuvwxyz + abcdefghijklmnopqrstvwxyz + abcdefghiklmnopqrstuvwxyz
+f11 = abcdefghijklmnopqrstuwxyz + abcdefghijklmnoqrstuvwxyz + acdefghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuwxyz + abcdefghijlmnopqrstuvwxyz
+f12 = abcdefghijklmnopqrstuvxyz + abcdefghijklmnoprstuvwxyz + abdefghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvxyz + abcdefghijkmnopqrstuvwxyz
+f13 = abcdefghijklmnopqrstuvwyz + abcdefghijklmnopqstuvwxyz + abcefghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwyz + abcdefghijklnopqrstuvwxyz
+f14 = abcdefghijklmnopqrstuvwxz + abcdefghijklmnopqrtuvwxyz + abcdfghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxz + abcdefghijklmopqrstuvwxyz
+f15 = abcdefghijklmnopqrstuvwxy + abcdefghijklmnopqrsuvwxyz + abcdeghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxy + abcdefghijklmnpqrstuvwxyz
+f16 = bcdefghijklmnopqrstuvwxyz + abcdefghijklmnopqrstvwxyz + abcdefhijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnpqrstuvwxyz
+f17 = acdefghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuwxyz + abcdefgijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnoqrstuvwxyz
+f18 = abdefghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvxyz + abcdefghjklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnoprstuvwxyz
+f19 = abcefghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwyz + abcdefghiklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz
+f20 = abcdfghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxz + abcdefghijlmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz + abcdefghijklmnopqrstuvwxyz
+
+.e
