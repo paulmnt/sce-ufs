@@ -1,0 +1,48 @@
+GROUP:
+	Kshitij Bhardwaj - kb2673@columbia.edu
+	Paolo Mantovani - pm2613@columbia.edu
+
+PROGRAM BASIC INFO:
+	- Language is C++
+	- No special requirements. The tool can be compiled with g++.
+
+
+LIST OF FOLDERS AND INSTRUCTIONS:
+
+./build
+	- contains the Makefile and the executable.
+
+	- to build the tool:
+	     $> cd build
+	     $> make
+
+	- to build with DEBUG printouts enabled: decomment the -DDEBUG flag and add it to $(CPPFLAGS) the Makefile.
+
+	- to show the tool help
+	     $> make help
+	     or
+	     $> make
+	     $> ./retime --help
+
+	     The tool will show the following:
+
+	- to run the regression test
+	     $> make test
+
+	- to run the tool with custom input file
+	     $> ./retime [options] <input_file>
+
+	- to clean the folder
+	     $> make clean
+
+
+./doc
+	- contains the tex and the Makefile of the write up
+
+./src
+	- contains source (*.cpp) files and header files (*.h) of the tool.
+
+./tb
+	- contains the input files for the regression test.
+
+
