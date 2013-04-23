@@ -1,3 +1,6 @@
+#ifndef __PARSER_H__
+#define __PARSER_H__
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -25,3 +28,6 @@ public:
 	vector<int> get_edge_wts_vec();
 
 };
+
+
+#endif /* __PARSER_H__ */

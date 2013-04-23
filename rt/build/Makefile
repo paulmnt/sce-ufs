@@ -5,13 +5,13 @@ LIBS   =
 LIBDIR =
 INCDIR = ../include
 TBDIR  = ../tb
-TB     = $(TBDIR)/correlator-in.txt
+TB     = --f $(TBDIR)/correlator-in.txt
 CPPFLAGS = -I $(INCDIR) -Wall -DDEBUG
 
 
 TARGET = retime
 VPATH := ../src
-SRCS = algo_cp.cpp parser.cpp kmain.cpp
+SRCS = algo_cp.cpp parser.cpp main.cpp
 HDRS = $(INCDIR)/algo_cp.h $(INCDIR)/parser.h
 OBJS = $(SRCS:.cpp=.o)
 

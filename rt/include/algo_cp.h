@@ -1,3 +1,6 @@
+#ifndef __CP_H__
+#define __CP_H__
+
 #include <parser.h>
 
 class cp{
@@ -19,3 +22,5 @@ public:
 	void visit(int u);
 
 };
+
+#endif /* __CP_H__ */

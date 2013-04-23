@@ -19,8 +19,8 @@ int cp::func_cp(parser& pobj)
 
 #ifdef DEBUG
 	for (uint i = 0; i < g0_edges.size(); i++) {
-		cout << "first vertex in g0: " << g0_edges[i][0];
-		cout << " second vertex in g0: " << g0_edges[i][1] << endl;
+		cout << "DEBUG: first vertex in g0: " << g0_edges[i][0];
+		cout << "       second vertex in g0: " << g0_edges[i][1] << endl;
        	}
 #endif
 
@@ -29,7 +29,7 @@ int cp::func_cp(parser& pobj)
 
 #ifdef DEBUG
 	for (uint i = 0; i < g0_vertices.size(); i++)
-		cout << "vertex in g0: " << g0_vertices[i]<<endl;
+		cout << "DEBUG: vertex in g0: " << g0_vertices[i]<<endl;
 #endif
 
 	//DFS for topological sort
@@ -48,7 +48,7 @@ int cp::func_cp(parser& pobj)
 	vector<int> deltav;
 	for (int i = topo_sort.size() - 1; i >= 0; i--) {
 #ifdef DEBUG
-		cout<<"vertex in topo_sort: "<<topo_sort[i]<<endl;
+		cout << "DEBUG: vertex in topo_sort: " << topo_sort[i]<<endl;
 #endif
 		deltav.push_back(-1);
 	}
@@ -72,7 +72,7 @@ int cp::func_cp(parser& pobj)
 		if(deltav[i] > max)
 			max = deltav[i];
 
-	cout << "clock period is: " << max << endl;
+	cout << "Initial clock period is: " << max << endl;
 	return max;
 }
 

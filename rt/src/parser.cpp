@@ -18,7 +18,7 @@ void parser::parse_file(char* file)
 	num_vertices++;
 
 #ifdef DEBUG
-	cout << "num_vertices: " << num_vertices<<endl;
+	cout << "DEBUG: " << "num_vertices: " << num_vertices<<endl;
 #endif
 
 	file_read = ".name";
@@ -38,8 +38,10 @@ void parser::parse_file(char* file)
 	f0.close();
 
 #ifdef DEBUG
-	for (uint i = 0; i < delay_vert_vec.size(); i++)
-		cout<<"vertex is: "<<i<<" delay is: "<<delay_vert_vec[i]<<endl;
+	for (uint i = 0; i < delay_vert_vec.size(); i++) {
+		cout << "DEBUG: " << "vertex is: " << i << " delay is: ";
+		cout << delay_vert_vec[i] << endl;
+	}
 #endif
 
 	f0.open(file);
@@ -58,7 +60,7 @@ void parser::parse_file(char* file)
 	getline(f0, line);
 
 #ifdef DEBUG
-	cout<< "comment if present is: " << line << endl;
+	cout << "DEBUG: " << "comment if present is: " << line << endl;
 #endif
 
 	while (line != ".e"){
@@ -86,9 +88,9 @@ void parser::parse_file(char* file)
 
 #ifdef DEBUG
 	for (uint i = 0; i < edge_wts_vec.size(); i++) {
-		cout << "first vertex: " << edges_vec[i][0];
-		cout << " second vertex: " << edges_vec[i][1];
-		cout << " edge weight: " << edge_wts_vec[i]<<endl;
+		cout << "DEBUG: first vertex: " << edges_vec[i][0];
+		cout << "       second vertex: " << edges_vec[i][1];
+		cout << "       edge weight: " << edge_wts_vec[i] << endl;
 	}
 #endif
 
