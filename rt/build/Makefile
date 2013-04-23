@@ -1,28 +1,29 @@
 TARGET_ARCH = linux64
 CC = g++
-CPPFLAGS = -Wall -DDEBUG
 
 LIBS   =
 LIBDIR =
-INCDIR = -I../include
+INCDIR = ../include
 TBDIR  = ../tb
-TB     = $(TBDIR)/g1
+TB     = $(TBDIR)/correlator-in.txt
+CPPFLAGS = -I $(INCDIR) -Wall -DDEBUG
 
 
 TARGET = retime
 VPATH := ../src
-SRCS = main.cpp rt.cpp
-HDRS = rt.h
+SRCS = algo_cp.cpp parser.cpp kmain.cpp
+HDRS = $(INCDIR)/algo_cp.h $(INCDIR)/parser.h
 OBJS = $(SRCS:.cpp=.o)
 
 .SUFFIXES: .cpp .cc .o
 $(TARGET): $(OBJS)
-	@$(CC) $(CPPFLAGS) ${INCDIR} ${LIBDIR} -o $@ $(OBJS) ${LIBS}
+	@$(CC) $(CPPFLAGS) ${LIBDIR} -o $@ $(OBJS) ${LIBS}
+	@rm -rf *.o
 
 $(OBJS): $(HDRS)
 
 .cpp.o:
-	@$(CC) $(CPPFLAGS) ${INCDIR} -c $<
+	@$(CC) $(CPPFLAGS) -c $<
 
 clean:
 	@ rm -rf *.o $(TARGET) *.txt *log
