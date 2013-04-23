@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 
+#include <sng.h>
 #include <parser.h>
 #include <algo_cp.h>
 
