@@ -1,67 +1,52 @@
 #include <parser.h>
 
-void parser::parse_file(char* file)
+sng *parser::parse_file(char* file)
 {
 	fstream f0;
 	f0.open(file);
 
+	if (!f0.good()) {
+		cout << "ERROR: cannot read input file " << file << endl;
+		return NULL;
+	}
+
 	string file_read = ".name";
-	int read_delay_vert = 0;
+	string name;
+	uint num_vertices;
 
-	delay_vert_vec.push_back(0);
-
-	while (file_read != ".e") {
+	while (file_read != ".d") {
 		f0 >> file_read;
+		if (file_read == ".name")
+			f0 >> name;
 		if(file_read == ".n")
 			f0 >> num_vertices;
 	}
 	num_vertices++;
 
-#ifdef DEBUG
-	cout << "DEBUG: " << "num_vertices: " << num_vertices<<endl;
-#endif
-
-	file_read = ".name";
-	f0.close();
-
-	f0.open(file);
-
-	while (file_read != ".e") {
-		f0>>file_read;
-		if (file_read == ".d")
-			for (int i = 0; i < num_vertices - 1; i++) {
-				f0 >> read_delay_vert;
-				delay_vert_vec.push_back(read_delay_vert);
-			}
-	}
-	file_read = ".name";
-	f0.close();
+	sng *graph = new sng(name, num_vertices);
 
 #ifdef DEBUG
-	for (uint i = 0; i < delay_vert_vec.size(); i++) {
-		cout << "DEBUG: " << "vertex is: " << i << " delay is: ";
-		cout << delay_vert_vec[i] << endl;
-	}
+	cout << "DEBUG: " << name << "has " << num_vertices << " vertices" << endl;
 #endif
 
-	f0.open(file);
+	uint delay;
+	for (uint i = 1; i < num_vertices; i++) {
+		f0 >> delay;
+		graph->set_vertex_delay(i, delay);
+	}
 
 	string line;
+	uint edge_id = 0;
 
-	while (file_read != ".e") {
-		f0>>file_read;
-		if (file_read == ".g")
-			break;
-	}
+	while (file_read != ".g")
+		f0 >> file_read;
 
-	int num_lines = 0;
-	string vert_str;
-
+	/* Skip comment if any */
 	getline(f0, line);
-
 #ifdef DEBUG
-	cout << "DEBUG: " << "comment if present is: " << line << endl;
+	cout << "DEBUG: " << "comment after .g if present is: " << line << endl;
 #endif
+
 
 	while (line != ".e"){
 		getline(f0, line);
@@ -70,48 +55,26 @@ void parser::parse_file(char* file)
 			break;
 
 		istringstream iss(line);
-		int a, b, c;
-
+		uint a, b, c;
 		iss >> a;
 		iss >> b;
 		iss >> c;
+		graph->add_edge(edge_id, c, a, b);
 
-		vector<int> edge;
-		edge.push_back(a);
-		edge.push_back(b);
-
-		edges_vec.push_back(edge);
-		edge_wts_vec.push_back(c);
-
-		num_lines++;
+		edge_id++;
 	}
 
 #ifdef DEBUG
-	for (uint i = 0; i < edge_wts_vec.size(); i++) {
-		cout << "DEBUG: first vertex: " << edges_vec[i][0];
-		cout << "       second vertex: " << edges_vec[i][1];
-		cout << "       edge weight: " << edge_wts_vec[i] << endl;
+	for (uint i = 0; i < edge_id; i++) {
+		cout << "DEBUG: ";
+		graph->print_edge(i);
+	}
+	for (uint i = 0; i < num_vertices; i++) {
+		cout << "DEBUG: ";
+		graph->print_vertex(i);
 	}
 #endif
 
-}
-
-int parser::get_num_vertices()
-{
-	return num_vertices;
-}
-
-vector<int> parser::get_delay_vert_vec()
-{
-	return delay_vert_vec;
-}
-
-vector<vector<int> > parser::get_edges_vec()
-{
-	return edges_vec;
-}
-
-vector<int> parser::get_edge_wts_vec()
-{
-	return edge_wts_vec;
+	f0.close();
+	return graph;
 }

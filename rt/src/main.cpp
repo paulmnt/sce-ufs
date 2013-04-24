@@ -5,7 +5,7 @@
 
 #include <sng.h>
 #include <parser.h>
-#include <algo_cp.h>
+//#include <algo_cp.h>
 
 using namespace std;
 
@@ -103,21 +103,21 @@ int main(int argc, char **argv) {
 
 	/* Open and parse input file */
 	parser ip;
-	ip.parse_file(INFILE);
-/*
-	int lits = in.get_lits();
-	if (lits < 0) {
-		cout << "ERROR: Bad input file path" << endl;
+	sng *graph  = NULL;
+	graph = ip.parse_file(INFILE);
+	if (!graph)
 		return 1;
-	}
-*/
 
+
+/*
 	if (minphi) {
 		cp cpobj;
 		cpobj.func_cp(ip);
 	} else
 		//TODO!!!!
 		cout << "INFO: Minimum Area mode not implemented yet" << endl;
+*/
+
 
 	/* Print output */
 /*
