@@ -1,7 +1,7 @@
 #ifndef __CP_H__
 #define __CP_H__
 
-#include <parser.h>
+#include <sng.h>
 
 class cp{
 
@@ -15,11 +15,17 @@ private:
 	int time;
 	vector<int> topo_sort;
 
+	sng *graph;
+	vector<vertex *> topo_sorted;
 
 public:
+	cp(sng *g)
+	{
+		graph = g;
+	}
 
-	int func_cp(parser& pobj);
-	void visit(int u);
+	int func_cp();
+	void visit(vertex *u);
 
 };
 

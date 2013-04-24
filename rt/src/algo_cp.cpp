@@ -1,50 +1,31 @@
 #include <algo_cp.h>
 
-int cp::func_cp(parser& pobj)
+int cp::func_cp()
 {
-        vector<int> delay_vert_vec_cp = pobj.get_delay_vert_vec();
-        vector<vector<int> > edges_vec_cp = pobj.get_edges_vec();
-        vector<int> edge_wts_vec_cp = pobj.get_edge_wts_vec();
-
-	for (uint i = 0; i < edge_wts_vec_cp.size(); i++) {
-		if (edge_wts_vec_cp[i] == 0) {
-			vector<int> temp_g0;
-			temp_g0.push_back(edges_vec_cp[i][0]);
-			temp_g0.push_back(edges_vec_cp[i][1]);
-			g0_vertices.push_back(edges_vec_cp[i][0]);
-			g0_vertices.push_back(edges_vec_cp[i][1]);
-			g0_edges.push_back(temp_g0);
-		}
-	}
 
 #ifdef DEBUG
-	for (uint i = 0; i < g0_edges.size(); i++) {
-		cout << "DEBUG: first vertex in g0: " << g0_edges[i][0];
-		cout << "       second vertex in g0: " << g0_edges[i][1] << endl;
-       	}
-#endif
-
-        sort(g0_vertices.begin(), g0_vertices.end());
-       	g0_vertices.erase(unique(g0_vertices.begin(), g0_vertices.end()), g0_vertices.end());
-
-#ifdef DEBUG
-	for (uint i = 0; i < g0_vertices.size(); i++)
-		cout << "DEBUG: vertex in g0: " << g0_vertices[i]<<endl;
+	cout << "DEBUG: CP... DFS on G0" << endl;
 #endif
 
 	//DFS for topological sort
-	for (uint i = 0; i < g0_vertices.size(); i++) {
-		color.push_back("white");
-		dis.push_back(0);
-		fin.push_back(0);
+	graph->clear_color();
+
+	for (uint i = 0; i < graph->get_num_vertices(); i++) {
+		vertex *u = graph->get_vertex(i);
+		if (u->get_color() == WHITE)
+			visit(u);
 	}
 
-	time = 0;
+	reverse(topo_sorted.begin(), topo_sorted.end());
 
-	for (uint i = 0; i < g0_vertices.size(); i++)
-		if (color[i] == "white")
-			visit(i);
+#ifdef DEBUG
+	cout << "       vertex in topo_sort: ";
+	for (uint i = 0; i < topo_sorted.size(); i++)
+		cout  << topo_sorted[i]->get_id() << " ";
+	cout << endl;
+#endif
 
+/*
 	vector<int> deltav;
 	for (int i = topo_sort.size() - 1; i >= 0; i--) {
 #ifdef DEBUG
@@ -74,29 +55,23 @@ int cp::func_cp(parser& pobj)
 
 	cout << "Initial clock period is: " << max << endl;
 	return max;
+*/
+	return 0;
 }
 
-void cp::visit(int u)
+void cp::visit(vertex *u)
 {
-	color[u] = "gray";
-	time++;
-	dis[u] = time;
+#ifdef DEBUG
+	cout << "       Visiting " << u->get_id() << "..." << endl;
+#endif
+	u->set_color(GRAY);
 
-	vector<int> adj;
+	for (uint i = 0; i < u->out.size(); i++) {
+		vertex *next = u->out[i]->dst;
+		if (!u->out[i]->weight && (next->get_color() == WHITE))
+			visit(next);
+	}
 
-	for (uint i = 0; i < g0_edges.size(); i++)
-		if (g0_vertices[u] == g0_edges[i][0])
-			adj.push_back(g0_edges[i][1]);
-
-	for (uint i = 0; i < adj.size(); i++)
-		for (uint j = 0; j < g0_vertices.size(); j++)
-			if (g0_vertices[j] == adj[i])
-				if(color[j] == "white")
-					visit(j);
-
-	color[u] = "black";
-	time++;
-	fin[u] = time;
-
-	topo_sort.push_back(g0_vertices[u]);
+	u->set_color(BLACK);
+	topo_sorted.push_back(u);
 }

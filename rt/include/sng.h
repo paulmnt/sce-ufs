@@ -15,11 +15,16 @@ using namespace std;
 
 class edge;
 
+#define WHITE 0
+#define GRAY 1
+#define BLACK 2
+
 class vertex {
 
 public:
 	vertex(uint i) {
 		id = i;
+		color = WHITE;
 	}
 
 	void set_delay(uint d)
@@ -45,12 +50,34 @@ public:
 		out.push_back(e);
 	}
 
+	int get_color()
+	{
+		return color;
+	}
+	void set_color(int c)
+	{
+		color = c;
+	}
+
+	uint get_delta()
+	{
+		return delta;
+	}
+	void set_delta(uint d)
+	{
+		delta = d;
+	}
+
 	vector<edge *> in;
 	vector<edge *> out;
 
 private:
 	uint id;
 	uint delay;
+	/* Color used to walk the graph */
+	int color;
+	/* Accumulated delay on worst path with no registers including delay */
+	uint delta;
 };
 
 
@@ -118,7 +145,6 @@ public:
 		edges.push_back(e);
 		vertices[u]->add_out_edge(e);
 		vertices[v]->add_in_edge(e);
-		edges[edge_id]->print();
 	}
 
 	void print_vertex(uint vind)
@@ -146,6 +172,43 @@ public:
 		else
 			cout << "ERROR: edge index out of bound" << endl;
 	}
+
+	void clear_color()
+	{
+		for (uint i = 0; i < vertices.size(); i++)
+			vertices[i]->set_color(0);
+	}
+	void set_v_color(uint vind, int color)
+	{
+		if (vind < vertices.size())
+			vertices[vind]->set_color(color);
+		else
+			cout << "ERROR: vertex index out of bound" << endl;
+	}
+	int get_v_color(uint vind)
+	{
+		if (vind < vertices.size())
+			return vertices[vind]->get_color();
+		else {
+			cout << "ERROR: vertex index out of bound" << endl;
+			return -1;
+		}
+	}
+	uint get_num_vertices()
+	{
+		return vertices.size();
+	}
+
+	vertex *get_vertex(uint vind)
+	{
+		if (vind < vertices.size())
+			return vertices[vind];
+		else {
+			cout << "ERROR: vertex index out of bound" << endl;
+			return NULL;
+		}
+	}
+
 
 private:
 	string name;

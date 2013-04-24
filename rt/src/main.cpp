@@ -5,7 +5,7 @@
 
 #include <sng.h>
 #include <parser.h>
-//#include <algo_cp.h>
+#include <algo_cp.h>
 
 using namespace std;
 
@@ -108,7 +108,8 @@ int main(int argc, char **argv) {
 	if (!graph)
 		return 1;
 
-
+	cp cpobj(graph);
+	cpobj.func_cp();
 /*
 	if (minphi) {
 		cp cpobj;

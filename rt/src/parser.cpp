@@ -2,6 +2,11 @@
 
 sng *parser::parse_file(char* file)
 {
+
+#ifdef DEBUG
+	cout << "DEBUG: PARSING..." << endl;
+#endif
+
 	fstream f0;
 	f0.open(file);
 
