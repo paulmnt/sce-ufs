@@ -2,6 +2,10 @@
 
 void wd::init_wd(sng *graph)
 {
+#ifdef DEBUG
+	cout << "DEBUG: COMPUTING WD MATRICES..." << endl;
+#endif
+
 	g = graph;
 
 	for (uint i = 0; i < n; i++)
@@ -61,9 +65,12 @@ void wd::compute_wd()
 						w[i][j] = w[i][k] + w[k][j];
 						d[i][j] = d[i][k] + d[k][j];
 					}
-				if (k == n - 1)
+				if (k == n - 1) {
 					/* Add destination vertex delay */
 					d[i][j] += g->get_vertex_delay(j);
+					/* Populate sorted_d vector */
+					sorted_d.push_back(d[i][j]);
+				}
 			}
 	}
 
@@ -79,7 +86,7 @@ void wd::compute_wd()
 		}
 		cout << endl;
 	}
-	cout << "DEBUG: D0 Matrix..." << endl;
+	cout << "DEBUG: D Matrix..." << endl;
 	for (uint i = 0; i < n; i++) {
 		cout << "       ";
 		for (uint j = 0; j < n; j++)
@@ -91,4 +98,23 @@ void wd::compute_wd()
 	}
 #endif
 
+}
+
+
+void wd::sort_d()
+{
+	/* Sort d vector and remove duplicates */
+	sort(sorted_d.begin(), sorted_d.end());
+	vector<uint>::iterator it;
+	it = unique(sorted_d.begin(), sorted_d.end());
+	sorted_d.resize(distance(sorted_d.begin(), it));
+
+
+#ifdef DEBUG
+	cout << "DEBUG: Sorted and Unique D elements for binary search" << endl;
+	cout << "       ";
+	for (uint i = 0; i < sorted_d.size(); i++)
+		cout << sorted_d[i] << " ";
+	cout << endl;
+#endif
 }

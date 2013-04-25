@@ -125,6 +125,7 @@ int main(int argc, char **argv) {
 		wdobj.compute_wd();
 
 		/* Step 2: TODO Sort elements in the range of D */
+		wdobj.sort_d();
 
 		/* Step 3: Binary search the minimum cycle phi with FEAS */
 		cp cpobj(graph);

@@ -21,14 +21,29 @@ public:
 
 	void init_wd(sng *graph);
 	void compute_wd();
+	void sort_d();
+
+	uint get_target_phi_list_size()
+	{
+		return sorted_d.size();
+	}
+	uint get_target_phi(uint i)
+	{
+		if (i < sorted_d.size())
+			return sorted_d[i];
+		else {
+			cout << "ERROR: sorted_d index out of bound" << endl;
+			return UINT_MAX;
+		}
+	}
 
 private:
-	void copy_wd();
-
 	uint **w;
 	uint **d;
 	uint n;
 	sng *g;
+
+	vector<uint> sorted_d;
 };
 
 #endif

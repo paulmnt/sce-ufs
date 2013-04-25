@@ -4,7 +4,7 @@ int cp::func_cp()
 {
 
 #ifdef DEBUG
-	cout << "DEBUG: CP... DFS on G0" << endl;
+	cout << "DEBUG: RUNNING CP... DFS on G0" << endl;
 #endif
 
 	//DFS for topological sort
