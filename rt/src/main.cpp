@@ -7,13 +7,14 @@
 #include <parser.h>
 #include <algo_cp.h>
 #include <algo_wd.h>
+#include <algo_feas.h>
 
 using namespace std;
 
 static char *INFILE;        // Input file passed from command line
 static bool verb = false;   // Verbose disabled by default
 static bool minphi = true;  // Default mode is minimum cycle
-static int phi = 0;         // target clock cycle
+static int target_phi = 0;         // target clock cycle
 static int flags_count = 1;
 
 /* Returns the index of the argument if found. 0 otherwise */
@@ -58,13 +59,13 @@ static int parse_flags(int argc, char **argv)
 			return 1;
 		}
 		stringstream ss(argv[index + 1]);
-		ss >> phi;
-		if (!phi || phi < 1) {
+		ss >> target_phi;
+		if (!target_phi || target_phi < 1) {
 			cout << "ERROR: Mode --phi requires target cycle > 0" << endl;
 			cout << "To display options: retime --help" << endl;
 			return 1;
 		}
-		cout << "INFO: Minimum area mode enabled with target cycle " << phi << endl;
+		cout << "INFO: Minimum area mode enabled with target cycle " << target_phi << endl;
 	}
 	if (minphi)
 		cout << "INFO: Minimum cycle mode enabled" << endl;
@@ -102,25 +103,35 @@ int main(int argc, char **argv) {
 	if (pf)
 		return 1;
 
+	sng *graph  = NULL; // Synch. Network Graph
+	int phi;            // Cycle
+	int *r;             // Retiming vector
+
 	/* Open and parse input file */
 	parser ip;
-	sng *graph  = NULL;
 	graph = ip.parse_file(INFILE);
 	if (!graph)
 		return 1;
 
-	cp cpobj(graph);
-	int phi = cpobj.func_cp();
-	cout << "Initial clock period is: " << phi << endl;
-
-	uint n = graph->get_num_vertices();
-	uint **w = NULL;
-	int **d = NULL;
-	wd wdobj(n, w, d);
-	wdobj.init_wd(graph);
-	wdobj.compute_wd();
-
 	if (minphi) {
+		/* OPT2 */
+
+		/* Step 1: Compute W and D */
+		uint n = graph->get_num_vertices();
+		uint **w = NULL;
+		uint **d = NULL;
+		wd wdobj(n, w, d);
+		wdobj.init_wd(graph);
+		wdobj.compute_wd();
+
+		/* Step 2: TODO Sort elements in the range of D */
+
+		/* Step 3: Binary search the minimum cycle phi with FEAS */
+		cp cpobj(graph);
+		phi = cpobj.func_cp();
+		cout << "Initial clock period is: " << phi << endl;
+
+		/* Step 4: TODO Apply retiming vector to the graph */
 
 	} else
 		//TODO!!!!
