@@ -25,38 +25,38 @@ int cp::func_cp()
 	cout << endl;
 #endif
 
-/*
-	vector<int> deltav;
-	for (int i = topo_sort.size() - 1; i >= 0; i--) {
+	for (uint i = 0; i < topo_sorted.size(); i++) {
+		vertex *u = topo_sorted[i];
+		uint u_delay = u->get_delay();
+		uint src_delta_max = 0;
+		for (uint j = 0; j < u->in.size(); j++)
+			if (!u->in[j]->weight) {
+				uint src_delta = u->in[j]->src->get_delta();
+				if (src_delta > src_delta_max)
+					src_delta_max = src_delta;
+			}
+		u->set_delta(u_delay + src_delta_max);
+	}
+
+
 #ifdef DEBUG
-		cout << "DEBUG: vertex in topo_sort: " << topo_sort[i]<<endl;
+	cout << "DEBUG: vertex deltas in topo_sort: ";
+	for (uint i = 0; i < topo_sorted.size(); i++)
+		cout  << topo_sorted[i]->get_delta() << " ";
+	cout << endl;
 #endif
-		deltav.push_back(-1);
+
+	uint max = 0;
+	for (uint i = 0; i < topo_sorted.size(); i++) {
+		uint delta = topo_sorted[i]->get_delta();
+		if (delta > max)
+			max = delta;
 	}
 
-	int max = -1;
-	for (int i = topo_sort.size() - 1; i >= 0; i--) {
-		deltav[topo_sort[i]] = delay_vert_vec_cp[topo_sort[i]];
-		max = -1;
-
-		for (uint j = 0; j < g0_edges.size(); j++)
-			if (topo_sort[i] == g0_edges[j][1])
-				if (deltav[g0_edges[j][0]] > max)
-					max = deltav[g0_edges[j][0]];
-
-		if(max > -1)
-			deltav[topo_sort[i]] = delay_vert_vec_cp[topo_sort[i]] + max;
-	}
-
-	max = -1;
-	for (uint i = 0; i < deltav.size(); i++)
-		if(deltav[i] > max)
-			max = deltav[i];
-
-	cout << "Initial clock period is: " << max << endl;
+#ifdef DEBUG
+	cout << "DEBUG: CP... Initial clock period is: " << max << endl;
+#endif
 	return max;
-*/
-	return 0;
 }
 
 void cp::visit(vertex *u)

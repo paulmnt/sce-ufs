@@ -11,8 +11,8 @@ CPPFLAGS = -I $(INCDIR) -Wall -DDEBUG
 
 TARGET = retime
 VPATH := ../src
-SRCS = parser.cpp algo_cp.cpp main.cpp
-HDRS = $(INCDIR)/sng.h $(INCDIR)/algo_cp.h $(INCDIR)/parser.h
+SRCS = parser.cpp algo_cp.cpp algo_wd.cpp main.cpp
+HDRS = $(INCDIR)/sng.h $(INCDIR)/algo_wd.h $(INCDIR)/algo_cp.h $(INCDIR)/parser.h
 OBJS = $(SRCS:.cpp=.o)
 
 .SUFFIXES: .cpp .cc .o

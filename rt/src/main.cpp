@@ -6,6 +6,7 @@
 #include <sng.h>
 #include <parser.h>
 #include <algo_cp.h>
+#include <algo_wd.h>
 
 using namespace std;
 
@@ -109,15 +110,22 @@ int main(int argc, char **argv) {
 		return 1;
 
 	cp cpobj(graph);
-	cpobj.func_cp();
-/*
+	int phi = cpobj.func_cp();
+	cout << "Initial clock period is: " << phi << endl;
+
+	uint n = graph->get_num_vertices();
+	uint **w = NULL;
+	uint **d = NULL;
+	wd wdobj(n, w, d);
+	wdobj.init_wd(graph);
+	wdobj.compute_wd();
+
 	if (minphi) {
-		cp cpobj;
-		cpobj.func_cp(ip);
+
 	} else
 		//TODO!!!!
 		cout << "INFO: Minimum Area mode not implemented yet" << endl;
-*/
+
 
 
 	/* Print output */

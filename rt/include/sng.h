@@ -9,8 +9,8 @@
 using namespace std;
 
 /**
- * Synchronous Network Graph header defines all data structures used within
- * the implementation of the retiming tool
+ * Synchronous Network Graph header defines data structures used to represent
+ * the synchronous network as a directed graph with edge weights and nodes delay
  */
 
 class edge;
@@ -30,6 +30,8 @@ public:
 	void set_delay(uint d)
 	{
 		delay = d;
+		/* Accumulated delay is at least delay */
+		delta = delay;
 	}
 	uint get_delay()
 	{
@@ -198,6 +200,10 @@ public:
 	{
 		return vertices.size();
 	}
+	uint get_num_edges()
+	{
+		return edges.size();
+	}
 
 	vertex *get_vertex(uint vind)
 	{
@@ -205,6 +211,15 @@ public:
 			return vertices[vind];
 		else {
 			cout << "ERROR: vertex index out of bound" << endl;
+			return NULL;
+		}
+	}
+	edge *get_edge(uint eind)
+	{
+		if (eind < edges.size())
+			return edges[eind];
+		else {
+			cout << "ERROR: edge index out of bound" << endl;
 			return NULL;
 		}
 	}
