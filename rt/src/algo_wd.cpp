@@ -79,7 +79,7 @@ void wd::compute_wd()
 		}
 		cout << endl;
 	}
-	cout << "DEBUG: D0 initial Matrix..." << endl;
+	cout << "DEBUG: D0 Matrix..." << endl;
 	for (uint i = 0; i < n; i++) {
 		cout << "       ";
 		for (uint j = 0; j < n; j++)
