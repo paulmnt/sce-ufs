@@ -5,7 +5,6 @@
 
 #include <sng.h>
 #include <parser.h>
-#include <algo_cp.h>
 #include <algo_wd.h>
 #include <algo_feas.h>
 
@@ -124,13 +123,15 @@ int main(int argc, char **argv) {
 		wdobj.init_wd(graph);
 		wdobj.compute_wd();
 
-		/* Step 2: TODO Sort elements in the range of D */
+		/* Step 2: Sort elements in the range of D */
 		wdobj.sort_d();
 
 		/* Step 3: Binary search the minimum cycle phi with FEAS */
-		cp cpobj(graph);
-		phi = cpobj.func_cp();
-		cout << "Initial clock period is: " << phi << endl;
+		feas feasobj(graph);
+		phi = feasobj.get_initial_phi();
+		for (uint h = 0; h < wdobj.get_target_phi_list_size(); h++) {
+
+		}
 
 		/* Step 4: TODO Apply retiming vector to the graph */
 

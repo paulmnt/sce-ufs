@@ -1,8 +1,9 @@
 #include "algo_feas.h"
 
-bool feas::func_feas(sng *g, int c, int *r) {
+bool feas::func_feas(int c, int *r) {
 
 /*
+
 	vector<int> retime_vert;
 	vector<int> re_wts_edges = wts_edges;
 
