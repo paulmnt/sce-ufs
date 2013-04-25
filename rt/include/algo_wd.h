@@ -8,18 +8,14 @@
 class wd {
 
 public:
-	wd(uint size, uint **wptr, uint **dptr)
+	wd(uint size, uint **wptr, int **dptr)
 	{
 		n = size;
 		w = new uint*[n];
-		d = new uint*[n];
-		w1 = new uint*[n];
-		d1 = new uint*[n];
+		d = new int*[n];
 		for (uint i = 0; i < n; i++) {
 			w[i] = new uint[n];
-			d[i] = new uint[n];
-			w1[i] = new uint[n];
-			d1[i] = new uint[n];
+			d[i] = new int[n];
 		}
 	}
 
@@ -30,9 +26,7 @@ private:
 	void copy_wd();
 
 	uint **w;
-	uint **d;
-	uint **w1;
-	uint **d1;
+	int **d;
 	uint n;
 	sng *g;
 };

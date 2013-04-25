@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
 
 	uint n = graph->get_num_vertices();
 	uint **w = NULL;
-	uint **d = NULL;
+	int **d = NULL;
 	wd wdobj(n, w, d);
 	wdobj.init_wd(graph);
 	wdobj.compute_wd();
