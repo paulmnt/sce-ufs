@@ -130,26 +130,30 @@ int main(int argc, char **argv) {
 		/* Step 3: Binary search the minimum cycle phi with FEAS */
 		feas feasobj(graph, n);
 		r = new int[n];
+		feasobj.init_r(r);
 		uint max_ind;
 		uint min_ind = 0;
 		uint ind;
-		feasobj.func_feas(13, r);
 
-//TODO: decomment and complete the calls to feas with binary search
-/*		for (uint h = 0; h < wdobj.get_target_phi_list_size(); h++) {
+		for (uint h = 0; h < wdobj.get_target_phi_list_size(); h++) {
 			if (wdobj.get_target_phi(h) == phi) {
 				max_ind = h;
 				break;
 			}
 		}
-*/		/* We assume zero cycle not feasible (true for any circuit) */
-/*		ind = max_ind / 2;
+		/* We assume zero cycle not feasible (true for any circuit) */
+		ind = max_ind / 2;
 		while (ind != min_ind) {
-			if (max_ind == min_ind + 1)
-				ind = min_ind;
+			uint c = wdobj.get_target_phi(ind);
+			if (feasobj.func_feas(c, r)) {
+				phi = c;
+				max_ind = ind;
+			} else
+				min_ind = ind;
+			ind = (max_ind + min_ind) / 2;
 		}
-*/		/* Step 4: TODO: Print output */
-
+		/* Step 4: TODO: Print output */
+		cout << "Minimum feasible cycle is " << phi << endl;
 	} else
 		//TODO!!!!
 		cout << "INFO: Minimum Area mode not implemented yet" << endl;

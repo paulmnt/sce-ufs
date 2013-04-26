@@ -24,7 +24,7 @@ int cp::func_cp(sng *graph)
 #ifdef DEBUG
 	cout << "DEBUG: vertex in topo_sort: ";
 	for (uint i = 0; i < topo_sorted.size(); i++)
-		cout  << topo_sorted[i]->get_id() << " ";
+		cout  << " " << topo_sorted[i]->get_id() << " ";
 	cout << endl;
 #endif
 
@@ -43,9 +43,12 @@ int cp::func_cp(sng *graph)
 
 
 #ifdef DEBUG
-	cout << "DEBUG: vertex deltas in topo_sort: ";
+	cout << "DEBUG: vertex deltas      : ";
 	for (uint i = 0; i < topo_sorted.size(); i++)
-		cout  << topo_sorted[i]->get_delta() << " ";
+		if (topo_sorted[i]->get_delta() < 10)
+			cout << " " << topo_sorted[i]->get_delta() << " ";
+		else
+			cout  << topo_sorted[i]->get_delta() << " ";
 	cout << endl;
 #endif
 

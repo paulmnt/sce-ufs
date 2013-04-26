@@ -33,6 +33,7 @@ public:
 
 	void compute_retiming(uint c, int *r);
 	void update_retiming(int *src, int *dst);
+	void copy_retiming(int *src, int *dst);
 
 private:
 	cp cpobj;
