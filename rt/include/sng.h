@@ -98,7 +98,7 @@ public:
 
 	void print()
 	{
-		cout << "Edge " << id << ": ";
+		cout << "      Edge " << id << ": ";
 		cout << src->get_id() << "->" << dst->get_id();
 		cout << "; w=" << weight << endl;
 	}

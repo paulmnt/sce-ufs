@@ -100,7 +100,7 @@ bool feas::func_feas(uint c, int *rptr) {
 		retime_sng(retime_vect);
 	}
 
-	cout << "INFO: Target cycle was " << c << ", achieved is " << phi << endl;
+	cout << "      FEAS: Target cycle was " << c << ", achieved is " << phi << endl;
 
 	delete[] retime_vect;
 	if (phi <= c) {

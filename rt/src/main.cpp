@@ -153,7 +153,13 @@ int main(int argc, char **argv) {
 			ind = (max_ind + min_ind) / 2;
 		}
 		/* Step 4: TODO: Print output */
-		cout << "Minimum feasible cycle is " << phi << endl;
+		cout << "INFO: Minimum feasible cycle is " << phi << endl;
+		cout << "      Retiming vector is ";
+		for (uint i = 0; i < n; i++)
+			cout << r[i] << " ";
+		cout << endl;
+		for (uint i = 0; i < graph->get_num_edges(); i++)
+			graph->print_edge(i);
 	} else
 		//TODO!!!!
 		cout << "INFO: Minimum Area mode not implemented yet" << endl;
