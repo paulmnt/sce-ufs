@@ -1,15 +1,18 @@
 #include <algo_cp.h>
 
-int cp::func_cp()
+int cp::func_cp(sng *graph)
 {
 
-#ifdef DEBUG
-	cout << "DEBUG: RUNNING CP... DFS on G0" << endl;
-#endif
+	cout << "INFO: RUNNING CP... DFS on G" << endl;
 
-	//DFS for topological sort
+	/* Clear elements of vector topo_sorted from last CP */
+	topo_sorted.clear();
+	/* Clear info from last DFS */
 	graph->clear_color();
+	/* Reset accumulated delays from last CP */
+	graph->reset_deltas();
 
+	/* DFS for topological sort */
 	for (uint i = 0; i < graph->get_num_vertices(); i++) {
 		vertex *u = graph->get_vertex(i);
 		if (u->get_color() == WHITE)
@@ -19,7 +22,7 @@ int cp::func_cp()
 	reverse(topo_sorted.begin(), topo_sorted.end());
 
 #ifdef DEBUG
-	cout << "       vertex in topo_sort: ";
+	cout << "DEBUG: vertex in topo_sort: ";
 	for (uint i = 0; i < topo_sorted.size(); i++)
 		cout  << topo_sorted[i]->get_id() << " ";
 	cout << endl;
@@ -53,9 +56,7 @@ int cp::func_cp()
 			max = delta;
 	}
 
-#ifdef DEBUG
-	cout << "DEBUG: CP... Initial clock period is: " << max << endl;
-#endif
+	cout << "INFO: CP... clock period is: " << max << endl;
 	return max;
 }
 

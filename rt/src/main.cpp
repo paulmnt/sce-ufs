@@ -102,9 +102,9 @@ int main(int argc, char **argv) {
 	if (pf)
 		return 1;
 
-	sng *graph  = NULL; // Synch. Network Graph
-	int phi;            // Cycle
-	int *r;             // Retiming vector
+	sng *graph  = NULL;  // Synch. Network Graph
+	uint phi;            // Cycle
+	int *r = NULL;       // Retiming vector
 
 	/* Open and parse input file */
 	parser ip;
@@ -121,35 +121,40 @@ int main(int argc, char **argv) {
 		uint **d = NULL;
 		wd wdobj(n, w, d);
 		wdobj.init_wd(graph);
-		wdobj.compute_wd();
+		/* Method returns initial cycle */
+		phi = wdobj.compute_wd();
 
 		/* Step 2: Sort elements in the range of D */
 		wdobj.sort_d();
 
 		/* Step 3: Binary search the minimum cycle phi with FEAS */
-		feas feasobj(graph);
-		phi = feasobj.get_initial_phi();
-		for (uint h = 0; h < wdobj.get_target_phi_list_size(); h++) {
+		feas feasobj(graph, n);
+		r = new int[n];
+		uint max_ind;
+		uint min_ind = 0;
+		uint ind;
+		feasobj.func_feas(13, r);
 
+//TODO: decomment and complete the calls to feas with binary search
+/*		for (uint h = 0; h < wdobj.get_target_phi_list_size(); h++) {
+			if (wdobj.get_target_phi(h) == phi) {
+				max_ind = h;
+				break;
+			}
 		}
-
-		/* Step 4: TODO Apply retiming vector to the graph */
+*/		/* We assume zero cycle not feasible (true for any circuit) */
+/*		ind = max_ind / 2;
+		while (ind != min_ind) {
+			if (max_ind == min_ind + 1)
+				ind = min_ind;
+		}
+*/		/* Step 4: TODO: Print output */
 
 	} else
 		//TODO!!!!
 		cout << "INFO: Minimum Area mode not implemented yet" << endl;
 
 
-
-	/* Print output */
-/*
-	ofstream of(TREE);
-	u.print_levels(of);
-	of.close();
-	ofstream test("print_sim.txt");
-	test << sim << endl;
-	test.close();
-*/
 
 	return 0;
 }

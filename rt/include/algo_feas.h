@@ -14,23 +14,30 @@
 class feas{
 
 public:
-	feas(sng *graph)
+	feas(sng *graph, uint num_vertices)
 	{
 		g = graph;
-		cpobj = new cp(graph);
+		n = num_vertices;
 	}
 
-	uint get_initial_phi()
+	void init_r(int *r)
 	{
-		uint phi = cpobj->func_cp();
-		cout << "Initial clock period is: " << phi << endl;
-		return phi;
+		for (uint i = 0; i < n; i++)
+			r[i] = 0;
 	}
-	bool func_feas(int c, int *r);
+
+	bool func_feas(uint c, int *r);
+
+	void retime_sng(int *r);
+	void revert_sng(int *r);
+
+	void compute_retiming(uint c, int *r);
+	void update_retiming(int *src, int *dst);
 
 private:
-	cp *cpobj;
+	cp cpobj;
 	sng *g;
+	uint n;
 
 };
 

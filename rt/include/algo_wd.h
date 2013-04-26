@@ -20,7 +20,7 @@ public:
 	}
 
 	void init_wd(sng *graph);
-	void compute_wd();
+	uint compute_wd();
 	void sort_d();
 
 	uint get_target_phi_list_size()

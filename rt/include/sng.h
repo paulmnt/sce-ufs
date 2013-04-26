@@ -69,6 +69,10 @@ public:
 	{
 		delta = d;
 	}
+	void reset_delta()
+	{
+		delta = delay;
+	}
 
 	vector<edge *> in;
 	vector<edge *> out;
@@ -135,6 +139,22 @@ public:
 	{
 		if (vind < vertices.size())
 			return vertices[vind]->get_delay();
+		else {
+			cout << "ERROR: vertex index out of bound" << endl;
+			return -1;
+		}
+	}
+	void set_vertex_delta(uint vind, uint delta)
+	{
+		if (vind < vertices.size())
+			vertices[vind]->set_delta(delta);
+		else
+			cout << "ERROR: vertex index out of bound" << endl;
+	}
+	uint get_vertex_delta(uint vind)
+	{
+		if (vind < vertices.size())
+			return vertices[vind]->get_delta();
 		else {
 			cout << "ERROR: vertex index out of bound" << endl;
 			return -1;
@@ -224,6 +244,11 @@ public:
 		}
 	}
 
+	void reset_deltas()
+	{
+		for (uint i = 0; i < vertices.size(); i++)
+			vertices[i]->reset_delta();
+	}
 
 private:
 	string name;

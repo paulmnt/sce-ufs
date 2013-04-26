@@ -2,10 +2,6 @@
 
 void wd::init_wd(sng *graph)
 {
-#ifdef DEBUG
-	cout << "DEBUG: COMPUTING WD MATRICES..." << endl;
-#endif
-
 	g = graph;
 
 	for (uint i = 0; i < n; i++)
@@ -55,8 +51,12 @@ void wd::init_wd(sng *graph)
 }
 
 
-void wd::compute_wd()
+uint wd::compute_wd()
 {
+	cout << "INFO: STEP 1: Computing WD matrices..." << endl;
+
+	uint phi = 0;
+
 	for (uint k = 0; k < n; k++) {
 		for (uint i = 0; i < n; i++)
 			for (uint j = 0; j < n; j++) {
@@ -70,14 +70,17 @@ void wd::compute_wd()
 					d[i][j] += g->get_vertex_delay(j);
 					/* Populate sorted_d vector */
 					sorted_d.push_back(d[i][j]);
+					/* Update current cycle */
+					if (w[i][j] == 0)
+						if (phi < d[i][j])
+							phi = d[i][j];
 				}
 			}
 	}
 
-#ifdef DEBUG
-	cout << "DEBUG: W Matrix..." << endl;
+	cout << "      W Matrix..." << endl;
 	for (uint i = 0; i < n; i++) {
-		cout << "       ";
+		cout << "      ";
 		for (uint j = 0; j < n; j++) {
 			if (w[i][j] < UINT_MAX)
 				cout << " " << w[i][j] << " ";
@@ -86,9 +89,9 @@ void wd::compute_wd()
 		}
 		cout << endl;
 	}
-	cout << "DEBUG: D Matrix..." << endl;
+	cout << "      D Matrix..." << endl;
 	for (uint i = 0; i < n; i++) {
-		cout << "       ";
+		cout << "      ";
 		for (uint j = 0; j < n; j++)
 			if (d[i][j] < 0 || d[i][j] > 9)
 				cout << d[i][j] << " ";
@@ -96,13 +99,16 @@ void wd::compute_wd()
 				cout << " " << d[i][j] << " ";
 		cout << endl;
 	}
-#endif
 
+	cout << "      Initial clock cycle is " << phi << endl;
+	return phi;
 }
 
 
 void wd::sort_d()
 {
+	cout << "INFO: STEP 2: Sorting D elements..." << endl;
+
 	/* Sort d vector and remove duplicates */
 	sort(sorted_d.begin(), sorted_d.end());
 	vector<uint>::iterator it;
@@ -110,11 +116,9 @@ void wd::sort_d()
 	sorted_d.resize(distance(sorted_d.begin(), it));
 
 
-#ifdef DEBUG
-	cout << "DEBUG: Sorted and Unique D elements for binary search" << endl;
-	cout << "       ";
+	cout << "      Sorted and Unique D elements for binary search" << endl;
+	cout << "      ";
 	for (uint i = 0; i < sorted_d.size(); i++)
 		cout << sorted_d[i] << " ";
 	cout << endl;
-#endif
 }

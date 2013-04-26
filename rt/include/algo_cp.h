@@ -6,16 +6,11 @@
 class cp{
 
 private:
-	sng *graph;
 	vector<vertex *> topo_sorted;
 
 public:
-	cp(sng *g)
-	{
-		graph = g;
-	}
 
-	int func_cp();
+	int func_cp(sng *graph);
 	void visit(vertex *u);
 
 };
