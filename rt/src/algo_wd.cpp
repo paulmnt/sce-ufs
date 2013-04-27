@@ -53,7 +53,9 @@ void wd::init_wd(sng *graph)
 
 uint wd::compute_wd()
 {
+#ifdef INFO
 	cout << "INFO: STEP 1: Computing WD matrices..." << endl;
+#endif
 
 	uint phi = 0;
 
@@ -78,6 +80,7 @@ uint wd::compute_wd()
 			}
 	}
 
+#ifdef INFO
 	cout << "      W Matrix..." << endl;
 	for (uint i = 0; i < n; i++) {
 		cout << "      ";
@@ -101,13 +104,17 @@ uint wd::compute_wd()
 	}
 
 	cout << "      Initial clock cycle is " << phi << endl;
+#endif
+
 	return phi;
 }
 
 
 void wd::sort_d()
 {
+#ifdef INFO
 	cout << "INFO: STEP 2: Sorting D elements..." << endl;
+#endif
 
 	/* Sort d vector and remove duplicates */
 	sort(sorted_d.begin(), sorted_d.end());
@@ -115,10 +122,12 @@ void wd::sort_d()
 	it = unique(sorted_d.begin(), sorted_d.end());
 	sorted_d.resize(distance(sorted_d.begin(), it));
 
-
+#ifdef INFO
 	cout << "      Sorted and Unique D elements for binary search" << endl;
 	cout << "      ";
 	for (uint i = 0; i < sorted_d.size(); i++)
 		cout << sorted_d[i] << " ";
+#endif
+
 	cout << endl;
 }

@@ -250,6 +250,19 @@ public:
 			vertices[i]->reset_delta();
 	}
 
+	string get_name()
+	{
+		return name;
+	}
+
+	uint get_area()
+	{
+		uint area = 0;
+		for (uint i = 0; i < edges.size(); i++)
+			area += edges[i]->weight;
+		return area;
+	}
+
 private:
 	string name;
 	vector<vertex *> vertices;

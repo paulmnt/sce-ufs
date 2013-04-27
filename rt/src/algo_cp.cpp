@@ -2,8 +2,9 @@
 
 int cp::func_cp(sng *graph)
 {
-
+#ifdef INFO
 	cout << "      RUNNING CP... DFS on G" << endl;
+#endif
 
 	/* Clear elements of vector topo_sorted from last CP */
 	topo_sorted.clear();
@@ -59,7 +60,10 @@ int cp::func_cp(sng *graph)
 			max = delta;
 	}
 
+#ifdef INFO
 	cout << "      CP... clock period is: " << max << endl;
+#endif
+
 	return max;
 }
 

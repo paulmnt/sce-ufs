@@ -54,8 +54,9 @@ void feas::copy_retiming(int *src, int *dst)
 
 bool feas::func_feas(uint c, int *rptr) {
 
+#ifdef INFO
 	cout << "INFO: STEP 3: running FEAS with target cycle " << c << endl;
-
+#endif
 	/*
 	 * Initialize vector r and create 2 temporary vectors:
 	 * retime_vect is reset to zero at each iteration of FEAS
@@ -100,7 +101,9 @@ bool feas::func_feas(uint c, int *rptr) {
 		retime_sng(retime_vect);
 	}
 
+#ifdef INFO
 	cout << "      FEAS: Target cycle was " << c << ", achieved is " << phi << endl;
+#endif
 
 	delete[] retime_vect;
 	if (phi <= c) {

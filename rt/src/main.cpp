@@ -1,7 +1,5 @@
 #include <iostream>
-#include <string>
-#include <sstream>
-#include <fstream>
+#include <p1out.h>
 
 #include <sng.h>
 #include <parser.h>
@@ -13,7 +11,7 @@ using namespace std;
 static char *INFILE;        // Input file passed from command line
 static bool verb = false;   // Verbose disabled by default
 static bool minphi = true;  // Default mode is minimum cycle
-static int target_phi = 0;         // target clock cycle
+static int target_phi = 0;  // target clock cycle
 static int flags_count = 1;
 
 /* Returns the index of the argument if found. 0 otherwise */
@@ -112,7 +110,14 @@ int main(int argc, char **argv) {
 	if (!graph)
 		return 1;
 
+	/* Open output files */
+	string name = graph->get_name();
+	p1out print1(name, verb);
+
 	if (minphi) {
+		/* Item 0: Initial Area */
+		print1.it0(graph->get_area());
+
 		/* OPT2 */
 
 		/* Step 1: Compute W and D */
@@ -152,7 +157,8 @@ int main(int argc, char **argv) {
 				min_ind = ind;
 			ind = (max_ind + min_ind) / 2;
 		}
-		/* Step 4: TODO: Print output */
+		/* Step 4: Print output */
+#ifdef INFO
 		cout << "INFO: Minimum feasible cycle is " << phi << endl;
 		cout << "      Retiming vector is ";
 		for (uint i = 0; i < n; i++)
@@ -160,9 +166,15 @@ int main(int argc, char **argv) {
 		cout << endl;
 		for (uint i = 0; i < graph->get_num_edges(); i++)
 			graph->print_edge(i);
+#endif
+		/* Item 1: Optimal retiming vector */
+		print1.it1(r, n);
+
 	} else
 		//TODO!!!!
 		cout << "INFO: Minimum Area mode not implemented yet" << endl;
+
+	/* p1out destructor closes output files */
 
 
 
