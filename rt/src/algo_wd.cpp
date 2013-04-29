@@ -127,6 +127,9 @@ void wd::sort_d()
 	it = unique(sorted_d.begin(), sorted_d.end());
 	sorted_d.resize(distance(sorted_d.begin(), it));
 
+	/* Item 7: sorted and unique elements of D Matrix */
+	print1->it7(sorted_d, sorted_d.size());
+
 #ifdef INFO
 	cout << "      Sorted and Unique D elements for binary search" << endl;
 	cout << "      ";

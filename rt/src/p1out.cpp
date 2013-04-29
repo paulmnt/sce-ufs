@@ -69,32 +69,64 @@ void p1out::it2(sng *g)
 
 void p1out::it4(uint **w, uint **d, uint n)
 {
-	print_item(p1_457, "#4. W Matrix");
+	p1_457 << "#4. W and D Matrices" << endl;
+	p1_457 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_457 << "-----";
 	p1_457 << "      ";
+	p1_457 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_457 << "-----";
+	p1_457 << endl;
+
+	p1_457 << "     ";
 	for (uint i = 0; i < n - 1; i++)
-		p1_457 << " v_" << i << " ";
-	p1_457 << " v_" << n - 1 << endl;
-	p1_457 << "----------------------------------------------" << endl;
+		if (i < 10)
+			p1_457 << "  v" << i << " ";
+		else
+			p1_457 << " v" << i << " ";
+	if (n - 1 < 10)
+		p1_457 << "  v" << n - 1;
+	else
+		p1_457 << " v" << n - 1;
+
+	p1_457 << "              ";
+	for (uint i = 0; i < n - 1; i++)
+		if (i < 10)
+			p1_457 << "  v" << i << " ";
+		else
+			p1_457 << " v" << i << " ";
+	if (n - 1 < 10)
+		p1_457 << "  v" << n - 1;
+	else
+		p1_457 << " v" << n - 1;
+	p1_457 << endl;
+
+	p1_457 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_457 << "-----";
+	p1_457 << "      ";
+	p1_457 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_457 << "-----";
+	p1_457 << endl;
+
 	for (uint i = 0; i < n; i++) {
-		p1_457 << "  v_" << i << " ";
+		if (i < 10)
+			p1_457 << "   v" << i << " ";
+		else
+			p1_457 << "  v" << i << " ";
 		for (uint j = 0; j < n; j++) {
 			if (w[i][j] < UINT_MAX)
 				p1_457 << "  " << w[i][j] << "  ";
 			else
 				p1_457 << "  -  ";
 		}
-		p1_457 << endl;
-	}
-	p1_457 << "----------------------------------------------" << endl;
-	p1_457 << endl;
-	print_item(p1_457, "#4. D Matrix");
-	p1_457 << "      ";
-	for (uint i = 0; i < n - 1; i++)
-		p1_457 << " v_" << i << " ";
-	p1_457 << " v_" << n - 1 << endl;
-	p1_457 << "----------------------------------------------" << endl;
-	for (uint i = 0; i < n; i++) {
-		p1_457 << "  v_" << i << " ";
+		p1_457 << "       ";
+		if (i < 10)
+			p1_457 << "   v" << i << " ";
+		else
+			p1_457 << "  v" << i << " ";
 		for (uint j = 0; j < n; j++)
 			if (d[i][j] < 0 || d[i][j] > 9)
 				p1_457 << " " << d[i][j] << "  ";
@@ -102,8 +134,18 @@ void p1out::it4(uint **w, uint **d, uint n)
 				p1_457 << "  " << d[i][j] << "  ";
 		p1_457 << endl;
 	}
-	p1_457 << "----------------------------------------------" << endl;
-	p1_457 << endl << endl;
+	p1_457 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_457 << "-----";
+	p1_457 << "      ";
+	p1_457 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_457 << "-----";
+	p1_457 << endl;
+
+
+	p1_457 << endl;
+
 }
 
 void p1out::it5(uint phi)
@@ -119,36 +161,65 @@ void p1out::it6(uint **w, uint **d, uint n, uint it)
 	if (!verb)
 		return;
 
-	stringstream ss;
-	ss << "#6. W" << it << " Matrix";
-	print_item(p1_6, ss.str());
+
+	p1_6 << "#6. W" << it << " and D" << it << " Matrices" << endl;
+	p1_6 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_6 << "-----";
 	p1_6 << "      ";
+	p1_6 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_6 << "-----";
+	p1_6 << endl;
+
+	p1_6 << "     ";
 	for (uint i = 0; i < n - 1; i++)
-		p1_6 << " v_" << i << " ";
-	p1_6 << " v_" << n - 1 << endl;
-	p1_6 << "----------------------------------------------" << endl;
+		if (i < 10)
+			p1_6 << "  v" << i << " ";
+		else
+			p1_6 << " v" << i << " ";
+	if (n - 1 < 10)
+		p1_6 << "  v" << n - 1;
+	else
+		p1_6 << " v" << n - 1;
+
+	p1_6 << "              ";
+	for (uint i = 0; i < n - 1; i++)
+		if (i < 10)
+			p1_6 << "  v" << i << " ";
+		else
+			p1_6 << " v" << i << " ";
+	if (n - 1 < 10)
+		p1_6 << "  v" << n - 1;
+	else
+		p1_6 << " v" << n - 1;
+	p1_6 << endl;
+
+	p1_6 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_6 << "-----";
+	p1_6 << "      ";
+	p1_6 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_6 << "-----";
+	p1_6 << endl;
+
 	for (uint i = 0; i < n; i++) {
-		p1_6 << "  v_" << i << " ";
+		if (i < 10)
+			p1_6 << "   v" << i << " ";
+		else
+			p1_6 << "  v" << i << " ";
 		for (uint j = 0; j < n; j++) {
 			if (w[i][j] < UINT_MAX)
 				p1_6 << "  " << w[i][j] << "  ";
 			else
 				p1_6 << "  -  ";
 		}
-		p1_6 << endl;
-	}
-	p1_6 << "----------------------------------------------" << endl;
-	p1_6 << endl;
-	ss.str("");
-	ss << "#6. D" << it << " Matrix";
-	print_item(p1_6, ss.str());
-	p1_6 << "      ";
-	for (uint i = 0; i < n - 1; i++)
-		p1_6 << " v_" << i << " ";
-	p1_6 << " v_" << n - 1 << endl;
-	p1_6 << "----------------------------------------------" << endl;
-	for (uint i = 0; i < n; i++) {
-		p1_6 << "  v_" << i << " ";
+		p1_6 << "       ";
+		if (i < 10)
+			p1_6 << "   v" << i << " ";
+		else
+			p1_6 << "  v" << i << " ";
 		for (uint j = 0; j < n; j++)
 			if (d[i][j] < 0 || d[i][j] > 9)
 				p1_6 << " " << d[i][j] << "  ";
@@ -156,6 +227,35 @@ void p1out::it6(uint **w, uint **d, uint n, uint it)
 				p1_6 << "  " << d[i][j] << "  ";
 		p1_6 << endl;
 	}
-	p1_6 << "----------------------------------------------" << endl;
-	p1_6 << endl << endl;
+	p1_6 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_6 << "-----";
+	p1_6 << "      ";
+	p1_6 << "-------";
+	for (uint i = 0; i < n; i++)
+		p1_6 << "-----";
+	p1_6 << endl;
+
+
+	p1_6 << endl;
+
+}
+
+void p1out::it7(vector<uint> &r, uint n)
+{
+	print_item(p1_457, "#7. Sorted and unique elements of Matrix D");
+	if (r[0] < 10)
+		p1_457 << " ";
+	p1_457  << r[0] << " ";
+	for (uint i = 1; i < n; i++) {
+		if (!(i % 10))
+			p1_457 << endl;
+		if (i == n - 1)
+			/* Don't want a space after last element */
+			break;
+		if (r[i] < 10)
+			p1_457 << " ";
+		p1_457  << r[i] << " ";
+	}
+	p1_457 << r[n - 1] << endl << endl;
 }
