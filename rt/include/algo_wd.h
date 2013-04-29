@@ -5,18 +5,18 @@
 #include <climits>
 #include <algorithm>
 
+#include <p1out.h>
+
 class wd {
 
 public:
-	wd(uint size, uint **wptr, uint **dptr)
+	wd(uint size, uint **wptr, uint **dptr, p1out *p1)
 	{
 		n = size;
-		w = new uint*[n];
-		d = new uint*[n];
-		for (uint i = 0; i < n; i++) {
-			w[i] = new uint[n];
-			d[i] = new uint[n];
-		}
+		w = wptr;
+		d = dptr;
+		print1 = p1;
+
 	}
 
 	void init_wd(sng *graph);
@@ -36,14 +36,16 @@ public:
 			return UINT_MAX;
 		}
 	}
+	uint **w;
 
 private:
-	uint **w;
 	uint **d;
 	uint n;
 	sng *g;
 
 	vector<uint> sorted_d;
+
+	p1out *print1;
 };
 
 #endif

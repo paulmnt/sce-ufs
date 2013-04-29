@@ -3,6 +3,9 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <climits>
+
+#include <sng.h>
 
 using namespace std;
 
@@ -32,7 +35,6 @@ public:
 		name = s;
 		verb = b;
 
-		stringstream ss;
 		p1_013.open((name + string(P1_013)).c_str());
 		p1_2.open((name + string(P1_2)).c_str());
 		p1_457.open((name + string(P1_457)).c_str());
@@ -58,6 +60,14 @@ public:
 
 	void it0(uint area);
 	void it1(int *r, uint n);
+	void it3(uint phi);
+
+	void it2(sng *g);
+
+	void it4(uint **w, uint **d, uint n);
+	void it5(uint phi);
+
+	void it6(uint **w, uint **d, uint n, uint it);
 
 private:
 	string name;

@@ -24,6 +24,9 @@ void wd::init_wd(sng *graph)
 		d[i][j] = v->get_delay();
 	}
 
+	/* Item 6: Intermediate F-W results (verbose) */
+	print1->it6(w, d, n, 0);
+
 #ifdef DEBUG
 	cout << "DEBUG: W0 initial Matrix..." << endl;
 	for (uint i = 0; i < n; i++) {
@@ -78,6 +81,8 @@ uint wd::compute_wd()
 							phi = d[i][j];
 				}
 			}
+		/* Item 6: Intermediate F-W results (verbose) */
+		print1->it6(w, d, n, k);
 	}
 
 #ifdef INFO

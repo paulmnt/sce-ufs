@@ -5,8 +5,8 @@ LIBS   =
 LIBDIR =
 INCDIR = ../include
 TBDIR  = ../tb
-TB     = --f $(TBDIR)/correlator-in.txt
-CPPFLAGS = -I $(INCDIR) -Wall #-DDEBUG #-DINFO
+TB     = --f $(TBDIR)/correlator-in.txt --verbose
+CPPFLAGS = -I $(INCDIR) -Wall #-DINFO #-DDEBUG
 
 
 TARGET = retime

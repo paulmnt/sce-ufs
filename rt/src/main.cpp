@@ -122,12 +122,20 @@ int main(int argc, char **argv) {
 
 		/* Step 1: Compute W and D */
 		uint n = graph->get_num_vertices();
-		uint **w = NULL;
-		uint **d = NULL;
-		wd wdobj(n, w, d);
+		uint **w = new uint*[n];
+		uint **d = new uint*[n];
+		for (uint i = 0; i < n; i++) {
+			w[i] = new uint[n];
+			d[i] = new uint[n];
+		}
+		wd wdobj(n, w, d, &print1);
 		wdobj.init_wd(graph);
 		/* Method returns initial cycle */
 		phi = wdobj.compute_wd();
+		/* Item 4: WD Matrices */
+		print1.it4(w, d, n);
+		/* Item 5: Initial clock cycle */
+		print1.it5(phi);
 
 		/* Step 2: Sort elements in the range of D */
 		wdobj.sort_d();
@@ -169,7 +177,10 @@ int main(int argc, char **argv) {
 #endif
 		/* Item 1: Optimal retiming vector */
 		print1.it1(r, n);
-
+		/* Item 3: Optimal clock cycle */
+		print1.it3(phi);
+		/* Item 2: Retimed Synchronous Network Graph */
+		print1.it2(graph);
 	} else
 		//TODO!!!!
 		cout << "INFO: Minimum Area mode not implemented yet" << endl;
