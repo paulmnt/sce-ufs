@@ -80,11 +80,13 @@ bool feas::func_feas(uint c, int *rptr) {
 	revert_sng(rptr);
 
 	for (uint k = 0; k < n; k++) {
+		phi = cpobj.func_cp(g);
+
 		/* Item 8: FEAS Combinational Component Graph (verbose) */
 		print1->it8a(g, k, c);
 		print1->it8b(g, k, c);
+		print1->it8c(g, k, c);
 
-		phi = cpobj.func_cp(g);
 		if (phi <= c)
 			/* Found a feasible retiming */
 			break;

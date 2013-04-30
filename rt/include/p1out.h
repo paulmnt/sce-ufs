@@ -72,6 +72,7 @@ public:
 
 	void it8a(sng *g, uint it, uint phi);
 	void it8b(sng *g, uint it, uint phi);
+	void it8c(sng *g, uint it, uint phi);
 
 private:
 	string name;

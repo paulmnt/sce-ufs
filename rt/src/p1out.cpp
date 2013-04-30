@@ -320,9 +320,39 @@ void p1out::it8b(sng *g, uint it, uint phi)
 			p1_8 << " ";
 		p1_8 << g->get_vertex_delta(i) << " ";
 	}
+	if (g->get_vertex_delta(g->get_num_vertices() - 1) < 10)
+		p1_8 << " ";
 	p1_8 << g->get_vertex_delta(g->get_num_vertices() - 1) << endl << endl;
 
 	p1_8 << endl;
+
+}
+
+
+void p1out::it8c(sng *g, uint it, uint phi)
+{
+	/* Only in Verbose mode */
+	if (!verb)
+		return;
+
+	stringstream ss;
+	ss << "#8c. FEAS late vertices" << endl;
+	ss << "     Target cycle: " << phi << "; Iteration: " << it;
+	print_item(p1_8, ss.str());
+
+	uint count = 0;
+
+	for (uint i = 0; i < g->get_num_vertices(); i++) {
+		if (!(count % 10) && count)
+			p1_8 << endl;
+		if (g->get_vertex_delta(i) > phi) {
+			if (i < 10)
+				p1_8 << " ";
+			p1_8 << i << " ";
+			count++;
+		}
+	}
+	p1_8 << endl << endl << endl;
 
 
 }
