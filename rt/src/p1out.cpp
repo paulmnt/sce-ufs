@@ -295,3 +295,34 @@ void p1out::it8a(sng *g, uint it, uint phi)
 	p1_8 << ".e" << endl << endl << endl;
 
 }
+
+void p1out::it8b(sng *g, uint it, uint phi)
+{
+	/* Only in Verbose mode */
+	if (!verb)
+		return;
+
+	stringstream ss;
+	ss << "#8b. FEAS vertices data-ready time" << endl;
+	ss << "     Target cycle: " << phi << "; Iteration: " << it;
+	print_item(p1_8, ss.str());
+
+	if (g->get_vertex_delta(0) < 10)
+		p1_8 << " ";
+	p1_8  << g->get_vertex_delta(0) << " ";
+	for (uint i = 1; i < g->get_num_vertices(); i++) {
+		if (!(i % 10))
+			p1_8 << endl;
+		if (i == g->get_num_vertices() - 1)
+			/* Don't want a space after last element */
+			break;
+		if (g->get_vertex_delta(i) < 10)
+			p1_8 << " ";
+		p1_8 << g->get_vertex_delta(i) << " ";
+	}
+	p1_8 << g->get_vertex_delta(g->get_num_vertices() - 1) << endl << endl;
+
+	p1_8 << endl;
+
+
+}
