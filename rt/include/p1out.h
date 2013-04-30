@@ -66,9 +66,11 @@ public:
 
 	void it4(uint **w, uint **d, uint n);
 	void it5(uint phi);
+	void it7(vector<uint> &r, uint n);
 
 	void it6(uint **w, uint **d, uint n, uint it);
-	void it7(vector<uint> &r, uint n);
+
+	void it8a(sng *g, uint it, uint phi);
 
 private:
 	string name;

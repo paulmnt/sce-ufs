@@ -3,6 +3,7 @@
 
 #include <sng.h>
 #include <algo_cp.h>
+#include <p1out.h>
 
 /**
  * FEAS is used to implement OPT2. The algorithm returns true if the given
@@ -14,10 +15,11 @@
 class feas{
 
 public:
-	feas(sng *graph, uint num_vertices)
+	feas(sng *graph, uint num_vertices, p1out *p1)
 	{
 		g = graph;
 		n = num_vertices;
+		print1 = p1;
 	}
 
 	void init_r(int *r)
@@ -40,6 +42,7 @@ private:
 	sng *g;
 	uint n;
 
+	p1out *print1;
 };
 
 #endif /* __FEAS_H__ */

@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
 		wdobj.sort_d();
 
 		/* Step 3: Binary search the minimum cycle phi with FEAS */
-		feas feasobj(graph, n);
+		feas feasobj(graph, n, &print1);
 		r = new int[n];
 		feasobj.init_r(r);
 		uint max_ind;

@@ -142,8 +142,6 @@ void p1out::it4(uint **w, uint **d, uint n)
 	for (uint i = 0; i < n; i++)
 		p1_457 << "-----";
 	p1_457 << endl;
-
-
 	p1_457 << endl;
 
 }
@@ -258,4 +256,42 @@ void p1out::it7(vector<uint> &r, uint n)
 		p1_457  << r[i] << " ";
 	}
 	p1_457 << r[n - 1] << endl << endl;
+}
+
+
+void p1out::it8a(sng *g, uint it, uint phi)
+{
+	/* Only in Verbose mode */
+	if (!verb)
+		return;
+
+	stringstream ss;
+	ss << "#8a. FEAS combinational component graph" << endl;
+	ss << "     Target cycle: " << phi << "; Iteration: " << it;
+	print_item(p1_8, ss.str());
+
+	p1_8 << ".name " << g->get_name() << endl;
+	p1_8 << ".n " << g->get_num_vertices() << endl;
+	p1_8 << ".d";
+	for (uint i = 1; i < g->get_num_vertices(); i++)
+		p1_8 << " " << g->get_vertex_delay(i);
+	p1_8 << endl;
+	p1_8 << ".g" << endl;
+	for (uint i = 0; i < g->get_num_vertices(); i++) {
+		vertex *v = g->get_vertex(i);
+		vector<tuple> tmp;
+		for (uint j = 0; j < v->out.size(); j++) {
+			tuple t;
+			t.v = v->out[j]->dst->get_id();
+			t.w = v->out[j]->weight;
+			if (t.w)
+				continue;
+			tmp.push_back(t);
+		}
+		sort(tmp.begin(), tmp.end(), cmp_tuple);
+		for (uint j = 0; j < tmp.size(); j++)
+			p1_8 << i << " " << tmp[j].v << " " << tmp[j].w << endl;
+	}
+	p1_8 << ".e" << endl << endl << endl;
+
 }
