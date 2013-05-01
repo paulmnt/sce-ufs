@@ -37,14 +37,27 @@ void simplex::print_tableau()
 		cout << " " << i << " ";
 	}
 	cout << "|" << endl;
-	for (uint i = 0; i < matrix.size(); i++)
+
+	cout << "------";
+	for (uint i = 0; i < slack_var; i++)
+		cout << "----";
+	cout <<"------" << endl;
+
+	for (uint i = 0; i < matrix.size() - 1; i++)
 		matrix[i].print();
+
+	cout << "------";
+	for (uint i = 0; i < slack_var; i++)
+		cout << "----";
+	cout <<"------" << endl;
+
+	matrix[matrix.size() - 1].print();
 #endif
 }
 
-void simplex::make_tableau(sng *g, uint **w, uint **d)
+void simplex::add_legal_constraints(sng *g)
 {
-	/* Add constraints to make retiming vector legal 
+	/* Add constraints to make retiming vector legal
 	 *
 	 *                       | ...  i ...  j ... k ... |
 	 *                       ---------------------------
@@ -84,5 +97,102 @@ void simplex::make_tableau(sng *g, uint **w, uint **d)
 		/* Add row to tableau */
 		matrix.push_back(row);
 	}
+}
+
+
+void simplex::add_timing_constraints(sng *g, uint **w, uint **d)
+{
+	/* Add constraints to make retiming vector feasible
+	 *
+	 *                                 | ...  i ...  j ... k ... |
+	 *                                 ---------------------------
+	 *	                           .                         .
+	 *	                           .                         .
+	 * ri - rj <= W(vi, vj) - 1 ---> k | ...  1 ... -1 ... 1 ... | W(vi, vj) - 1
+	 *	                           .                         .
+	 *	                           .                         .
+	 */
+	for (uint i = 0; i < num_vertices; i++)
+		for (uint j = 0; j < num_vertices; j++) {
+			if (d[i][j] <= phi)
+				continue;
+			if (d[i][j] - g->get_vertex_delay(i) > phi)
+				continue;
+			if (d[i][j] - g->get_vertex_delay(j) > phi)
+				continue;
+
+			/* Add a column to the tableau */
+			for (uint k = 0; k < matrix.size(); k++)
+				matrix[k].add_slack_var();
+
+			/* Prepare new row */
+			tab_row row;
+			row.label = slack_var;
+			int leq = 1;
+			if ((int) w[i][j] - 1 < 0)
+				/* ans must be positive */
+				leq = -1;
+			row.ans = leq * (w[i][j] - 1);
+
+			for (uint k = 0; k < slack_var; k++)
+				if (k == i)
+					row.coeff.push_back(1 * leq);
+				else if (k == j)
+					row.coeff.push_back(-1 * leq);
+				else
+					row.coeff.push_back(0);
+
+			/*
+			 * Slack variable coeff. is 1 in the initial tableau
+			 * while surplus variable coeff. is -1
+			 */
+			row.coeff.push_back(1 * leq);
+			row.star = false;
+			slack_var++;
+
+			/* Add row to tableau */
+			matrix.push_back(row);
+		}
+}
+
+void simplex::add_objective_func_row(sng *g)
+{
+	/* Add a column to the tableau */
+	for (uint j = 0; j < matrix.size(); j++)
+		matrix[j].add_slack_var();
+
+	/* Prepare new row */
+	tab_row row;
+	row.label = slack_var;
+	row.ans = 0;
+
+	for (uint k = 0; k < slack_var; k++)
+		if (k < num_vertices)
+			/*
+			 * Notice that sign is changed twice:
+			 * 1. we want to convert the minimization
+			 * problem into a maximization one.
+			 * 2. when making the tableau we move
+			 * all coefficients of the objective function
+			 * to the left hand side
+			 */
+			row.coeff.push_back(g->get_vertex_c(k));
+		else
+			row.coeff.push_back(0);
+
+	/* Slack variable coeff. is 1 in the initial tableau */
+	row.coeff.push_back(1);
+	row.star = false;
+	slack_var++;
+
+	/* Add row to tableau */
+	matrix.push_back(row);
+}
+
+void simplex::make_tableau(sng *g, uint **w, uint **d)
+{
+	add_legal_constraints(g);
+	add_timing_constraints(g, w, d);
+	add_objective_func_row(g);
 	print_tableau();
 }

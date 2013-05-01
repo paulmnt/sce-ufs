@@ -23,9 +23,10 @@ public:
 class simplex {
 
 public:
-	simplex(uint n)
+	simplex(uint n, uint target_phi)
 	{
 		num_vertices = n;
+		phi = target_phi;
 		/*
 		 * Retiming vector variable labels range from 0 to
 		 * num_vertices - 1 therefore slack variables first
@@ -36,10 +37,14 @@ public:
 
 	void print_tableau();
 	void make_tableau(sng *g, uint **w, uint **d);
+	void add_legal_constraints(sng *g);
+	void add_timing_constraints(sng *g, uint **w, uint **d);
+	void add_objective_func_row(sng *g);
 
 private:
 	/* variables from 0 to num_vertices - 1 are the ri */
-	int num_vertices;
+	uint num_vertices;
+	uint phi;
 	vector<tab_row > matrix;
 	vector<int> result;
 
@@ -48,6 +53,9 @@ private:
 	 * therefor slack variables first label is num_vertices.
 	 */
 	uint slack_var;
+
+	/* Vector of starred rows indices */
+	vector<uint> stars;
 };
 
 #endif /* __SIPLEX_H__ */
