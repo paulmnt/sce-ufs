@@ -5,16 +5,17 @@ LIBS   =
 LIBDIR =
 INCDIR = ../include
 TBDIR  = ../tb
-TB     = --f $(TBDIR)/correlator-in.txt --verbose
-CPPFLAGS = -I $(INCDIR) -Wall #-DINFO #-DDEBUG
+TB     = --f $(TBDIR)/correlator-in.txt --phi 13 --verbose
+CPPFLAGS = -I $(INCDIR) -Wall -DINFO #-DDEBUG
 
 
 TARGET = retime
 VPATH := ../src
 SRCS = parser.cpp algo_cp.cpp algo_wd.cpp algo_feas.cpp main.cpp \
-	p1out.cpp
+	p1out.cpp algo_simplex.cpp
 HDRS = $(INCDIR)/p1out.h $(INCDIR)/sng.h $(INCDIR)/algo_wd.h \
-	$(INCDIR)/algo_cp.h $(INCDIR)/algo_feas.h $(INCDIR)/parser.h
+	$(INCDIR)/algo_cp.h $(INCDIR)/algo_feas.h $(INCDIR)/parser.h \
+	$(INCDIR)/algo_simplex.h
 OBJS = $(SRCS:.cpp=.o)
 
 .SUFFIXES: .cpp .cc .o

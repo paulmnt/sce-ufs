@@ -25,7 +25,8 @@ void wd::init_wd(sng *graph)
 	}
 
 	/* Item 6: Intermediate F-W results (verbose) */
-	print1->it6(w, d, n, 0);
+	if (print1 != NULL)
+		print1->it6(w, d, n, 0);
 
 #ifdef DEBUG
 	cout << "DEBUG: W0 initial Matrix..." << endl;
@@ -82,7 +83,8 @@ uint wd::compute_wd()
 				}
 			}
 		/* Item 6: Intermediate F-W results (verbose) */
-		print1->it6(w, d, n, k);
+		if (print1 != NULL)
+			print1->it6(w, d, n, k);
 	}
 
 #ifdef INFO
@@ -128,7 +130,8 @@ void wd::sort_d()
 	sorted_d.resize(distance(sorted_d.begin(), it));
 
 	/* Item 7: sorted and unique elements of D Matrix */
-	print1->it7(sorted_d, sorted_d.size());
+	if (print1 != NULL)
+		print1->it7(sorted_d, sorted_d.size());
 
 #ifdef INFO
 	cout << "      Sorted and Unique D elements for binary search" << endl;

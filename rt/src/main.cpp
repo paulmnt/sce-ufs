@@ -5,6 +5,7 @@
 #include <parser.h>
 #include <algo_wd.h>
 #include <algo_feas.h>
+#include <algo_simplex.h>
 
 using namespace std;
 
@@ -110,11 +111,11 @@ int main(int argc, char **argv) {
 	if (!graph)
 		return 1;
 
-	/* Open output files */
-	string name = graph->get_name();
-	p1out print1(name, verb);
-
 	if (minphi) {
+		/* Open output files */
+		string name = graph->get_name();
+		p1out print1(name, verb);
+
 		/* Item 0: Initial Area */
 		print1.it0(graph->get_area());
 
@@ -181,13 +182,24 @@ int main(int argc, char **argv) {
 		print1.it3(phi);
 		/* Item 2: Retimed Synchronous Network Graph */
 		print1.it2(graph);
-	} else
-		//TODO!!!!
-		cout << "INFO: Minimum Area mode not implemented yet" << endl;
+	} else {
+		/* Step 1: Compute W and D */
+		uint n = graph->get_num_vertices();
+		uint **w = new uint*[n];
+		uint **d = new uint*[n];
+		for (uint i = 0; i < n; i++) {
+			w[i] = new uint[n];
+			d[i] = new uint[n];
+		}
+		wd wdobj(n, w, d, NULL);
+		wdobj.init_wd(graph);
+		/* Method returns initial cycle */
+		phi = wdobj.compute_wd();
+		simplex simp(n);
+		simp.make_tableau(graph, w, d);
+	}
 
-	/* p1out destructor closes output files */
-
-
+	/* p1out and p2out destructors close output files */
 
 	return 0;
 }

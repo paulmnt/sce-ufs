@@ -45,11 +45,15 @@ public:
 	void add_in_edge(edge *e)
 	{
 		in.push_back(e);
+		/* increase indegree */
+		c++;
 	}
 
 	void add_out_edge(edge *e)
 	{
 		out.push_back(e);
+		/* icrease outdegree */
+		c--;
 	}
 
 	int get_color()
@@ -74,6 +78,11 @@ public:
 		delta = delay;
 	}
 
+	int get_c()
+	{
+		return c;
+	}
+
 	vector<edge *> in;
 	vector<edge *> out;
 
@@ -84,6 +93,8 @@ private:
 	int color;
 	/* Accumulated delay on worst path with no registers including delay */
 	uint delta;
+	/* indegree - outdegree */
+	int c;
 };
 
 
@@ -261,6 +272,16 @@ public:
 		for (uint i = 0; i < edges.size(); i++)
 			area += edges[i]->weight;
 		return area;
+	}
+
+	int get_vertex_c(uint vind)
+	{
+		if (vind < vertices.size())
+			return vertices[vind]->get_c();
+		else {
+			cout << "ERROR: vertex index out of bound" << endl;
+			return 0;
+		}
 	}
 
 private:

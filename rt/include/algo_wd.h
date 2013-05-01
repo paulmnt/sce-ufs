@@ -15,7 +15,10 @@ public:
 		n = size;
 		w = wptr;
 		d = dptr;
-		print1 = p1;
+		if (p1 != NULL)
+			print1 = p1;
+		else
+			print1 = NULL;
 
 	}
 
