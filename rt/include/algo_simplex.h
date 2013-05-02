@@ -1,4 +1,5 @@
 #include <sng.h>
+#include <cfloat>
 
 #ifndef __SIPLEX_H__
 #define __SIPLEX_H__
@@ -40,6 +41,11 @@ public:
 	void add_legal_constraints(sng *g);
 	void add_timing_constraints(sng *g, uint **w, uint **d);
 	void add_objective_func_row(sng *g);
+
+	void func_clear_col(int pivot_column, int pivot_row, int width_matrix);
+	int func_pivot_col(int first_starred_row, int width_matrix);
+	int func_test_ratio(int pivot_col, int width);
+	void phase1();
 
 private:
 	/* variables from 0 to num_vertices - 1 are the ri */

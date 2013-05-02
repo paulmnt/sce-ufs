@@ -195,8 +195,11 @@ int main(int argc, char **argv) {
 		wdobj.init_wd(graph);
 		/* Method returns initial cycle */
 		phi = wdobj.compute_wd();
+
+		/* Prepare and run SIMPLEX method */
 		simplex simp(n, target_phi);
 		simp.make_tableau(graph, w, d);
+		simp.phase1();
 	}
 
 	/* p1out and p2out destructors close output files */
