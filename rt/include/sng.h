@@ -284,6 +284,39 @@ public:
 		}
 	}
 
+
+
+	void retime_sng(int *r)
+	{
+		uint edges_num = get_num_edges();
+		for (uint i = 0; i < edges_num; i++) {
+			edge *e = get_edge(i);
+			uint u = e->src->get_id();
+			uint v = e->dst->get_id();
+			uint w = e->weight;
+			e->weight = w + r[v] - r[u];
+		}
+#ifdef DEBUG
+		for (uint i = 0; i < edges_num; i++) {
+			cout << "DEBUG: ";
+			print_edge(i);
+		}
+#endif
+	}
+
+	void revert_sng(int *r)
+	{
+		uint edges_num = get_num_edges();
+		for (uint i = 0; i < edges_num; i++) {
+			edge *e = get_edge(i);
+			uint u = e->src->get_id();
+			uint v = e->dst->get_id();
+			uint w = e->weight;
+			e->weight = w - r[v] + r[u];
+		}
+	}
+
+
 private:
 	string name;
 	vector<vertex *> vertices;

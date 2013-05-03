@@ -200,6 +200,24 @@ int main(int argc, char **argv) {
 		simplex simp(n, target_phi);
 		simp.make_tableau(graph, w, d);
 		simp.phase1();
+		simp.phase2();
+
+		/* Retiming the network */
+		r = new int[n];
+		simp.get_retiming_vector(r, n);
+		graph->retime_sng(r);
+
+		/* Print output */
+#ifdef INFO
+		cout << "INFO: Target cycle is " << target_phi << endl;
+		cout << "      Retiming vector is ";
+		for (uint i = 0; i < n; i++)
+			cout << r[i] << " ";
+		cout << endl;
+		for (uint i = 0; i < graph->get_num_edges(); i++)
+			graph->print_edge(i);
+#endif
+
 	}
 
 	/* p1out and p2out destructors close output files */

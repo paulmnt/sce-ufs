@@ -28,8 +28,6 @@ void tab_row::print()
 
 void simplex::print_tableau()
 {
-#ifdef INFO
-	cout << "INFO: Printing current tableau..." << endl;
 	cout << "     | ";
 	for (uint i = 0; i < slack_var; i++) {
 		if (i < 10)
@@ -52,7 +50,6 @@ void simplex::print_tableau()
 	cout <<"------" << endl;
 
 	matrix[matrix.size() - 1].print();
-#endif
 }
 
 void simplex::add_legal_constraints(sng *g)
@@ -91,7 +88,7 @@ void simplex::add_legal_constraints(sng *g)
 
 		/* Slack variable coeff. is 1 in the initial tableau 8 */
 		row.coeff.push_back(1);
-		if (row.ans * row.coeff[slack_var] < 0) {
+		if (row.coeff[slack_var] < 0) {
 			row.star = true;
 			stars.push_back(matrix.size());
 		} else
@@ -151,7 +148,7 @@ void simplex::add_timing_constraints(sng *g, uint **w, uint **d)
 			 * while surplus variable coeff. is -1
 			 */
 			row.coeff.push_back(1 * leq);
-			if (row.ans * row.coeff[slack_var] < 0) {
+			if (row.coeff[slack_var] < 0) {
 				row.star = true;
 				stars.push_back(matrix.size());
 			} else
@@ -192,7 +189,7 @@ void simplex::add_objective_func_row(sng *g)
 
 	/* Slack variable coeff. is 1 in the initial tableau */
 	row.coeff.push_back(1);
-	if (row.ans * row.coeff[slack_var] < 0) {
+	if (row.coeff[slack_var] < 0) {
 		row.star = true;
 		stars.push_back(matrix.size());
 	} else
@@ -208,107 +205,108 @@ void simplex::make_tableau(sng *g, uint **w, uint **d)
 	add_legal_constraints(g);
 	add_timing_constraints(g, w, d);
 	add_objective_func_row(g);
+#ifdef INFO
+	cout << "INFO: Printing initial tableau" << endl;
 	print_tableau();
+#endif
 }
-
-
 
 
 
 void simplex::func_clear_col(int pivot_col, int pivot_row, int width)
 {
-	int flag = 0;
-	int c1;
+
+	int pivot = matrix[pivot_row].coeff[pivot_col];
 
 	for (int i = 0; i < (int) matrix.size(); i++) {
-		if (i != pivot_row) {
-			c1 = matrix[i].coeff[pivot_col];
+		int c1, c2;
 
-			if ((abs(c1) % matrix[pivot_row].coeff[pivot_col] != 0 ) and (matrix[pivot_row].coeff[pivot_col] % abs(c1) != 0))
-				flag = 5;
-			else if (matrix[i].coeff[pivot_col] < 0) {
-				flag = 1;
-				if (abs(c1) > matrix[pivot_row].coeff[pivot_col])
-					flag = 4;
-			}
-			else if (matrix[i].coeff[pivot_col] > (matrix[pivot_row].coeff[pivot_col]))
-				flag = 3;
-			else if (matrix[i].coeff[pivot_col] == 0)
-				flag = 2;
+		if (i == pivot_row)
+			continue;
+		int coeff = matrix[i].coeff[pivot_col];
+		if (!coeff)
+			continue;
 
-			for (int j = 0; j < width; j++) {
-				if (flag == 0)
-					matrix[i].coeff[j] = ((matrix[pivot_row].coeff[pivot_col]) / (c1)) * matrix[i].coeff[j] - matrix[pivot_row].coeff[j];
-				if (flag == 1)
-					matrix[i].coeff[j] = ((matrix[pivot_row].coeff[pivot_col]) / (c1)) * matrix[i].coeff[j] * (-1) + matrix[pivot_row].coeff[j];
-				if (flag == 3)
-					matrix[i].coeff[j] = matrix[i].coeff[j] - (c1 / (matrix[pivot_row].coeff[pivot_col])) * matrix[pivot_row].coeff[j];
-				if (flag == 4)
-					matrix[i].coeff[j] = matrix[i].coeff[j] + (c1 / (matrix[pivot_row].coeff[pivot_col])) * matrix[pivot_row].coeff[j] * (-1);
-				if (flag == 5)
-					matrix[i].coeff[j] = (matrix[i].coeff[j] * matrix[pivot_row].coeff[pivot_col]) - (matrix[pivot_row].coeff[j] * c1);
-                        }
-                }
-                flag = 0;
-        }
+		for (int j = 0; j < width; j++) {
+			/* Notice that the pivot is always positive! */
+			c1 = pivot * matrix[i].coeff[j];
+			c2 = coeff * matrix[pivot_row].coeff[j];
+			matrix[i].coeff[j] = c1 - c2;
+		}
+		c1 = pivot * matrix[i].ans;
+		c2 = coeff * matrix[pivot_row].ans;
+		matrix[i].ans = c1 - c2;
+	}
 
         matrix[pivot_row].label = pivot_col;
 
+	if (!stars.size())
+		/* Phase 2 already started */
+		return;
+
+	/* Phase 1: Recheck stars */
+	stars.clear();
 	for (uint i = 0; i < matrix.size(); i++)
-		if (matrix[i].ans * matrix[i].coeff[matrix[i].label] < 0)
+		if (matrix[i].coeff[matrix[i].label] < 0) {
+			stars.push_back(i);
 			matrix[i].star = true;
-		else {
-			if (matrix[i].star)
-				for (uint k = 0; k < stars.size(); k++)
-					if (stars[k] == i)
-						stars.erase(stars.begin() + k);
+		} else
 			matrix[i].star = false;
-		}
 }
 
 
 int simplex::func_pivot_col(int first_starred_row, int width_matrix)
 {
-
+	/* Phase 1 */
         int max = -1;
-        int pivot_column = 0;
+        int pivot_column = -1;
 
-        for (int i = 0; i < width_matrix; i++){
-		if (matrix[first_starred_row].coeff[i] > max){
+	for (int i = 0; i < width_matrix; i++)
+		if (matrix[first_starred_row].coeff[i] > max) {
 			max = matrix[first_starred_row].coeff[i];
 			pivot_column = i;
 		}
-	}
+
 	return pivot_column;
 }
 
-
-int simplex::func_test_ratio(int pivot_col, int width)
+int simplex::func_pivot_col(int width_matrix)
 {
-	int pivot_row;
-	vector<double> test_ratios;
-	vector<int> rows_test_ratios;
-	for (int i = 0; i < (int) matrix.size() - 1; i++)
-		if (matrix[i].coeff[pivot_col] > 0) {
-			test_ratios.push_back((double)matrix[i].ans/(double)matrix[i].coeff[pivot_col]);
-			rows_test_ratios.push_back(i);
-		}
+	/* Phase 2 */
+	int row = matrix.size() - 1;
+	int max = -1;
+        int pivot_col = -1;
 
+	for (int j = 0; j < width_matrix; j++)
+		if (matrix[row].coeff[j] < 0)
+			if (abs(matrix[row].coeff[j]) > max) {
+				max = abs(matrix[row].coeff[j]);
+				pivot_col = j;
+			}
+
+	return pivot_col;
+}
+
+int simplex::func_test_ratio(int pivot_col)
+{
+	int pivot_row = -1;
 	double min = DBL_MAX;
 
-	for (uint i = 0; i < test_ratios.size(); i++) {
-		if (test_ratios[i] < min) {
-			min = test_ratios[i];
-			pivot_row = rows_test_ratios[i];
-		}
-	}
-
-	for (uint i = 0; i < rows_test_ratios.size(); i++)
-		if (test_ratios[i] == min)
-			if (matrix[rows_test_ratios[i]].star) {
-				pivot_row = rows_test_ratios[i];
-				break;
+	for (int i = 0; i < (int) matrix.size() - 1; i++)
+		if (matrix[i].coeff[pivot_col] > 0) {
+			double tmp;
+			tmp = (double) matrix[i].ans / (double) matrix[i].coeff[pivot_col];
+			if (tmp > min)
+				continue;
+			if (tmp == min) {
+				if (matrix[pivot_row].star)
+					continue;
+				if (!matrix[i].star)
+					continue;
 			}
+			min = tmp;
+			pivot_row = i;
+		}
 
 	return pivot_row;
 }
@@ -317,22 +315,86 @@ void simplex::phase1()
 {
 	while (stars.size() > 0) {
 		/* Pick first starred row and remove it form starred list */
-		uint first_starred_row = stars[0];
+		int first_starred_row = stars[0];
 
 		int pivot_column;
 		int pivot_row;
 		int width_matrix = slack_var;
 
 		pivot_column = func_pivot_col(first_starred_row, width_matrix);
-#ifdef INFO
-		cout << "pivot column is: " << pivot_column << endl;
+#ifdef DEBUG
+		cout << "DEBUG: pivot column is: " << pivot_column << endl;
 #endif
-		pivot_row = func_test_ratio(pivot_column, width_matrix);
-#ifdef INFO
-		cout << "pivot row is: " << pivot_row << endl;
-#endif
-		func_clear_col(pivot_column, pivot_row, width_matrix);
+		if (pivot_column < 0)
+			return;
 
+		pivot_row = func_test_ratio(pivot_column);
+#ifdef DEBUG
+		cout << "       pivot row is: " << pivot_row << endl;
+#endif
+		if (pivot_row < 0)
+			return;
+
+		func_clear_col(pivot_column, pivot_row, width_matrix);
+#ifdef DEBUG
+		cout << "DEBUG: Printing current tableau" << endl;
 		print_tableau();
+#endif
 	}
+}
+
+
+void simplex::phase2()
+{
+	int pivot_column;
+	int pivot_row;
+	int width_matrix = slack_var;
+
+	do {
+		pivot_column = func_pivot_col(width_matrix);
+#ifdef DEBUG
+		cout << "DEBUG: pivot column is: " << pivot_column << endl;
+#endif
+		pivot_row = func_test_ratio(pivot_column);
+#ifdef DEBUG
+		cout << "       pivot row is: " << pivot_row << endl;
+#endif
+		if (pivot_row < 0)
+			break;
+
+		func_clear_col(pivot_column, pivot_row, width_matrix);
+#ifdef DEBUG
+		cout << "DEBUG: Printing current tableau" << endl;
+		print_tableau();
+#endif
+	} while (pivot_column != 0);
+
+#ifdef INFO
+	cout << "INFO: Printing final tableau" << endl;
+	print_tableau();
+#endif
+
+	/* Initialize result vector */
+	for (uint i = 0; i < slack_var; i++)
+		result.push_back(0);
+
+	/* Notice that matrix size is always less than slack_var */
+	for (uint i = 0; i < matrix.size(); i++)
+		/* Given the constraints the result is proven to be integer! */
+		result[matrix[i].label] = matrix[i].ans / matrix[i].coeff[matrix[i].label];
+
+#ifdef INFO
+	cout << "INFO: Printing solution of SIMPLEX..." << endl;
+	for (uint i = 0; i < num_vertices; i++)
+		cout << "r" << i << " = " << result[i] << endl;
+	cout << "p = " << result[slack_var - 1] << endl;
+#endif
+}
+
+
+void simplex::get_retiming_vector(int *r, uint n)
+{
+	for (uint i = 0; i < n; i++)
+		if (i < result.size())
+			r[i] = result[i];
 }

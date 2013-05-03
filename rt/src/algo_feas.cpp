@@ -1,37 +1,5 @@
 #include "algo_feas.h"
 
-void feas::retime_sng(int *r)
-{
-	uint edges_num = g->get_num_edges();
-	for (uint i = 0; i < edges_num; i++) {
-		edge *e = g->get_edge(i);
-		uint u = e->src->get_id();
-		uint v = e->dst->get_id();
-		uint w = e->weight;
-		e->weight = w + r[v] - r[u];
-	}
-
-#ifdef DEBUG
-	for (uint i = 0; i < edges_num; i++) {
-		cout << "DEBUG: ";
-		g->print_edge(i);
-	}
-#endif
-
-}
-
-void feas::revert_sng(int *r)
-{
-	uint edges_num = g->get_num_edges();
-	for (uint i = 0; i < edges_num; i++) {
-		edge *e = g->get_edge(i);
-		uint u = e->src->get_id();
-		uint v = e->dst->get_id();
-		uint w = e->weight;
-		e->weight = w - r[v] + r[u];
-	}
-
-}
 
 void feas::compute_retiming(uint c, int *r)
 {
@@ -77,7 +45,7 @@ bool feas::func_feas(uint c, int *rptr) {
 	 * Restore original graph in case this is not the first call to FEAS
 	 * Notice that rptr is zero initialized if it's first call!
 	 */
-	revert_sng(rptr);
+	g->revert_sng(rptr);
 
 	for (uint k = 0; k < n; k++) {
 		phi = cpobj.func_cp(g);
@@ -103,7 +71,7 @@ bool feas::func_feas(uint c, int *rptr) {
 			cout << r[i] << " ";
 		cout << endl;
 #endif
-		retime_sng(retime_vect);
+		g->retime_sng(retime_vect);
 	}
 
 #ifdef INFO
@@ -116,8 +84,8 @@ bool feas::func_feas(uint c, int *rptr) {
 		delete[] r;
 		return true;
 	} else {
-		revert_sng(r);
-		retime_sng(rptr);
+		g->revert_sng(r);
+		g->retime_sng(rptr);
 		delete[] r;
 		return false;
 	}

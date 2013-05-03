@@ -30,9 +30,6 @@ public:
 
 	bool func_feas(uint c, int *r);
 
-	void retime_sng(int *r);
-	void revert_sng(int *r);
-
 	void compute_retiming(uint c, int *r);
 	void update_retiming(int *src, int *dst);
 	void copy_retiming(int *src, int *dst);

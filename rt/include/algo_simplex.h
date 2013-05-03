@@ -44,8 +44,13 @@ public:
 
 	void func_clear_col(int pivot_column, int pivot_row, int width_matrix);
 	int func_pivot_col(int first_starred_row, int width_matrix);
-	int func_test_ratio(int pivot_col, int width);
+	int func_test_ratio(int pivot_col);
 	void phase1();
+
+	int func_pivot_col(int width_matrix);
+	void phase2();
+
+	void get_retiming_vector(int *r, uint n);
 
 private:
 	/* variables from 0 to num_vertices - 1 are the ri */
