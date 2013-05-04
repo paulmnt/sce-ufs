@@ -1,6 +1,8 @@
 #include <sng.h>
 #include <cfloat>
 
+#include <p2out.h>
+
 #ifndef __SIPLEX_H__
 #define __SIPLEX_H__
 
@@ -24,7 +26,7 @@ public:
 class simplex {
 
 public:
-	simplex(uint n, uint target_phi)
+	simplex(uint n, uint target_phi, p2out *p2)
 	{
 		num_vertices = n;
 		phi = target_phi;
@@ -34,6 +36,8 @@ public:
 		 * label is num_vertices.
 		 */
 		slack_var = num_vertices;
+
+		print2 = p2;
 	}
 
 	void print_tableau();
@@ -67,6 +71,8 @@ private:
 
 	/* Vector of starred rows indices */
 	vector<uint> stars;
+
+	p2out *print2;
 };
 
 #endif /* __SIPLEX_H__ */

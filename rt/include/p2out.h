@@ -29,6 +29,18 @@ using namespace std;
 	of << "----------------------------------------------" << endl; \
 	of << endl
 
+
+struct p2_triple {
+	uint i;
+	int ic;
+	uint j;
+	int jc;
+	int ans;
+
+	bool leq;
+	bool opt;
+};
+
 class p2out {
 
 public:
@@ -77,6 +89,20 @@ public:
 	void it8b(sng *g, uint it, uint phi);
 	void it8c(sng *g, uint it, uint phi);
 
+	bool p2_cmp_triple(p2_triple a, p2_triple b)
+	{
+		if (a.i != b.i)
+			return (a.i < b.i);
+		if (a.j != b.j)
+			return (a.j < b.j);
+		return (a.ans <= b.ans);
+	}
+
+	void add_constraint(p2_triple &t)
+	{
+		constraints.push_back(t);
+	}
+
 private:
 	string name;
 	bool verb;
@@ -87,6 +113,7 @@ private:
 	ofstream p2_6;
 	ofstream p2_7;
 
+	vector<p2_triple> constraints;
 };
 
 #endif /* __P2OUT_H__ */

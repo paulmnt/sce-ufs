@@ -97,6 +97,17 @@ void simplex::add_legal_constraints(sng *g)
 
 		/* Add row to tableau */
 		matrix.push_back(row);
+
+		/* It. 5: Prepare new constraint */
+		p2_triple t;
+		t.i = u->get_id();
+		t.ic = 1;
+		t.j = v->get_id();
+		t.jc = -1;
+		t.ans = row.ans; //In this case always positive
+		t.leq = true; //Always less then or equal
+		t.opt = true; //Always necessary
+		print2->add_constraint(t);
 	}
 }
 
@@ -115,48 +126,79 @@ void simplex::add_timing_constraints(sng *g, uint **w, uint **d)
 	 */
 	for (uint i = 0; i < num_vertices; i++)
 		for (uint j = 0; j < num_vertices; j++) {
+
+			/*
+			 * We have to print all constraints. However, we don't
+			 * push a new row to the tableau if the constraint
+			 * can be discarded.
+			 */
+			bool skip = false;
+
 			if (d[i][j] <= phi)
+				/* This is not even a constraint */
 				continue;
 			if (d[i][j] - g->get_vertex_delay(i) > phi)
-				continue;
+				/* Discard this constraint */
+				skip = true;
 			if (d[i][j] - g->get_vertex_delay(j) > phi)
-				continue;
+				/* Discard this constraint */
+				skip = true;
 
-			/* Add a column to the tableau */
-			for (uint k = 0; k < matrix.size(); k++)
-				matrix[k].add_slack_var();
-
-			/* Prepare new row */
-			tab_row row;
-			row.label = slack_var;
 			int leq = 1;
 			if ((int) w[i][j] - 1 < 0)
 				/* ans must be positive */
 				leq = -1;
-			row.ans = leq * (w[i][j] - 1);
 
-			for (uint k = 0; k < slack_var; k++)
-				if (k == i)
-					row.coeff.push_back(1 * leq);
-				else if (k == j)
-					row.coeff.push_back(-1 * leq);
-				else
-					row.coeff.push_back(0);
+			/* Add a column to the tableau */
+			if (!skip) {
+				for (uint k = 0; k < matrix.size(); k++)
+					matrix[k].add_slack_var();
 
-			/*
-			 * Slack variable coeff. is 1 in the initial tableau
-			 * while surplus variable coeff. is -1
-			 */
-			row.coeff.push_back(1 * leq);
-			if (row.coeff[slack_var] < 0) {
-				row.star = true;
-				stars.push_back(matrix.size());
-			} else
-				row.star = false;
-			slack_var++;
+				/* Prepare new row */
+				tab_row row;
+				row.label = slack_var;
+				row.ans = leq * (w[i][j] - 1);
 
-			/* Add row to tableau */
-			matrix.push_back(row);
+				for (uint k = 0; k < slack_var; k++)
+					if (k == i)
+						row.coeff.push_back(1 * leq);
+					else if (k == j)
+						row.coeff.push_back(-1 * leq);
+					else
+						row.coeff.push_back(0);
+
+				/*
+				 * Slack variable coeff. is 1 in the initial tableau
+				 * while surplus variable coeff. is -1
+				 */
+				row.coeff.push_back(1 * leq);
+				if (row.coeff[slack_var] < 0) {
+					row.star = true;
+					stars.push_back(matrix.size());
+				} else
+					row.star = false;
+				slack_var++;
+
+				/* Add row to tableau */
+				matrix.push_back(row);
+			}
+
+			/* It. 5: Prepare new constraint */
+			p2_triple t;
+			t.i = i;
+			t.ic = 1 * leq;
+			t.j = j;
+			t.jc = -1 * leq;
+			t.ans = leq * (w[i][j] - 1);
+			if (leq < 0)
+				t.leq = false; //Use gte
+			else
+				t.leq = true;
+			if (skip)
+				t.opt = false;
+			else
+				t.opt = true;
+			print2->add_constraint(t);
 		}
 }
 
