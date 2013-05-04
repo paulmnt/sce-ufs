@@ -12,10 +12,10 @@ CPPFLAGS = -I $(INCDIR) -Wall #-DINFO #-DDEBUG
 TARGET = retime
 VPATH := ../src
 SRCS = parser.cpp algo_cp.cpp algo_wd.cpp algo_feas.cpp main.cpp \
-	p1out.cpp algo_simplex.cpp
+	p1out.cpp algo_simplex.cpp p2out.cpp
 HDRS = $(INCDIR)/p1out.h $(INCDIR)/sng.h $(INCDIR)/algo_wd.h \
 	$(INCDIR)/algo_cp.h $(INCDIR)/algo_feas.h $(INCDIR)/parser.h \
-	$(INCDIR)/algo_simplex.h
+	$(INCDIR)/algo_simplex.h $(INCDIR)/p2out.h
 OBJS = $(SRCS:.cpp=.o)
 
 .SUFFIXES: .cpp .cc .o

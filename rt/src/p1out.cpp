@@ -29,13 +29,17 @@ void p1out::it3(uint phi)
 
 }
 
+/**
+ * Simple definitions of structure and function to print output
+ * in the required format
+ */
 
-struct tuple {
+struct p1_tuple {
 	uint v;
 	uint w;
 };
 
-bool cmp_tuple(tuple i, tuple j)
+bool p1_cmp_tuple(p1_tuple i, p1_tuple j)
 {
 	return (i.v < j.v);
 }
@@ -51,14 +55,14 @@ void p1out::it2(sng *g)
 	p1_2 << ".g" << endl;
 	for (uint i = 0; i < g->get_num_vertices(); i++) {
 		vertex *v = g->get_vertex(i);
-		vector<tuple> tmp;
+		vector<p1_tuple> tmp;
 		for (uint j = 0; j < v->out.size(); j++) {
-			tuple t;
+			p1_tuple t;
 			t.v = v->out[j]->dst->get_id();
 			t.w = v->out[j]->weight;
 			tmp.push_back(t);
 		}
-		sort(tmp.begin(), tmp.end(), cmp_tuple);
+		sort(tmp.begin(), tmp.end(), p1_cmp_tuple);
 		for (uint j = 0; j < tmp.size(); j++)
 			p1_2 << i << " " << tmp[j].v << " " << tmp[j].w << endl;
 	}
@@ -279,16 +283,16 @@ void p1out::it8a(sng *g, uint it, uint phi)
 	p1_8 << ".g" << endl;
 	for (uint i = 0; i < g->get_num_vertices(); i++) {
 		vertex *v = g->get_vertex(i);
-		vector<tuple> tmp;
+		vector<p1_tuple> tmp;
 		for (uint j = 0; j < v->out.size(); j++) {
-			tuple t;
+			p1_tuple t;
 			t.v = v->out[j]->dst->get_id();
 			t.w = v->out[j]->weight;
 			if (t.w)
 				continue;
 			tmp.push_back(t);
 		}
-		sort(tmp.begin(), tmp.end(), cmp_tuple);
+		sort(tmp.begin(), tmp.end(), p1_cmp_tuple);
 		for (uint j = 0; j < tmp.size(); j++)
 			p1_8 << i << " " << tmp[j].v << " " << tmp[j].w << endl;
 	}

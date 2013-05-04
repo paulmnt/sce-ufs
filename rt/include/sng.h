@@ -323,5 +323,4 @@ private:
 	vector<edge *> edges;
 };
 
-
 #endif /* __SNG_H__ */

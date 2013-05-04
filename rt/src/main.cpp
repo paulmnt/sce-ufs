@@ -1,5 +1,6 @@
 #include <iostream>
 #include <p1out.h>
+#include <p2out.h>
 
 #include <sng.h>
 #include <parser.h>
@@ -183,6 +184,13 @@ int main(int argc, char **argv) {
 		/* Item 2: Retimed Synchronous Network Graph */
 		print1.it2(graph);
 	} else {
+		/* Open output files */
+		string name = graph->get_name();
+		p2out print2(name, verb);
+
+		/* Item 0: Initial Area */
+		print2.it0(graph->get_area());
+
 		/* Step 1: Compute W and D */
 		uint n = graph->get_num_vertices();
 		uint **w = new uint*[n];
@@ -217,7 +225,14 @@ int main(int argc, char **argv) {
 		for (uint i = 0; i < graph->get_num_edges(); i++)
 			graph->print_edge(i);
 #endif
-
+		/* Item 1: Optimal retiming vector */
+		print2.it1(r, n);
+		/* Item 3: Final area */
+		print2.it3(graph->get_area());
+		/* Item 2: Retimed Synchronous Network Graph */
+		print2.it2(graph);
+		/* Item 4: C vector */
+		print2.it4(graph);
 	}
 
 	/* p1out and p2out destructors close output files */
