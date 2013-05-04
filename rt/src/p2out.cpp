@@ -106,14 +106,12 @@ bool p2_cmp_triple(p2_triple i, p2_triple j)
 
 void p2out::it5()
 {
-	print_item(p2_5, "#5. All constraints");
-
 	sort(constraints.begin(), constraints.end(), p2_cmp_triple);
 	for (uint i = 0; i < constraints.size(); i++) {
 		if (constraints[i].ic < 0)
 			p2_5 << "-v";
 		else
-			p2_5 << " v";
+			p2_5 << "v";
 		p2_5 << constraints[i].i << " ";
 		if (constraints[i].jc < 0)
 			p2_5 << "- v";
@@ -128,36 +126,30 @@ void p2out::it5()
 	}
 }
 
+void p2out::it6()
+{
+	/* Constraints sorted already while printing item 5 */
+	for (uint i = 0; i < constraints.size(); i++) {
+		if (!constraints[i].opt)
+			continue;
+		if (constraints[i].ic < 0)
+			p2_6 << "-v";
+		else
+			p2_6 << "v";
+		p2_6 << constraints[i].i << " ";
+		if (constraints[i].jc < 0)
+			p2_6 << "- v";
+		else
+			p2_6 << "+ v";
+		p2_6 << constraints[i].j << " ";
+		if (constraints[i].leq)
+			p2_6 << "<= ";
+		else
+			p2_6 << ">= ";
+		p2_6 << constraints[i].ans << endl;
+	}
+}
 
-// void p2out::it6(uint **w, uint **d, uint n, uint it)
-// {
-// 	/* Only in Verbose mode */
-// 	if (!verb)
-// 		return;
-
-
-// 	p2_6 << "#6. W" << it << " and D" << it << " Matrices" << endl;
-// 	p2_6 << "-------";
-// 	for (uint i = 0; i < n; i++)
-// 		p2_6 << "-----";
-// 	p2_6 << "      ";
-// 	p2_6 << "-------";
-// 	for (uint i = 0; i < n; i++)
-// 		p2_6 << "-----";
-// 	p2_6 << endl;
-
-// 	p2_6 << "     ";
-// 	for (uint i = 0; i < n - 1; i++)
-// 		if (i < 10)
-// 			p2_6 << "  v" << i << " ";
-// 		else
-// 			p2_6 << " v" << i << " ";
-// 	if (n - 1 < 10)
-// 		p2_6 << "  v" << n - 1;
-// 	else
-// 		p2_6 << " v" << n - 1;
-
-// 	p2_6 << "              ";
 // 	for (uint i = 0; i < n - 1; i++)
 // 		if (i < 10)
 // 			p2_6 << "  v" << i << " ";

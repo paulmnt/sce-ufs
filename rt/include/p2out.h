@@ -82,10 +82,10 @@ public:
 	void it4(sng *g);
 
 	void it5();
+	void it6();
 
 	void it7(vector<uint> &r, uint n);
 
-	void it6(uint **w, uint **d, uint n, uint it);
 
 	void it8a(sng *g, uint it, uint phi);
 	void it8b(sng *g, uint it, uint phi);

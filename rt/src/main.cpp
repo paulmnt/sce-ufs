@@ -235,6 +235,8 @@ int main(int argc, char **argv) {
 		print2.it4(graph);
 		/* Item 5: All constraints */
 		print2.it5();
+		/* Item 6: Reduced set of constraints */
+		print2.it6();
 	}
 
 	/* p1out and p2out destructors close output files */
