@@ -95,6 +95,40 @@ void p2out::it4(sng *g)
 
 }
 
+bool p2_cmp_triple(p2_triple i, p2_triple j)
+{
+	if (i.i != j.i)
+		return (i.i < j.i);
+	if (i.j != j.j)
+		return (i.j < j.j);
+	return (i.ans <= j.ans);
+}
+
+void p2out::it5()
+{
+	print_item(p2_5, "#5. All constraints");
+
+	sort(constraints.begin(), constraints.end(), p2_cmp_triple);
+	for (uint i = 0; i < constraints.size(); i++) {
+		if (constraints[i].ic < 0)
+			p2_5 << "-v";
+		else
+			p2_5 << " v";
+		p2_5 << constraints[i].i << " ";
+		if (constraints[i].jc < 0)
+			p2_5 << "- v";
+		else
+			p2_5 << "+ v";
+		p2_5 << constraints[i].j << " ";
+		if (constraints[i].leq)
+			p2_5 << "<= ";
+		else
+			p2_5 << ">= ";
+		p2_5 << constraints[i].ans << endl;
+	}
+}
+
+
 // void p2out::it6(uint **w, uint **d, uint n, uint it)
 // {
 // 	/* Only in Verbose mode */

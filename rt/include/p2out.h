@@ -80,7 +80,9 @@ public:
 	void it2(sng *g);
 
 	void it4(sng *g);
-	void it5(uint phi);
+
+	void it5();
+
 	void it7(vector<uint> &r, uint n);
 
 	void it6(uint **w, uint **d, uint n, uint it);
@@ -88,15 +90,6 @@ public:
 	void it8a(sng *g, uint it, uint phi);
 	void it8b(sng *g, uint it, uint phi);
 	void it8c(sng *g, uint it, uint phi);
-
-	bool p2_cmp_triple(p2_triple a, p2_triple b)
-	{
-		if (a.i != b.i)
-			return (a.i < b.i);
-		if (a.j != b.j)
-			return (a.j < b.j);
-		return (a.ans <= b.ans);
-	}
 
 	void add_constraint(p2_triple &t)
 	{

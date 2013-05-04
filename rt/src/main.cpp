@@ -233,6 +233,8 @@ int main(int argc, char **argv) {
 		print2.it2(graph);
 		/* Item 4: C vector */
 		print2.it4(graph);
+		/* Item 5: All constraints */
+		print2.it5();
 	}
 
 	/* p1out and p2out destructors close output files */
