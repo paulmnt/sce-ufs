@@ -205,7 +205,7 @@ int main(int argc, char **argv) {
 		phi = wdobj.compute_wd();
 
 		/* Prepare and run SIMPLEX method */
-		simplex simp(n, target_phi, &print2);
+		simplex simp(n, target_phi, &print2, verb);
 		simp.make_tableau(graph, w, d);
 		simp.phase1();
 		simp.phase2();

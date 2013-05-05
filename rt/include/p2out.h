@@ -84,17 +84,17 @@ public:
 	void it5();
 	void it6();
 
-	void it7(vector<uint> &r, uint n);
-
-
-	void it8a(sng *g, uint it, uint phi);
-	void it8b(sng *g, uint it, uint phi);
-	void it8c(sng *g, uint it, uint phi);
+	void it7a();
+	void it7b(int it);
+	void it7b();
 
 	void add_constraint(p2_triple &t)
 	{
 		constraints.push_back(t);
 	}
+
+	/* Need to print intermediate tableau */
+	ofstream p2_7;
 
 private:
 	string name;
@@ -104,7 +104,6 @@ private:
 	ofstream p2_4;
 	ofstream p2_5;
 	ofstream p2_6;
-	ofstream p2_7;
 
 	vector<p2_triple> constraints;
 };

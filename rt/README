@@ -17,6 +17,7 @@ LIST OF FOLDERS AND INSTRUCTIONS:
 	     $> make
 
 	- to build with DEBUG printouts enabled: decomment the -DDEBUG flag and add it to $(CPPFLAGS) the Makefile.
+	- to build with INFO printouts enabled: decomment the -DINFO flag and add it to $(CPPFLAGS) the Makefile.
 
 	- to show the tool help
 	     $> make help
@@ -26,11 +27,23 @@ LIST OF FOLDERS AND INSTRUCTIONS:
 
 	     The tool will show the following:
 
-	- to run the regression test
-	     $> make test
+	     Usage: retime [flags] --f <input_file>
 
-	- to run the tool with custom input file
-	     $> ./retime [options] <input_file>
+	      --help            : Displays options
+
+	      --verbose         : Enables verbose mode and prints all
+
+	      --phi <cycle>     : The tool has two modes of operation. When
+               	      		  --phi is specified, mode (2) is enabled.
+                    		  Tool Modes:
+                     		  (1) Get minimum clock cycle (default)
+                     		  (2) Get minimum area given target cycle
+
+	- to run the tool with custom input file in default mode:
+	     $> ./retime --f <input_file>
+
+	- to run the tool with custom input file in minimum area mode:
+	     $> ./retime --phi <cycle> --f <input_file>
 
 	- to clean the folder
 	     $> make clean
@@ -40,9 +53,12 @@ LIST OF FOLDERS AND INSTRUCTIONS:
 	- contains the tex and the Makefile of the write up
 
 ./src
-	- contains source (*.cpp) files and header files (*.h) of the tool.
+	- contains source (*.cpp) files of the tool.
+
+./include
+	- contains header files (*.h) of the tool.
 
 ./tb
-	- contains the input files for the regression test.
+	- contains the input files.
 
 

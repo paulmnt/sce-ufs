@@ -52,6 +52,71 @@ void simplex::print_tableau()
 	matrix[matrix.size() - 1].print();
 }
 
+void tab_row::print(ofstream &of, bool pivot, int pc)
+{
+	of << " ";
+	if (star)
+		of << "*";
+	else
+		of << " ";
+	if (label < 10)
+		of << " ";
+	of << label << " | ";
+
+	for (uint i = 0; i < coeff.size(); i++) {
+		if (coeff[i] < 10 || coeff[i] > -10)
+			of << " ";
+		if (coeff[i] >= 0)
+			of << " ";
+		if (pivot && pc == (int) i)
+			of << "(" << coeff[i] << ")";
+		else
+			of << " " << coeff[i] << " ";
+	}
+	of << "| ";
+	if (ans < 10 || ans > -10)
+		of << " ";
+	if (ans >= 0)
+		of << " ";
+	of << ans;
+	of << " Ratio: " << ratio << endl;
+}
+
+void simplex::print_tableau(ofstream &of, int pc, int pr)
+{
+	of << "     | ";
+	for (uint i = 0; i < slack_var; i++) {
+		if (i < 10)
+			of << " ";
+		if (pc == (int) i)
+			of << " (" << i << ")";
+		else
+			of << "  " << i << " ";
+	}
+	of << "|" << endl;
+
+	of << "------";
+	for (uint i = 0; i < slack_var; i++)
+		of << "-----";
+	of <<"------" << endl;
+
+	for (uint i = 0; i < matrix.size() - 1; i++)
+		if (pr == (int) i)
+			matrix[i].print(of, true, pc);
+		else
+			matrix[i].print(of, false, pc);
+
+	of << "------";
+	for (uint i = 0; i < slack_var; i++)
+		of << "-----";
+	of <<"------" << endl;
+
+	matrix[matrix.size() - 1].print(of, false, pc);
+
+	of << endl;
+}
+
+
 void simplex::add_legal_constraints(sng *g)
 {
 	/* Add constraints to make retiming vector legal
@@ -86,7 +151,7 @@ void simplex::add_legal_constraints(sng *g)
 			else
 				row.coeff.push_back(0);
 
-		/* Slack variable coeff. is 1 in the initial tableau 8 */
+		/* Slack variable coeff. is 1 in the initial tableau */
 		row.coeff.push_back(1);
 		if (row.coeff[slack_var] < 0) {
 			row.star = true;
@@ -94,6 +159,9 @@ void simplex::add_legal_constraints(sng *g)
 		} else
 			row.star = false;
 		slack_var++;
+
+		/* Only to print it. 7 */
+		row.ratio = "null";
 
 		/* Add row to tableau */
 		matrix.push_back(row);
@@ -179,6 +247,9 @@ void simplex::add_timing_constraints(sng *g, uint **w, uint **d)
 					row.star = false;
 				slack_var++;
 
+				/* Only to print it. 7 */
+				row.ratio = "null";
+
 				/* Add row to tableau */
 				matrix.push_back(row);
 			}
@@ -238,15 +309,74 @@ void simplex::add_objective_func_row(sng *g)
 		row.star = false;
 	slack_var++;
 
+	/* Only to print it. 7 */
+	row.ratio = "na";
+
 	/* Add row to tableau */
 	matrix.push_back(row);
 }
+
+
+bool simplex_cmp_rows(tab_row i, tab_row j)
+{
+	int iu = -1;
+	int iv = -1;
+	int ju = -1;
+	int jv = -1;;
+	for (uint k = 0; k < i.coeff.size(); k++) {
+		if (i.star) {
+			if (i.coeff[k] == -1)
+				iu = k;
+			else if (i.coeff[k] == 1)
+				iv = k;
+		} else {
+			if (i.coeff[k] == -1)
+				iv = k;
+			else if (i.coeff[k] == 1)
+				iu = k;
+		}
+		if (j.star) {
+			if (j.coeff[k] == -1)
+				ju = k;
+			else if (j.coeff[k] == 1)
+				jv = k;
+		} else {
+			if (j.coeff[k] == -1)
+				jv = k;
+			else if (j.coeff[k] == 1)
+				ju = k;
+		}
+		if (iu >= 0 && iv >= 0 && ju >= 0 && jv >= 0)
+			/* Slack variables do not count for sorting */
+			break;
+	}
+	if (iu != ju)
+		return (iu < ju);
+	if (iv != jv)
+		return (iv < jv);
+	return (i.ans <= j.ans);
+}
+
 
 void simplex::make_tableau(sng *g, uint **w, uint **d)
 {
 	add_legal_constraints(g);
 	add_timing_constraints(g, w, d);
 	add_objective_func_row(g);
+
+	/* Useless operation needed for printout of item 7 */
+	if (verb) {
+		/* Works only after initial tableu is made */
+		sort(matrix.begin(), matrix.end() - 1, simplex_cmp_rows);
+		/* Need to Recheck stars */
+		stars.clear();
+		for (uint i = 0; i < matrix.size(); i++)
+			if (matrix[i].coeff[matrix[i].label] < 0) {
+				stars.push_back(i);
+				matrix[i].star = true;
+			} else
+				matrix[i].star = false;
+	}
 #ifdef INFO
 	cout << "INFO: Printing initial tableau" << endl;
 	print_tableau();
@@ -334,10 +464,20 @@ int simplex::func_test_ratio(int pivot_col)
 	int pivot_row = -1;
 	double min = DBL_MAX;
 
-	for (int i = 0; i < (int) matrix.size() - 1; i++)
+	for (int i = 0; i < (int) matrix.size() - 1; i++) {
+		/* only to print it. 7 */
+		matrix[i].ratio = "null";
+
 		if (matrix[i].coeff[pivot_col] > 0) {
 			double tmp;
 			tmp = (double) matrix[i].ans / (double) matrix[i].coeff[pivot_col];
+			/* only to print it. 7 */
+			if (verb) {
+				stringstream ss;
+				ss << matrix[i].ans << "/" << matrix[i].coeff[pivot_col];
+				matrix[i].ratio = ss.str();
+			}
+
 			if (tmp > min)
 				continue;
 			if (tmp == min) {
@@ -349,16 +489,18 @@ int simplex::func_test_ratio(int pivot_col)
 			min = tmp;
 			pivot_row = i;
 		}
+	}
 
 	return pivot_row;
 }
 
 void simplex::phase1()
 {
+	it = 0;
 	while (stars.size() > 0) {
+
 		/* Pick first starred row and remove it form starred list */
 		int first_starred_row = stars[0];
-
 		int pivot_column;
 		int pivot_row;
 		int width_matrix = slack_var;
@@ -376,6 +518,20 @@ void simplex::phase1()
 #endif
 		if (pivot_row < 0)
 			return;
+
+		if (verb) {
+			if (!it) {
+				/* it 7a: Printing initial tableau */
+				print2->it7a();
+				print_tableau(print2->p2_7, pivot_column, pivot_row);
+				it++;
+			} else {
+				/* It 7bcd: printing iteration # */
+				print2->it7b(it);
+				print_tableau(print2->p2_7, pivot_column, pivot_row);
+				it++;
+			}
+		}
 
 		func_clear_col(pivot_column, pivot_row, width_matrix);
 #ifdef DEBUG
@@ -404,17 +560,32 @@ void simplex::phase2()
 		if (pivot_row < 0)
 			break;
 
+		if (verb) {
+			/* It 7bcd: printing iteration # */
+			print2->it7b(it);
+			print_tableau(print2->p2_7, pivot_column, pivot_row);
+			it++;
+		}
+
 		func_clear_col(pivot_column, pivot_row, width_matrix);
 #ifdef DEBUG
 		cout << "DEBUG: Printing current tableau" << endl;
 		print_tableau();
 #endif
+		it++;
 	} while (pivot_column != 0);
 
 #ifdef INFO
 	cout << "INFO: Printing final tableau" << endl;
 	print_tableau();
 #endif
+
+	if (verb) {
+		/* It 7bcd: printing iteration # */
+		print2->it7b();
+		print_tableau(print2->p2_7, -1, -1);
+	}
+
 
 	/* Initialize result vector */
 	for (uint i = 0; i < slack_var; i++)
@@ -424,6 +595,7 @@ void simplex::phase2()
 	for (uint i = 0; i < matrix.size(); i++)
 		/* Given the constraints the result is proven to be integer! */
 		result[matrix[i].label] = matrix[i].ans / matrix[i].coeff[matrix[i].label];
+
 
 #ifdef INFO
 	cout << "INFO: Printing solution of SIMPLEX..." << endl;
