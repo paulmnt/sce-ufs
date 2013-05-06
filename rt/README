@@ -62,3 +62,9 @@ LIST OF FOLDERS AND INSTRUCTIONS:
 	- contains the input files.
 
 
+./out
+	- contains the output files printed in verbose mode for both
+	  min-cycle and min-area using the two given examples.
+	  Notice that when running the tool, the output files
+	  are printed in the current `pwd` folder, therefore the
+	  content of out should is not overwritten.
