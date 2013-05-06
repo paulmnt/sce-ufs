@@ -5,10 +5,10 @@
 
 \begin{document}
 
-\title{Function Similarity Evaluation Tool}
+\title{Retiming Tool}
 \subtitle{CSEE E6861y - Computer-Aided Design of Digital Systems}
 
-\numberofauthors{1}
+\numberofauthors{2}
 \author{
 \alignauthor
 Kshitij Bhardwaj \ \ \ \ Paolo Mantovani\\
@@ -18,237 +18,417 @@ Kshitij Bhardwaj \ \ \ \ Paolo Mantovani\\
 \maketitle
 
 \begin{abstract}
-This tool evaluates the similarity of two functions, which have the same support,
-given two covers representing the functions. The tool kernel is a divide and
-conquer algorithm which recursively splits the covers with respect to a variable
-by producing positive and negative cofactors, until a termination rules applies.
+In the context of logic synthesis, the retiming step is performed on a multi
+level logic network, in order to rebalance combinational paths and to squeeze
+some slack to increase clock frequency.
+The tool takes as input a Control Data Flow Graph (CDFG) encoded as a
+Synchronous Logic Network Graph, which will be addressed simply as graph or
+network through the rest of this report.
+
+The tool has two working modes: \texttt{min cycle} and \texttt{min area}.
+The former mode aims to find the minimum feasible clock cycle and retimes
+the network regardless of the registers count. The latter, instead, takes
+as input a target feasible clock cycle and tries to retime the network so
+that the clock cycle is met and the number of registers is minimized.
+\end{abstract}
+
+
+\section{Tool overview}
 
 The program is written in \texttt{C++}, which compiles to fast native executable
 and the code consists of a main function, which calls the basic components of
 the program:
 \begin{itemize}
-  \item {\bf The parser}: takes two PLA files as input, which describe the two
-    covers, each of which has the same number of input variables and a single
-    output;
-  \item {\bf Function Similarity}: is the heart of the program, containing the
-    recursive function. The latter takes the parsed covers and performs three
-    basic steps:
+  \item {\bf The parser}: takes  one text input file which describes the graph,
+    by listing nodes delay (combinationa logic) and edges weight (registers
+    current position). The parser allows the presence of comments at the end of
+    each line.
+  \item {\bf Min Cycle}: is the defaul running mode, which relies on the
+    following basic algorithms, which are invoked by the main function:
     \begin{enumerate}
-      \item Check if a termination rule applies; It is worth to notice that the
-        rules are checked in order of complexity, so that the faster rules will
-        match first. Also, most of the rules have running time linear in the
-        number of literals or in the number of cubes in the covers.
-        We implemented also a few rules with quadratic complexity, however,
-        these are not enabled by default.
-      \item If not, then split the covers and do two recursive calls on the
-        positive and negative cofactor;
-      \item If yes, then evaluate the similarity of the current cofactors and
-        return.
-      \item During the recursion, if the \texttt{verbose mode} is enabled, all
-        the intermediate PLA files are saved to disk. The local variables and
-        the arguments passed to the recursive function are small enough not to
-        incur in a memory fault.
+      \item {\bf WD}: computes all paths delays and weights for each vertex pair
+        and stores them into two matrices (W and D). This steps is an adapted
+        version of \texttt{Floyd Warshall} algorithm.
+      \item {\bf Binary search}: pick values from D matrix as possible target
+        clock cycles.
+      \item {\bf FEAS}: for each feasible target cycle, this step returns the
+        retiming vector and the retimed network. The algorithm repeats the
+        following steps n times, where n is the number of nodes in the network.
+        \begin {itemize}
+          \item {\bf Clock Period (CP)}: computes the arrival time of each vertex, given
+            the current register placement.
+          \item {\bf Retime}: determine the next retiming vector, based on late
+            notes, retime then retime the network.
+        \end{itemize}
     \end{enumerate}
-  \item {\bf The printer}: is responsible for invoking the methods for printing
-    the recursion tree and the PLA files if \texttt{verbose} is active.
+  \item {\bf Printer 1}: is responsible for invoking the methods for printing
+    the initial network information, the retiming information and the minimium
+    cycle achieved. When \texttt{verbose} flag is enabled, all intermediate steps
+    of WD and FEAS are printed to file.
+  \item {\bf Min Area}: takes the same input file described above, plus the
+    target clock cycle. This mode performs the following basic steps:
+    \begin{enumerate}
+      \item {\bf WD}: same as above.
+      \item {\bf SIMPLEX}: given the information found in the previous step, the
+        retiming problem is expressed as a set of linear disequations and a
+        function to minimize, which is the total number of registers after
+        retiming. The disequations are the constraints to which the network is
+        subject to: there must be no combinational loops and the final circuit
+        has to meet the target clock cycle.
+        SIMPLEX class includes, among the others, the following important methods:
+        \begin {itemize}
+          \item {\bf Make Tableau}: transforms the constraints and the objective
+            function into a matrix.
+          \item {\bf Phase 1}: performs rows operation to get a feasible solution
+            to the linear system.
+          \item {\bf Phase 2}: searches for the legal and feasible retiming vector
+            that minimizes the registers count. This is done again by performing
+            row operations on the matrix or \texttt{tableau}.
+        \end{itemize}
+    \end{enumerate}
+  \item {\bf Printer 2}: is responsible to print the initial network information,
+    the retiming information and the minimum area achieved. When \texttt{verbose}
+    flag is enabled, all intermediate steps of SIMPLEX are saved to file.
 \end{itemize}
 
-\end{abstract}
+Further details on the algorithms are provided in sections \ref{sec:struct} and
+\ref{sec:tech}.
 
 
-\section{Function Similarity}
+\section{Data structures and algorithms}
+\label{sec:struct}
 
-The similarity between two functions represents the percentage of input patterns,
-among the complete set of possible input vectors, for which the functions give
-the same output.
-For this tool we assume that the functions are completely specified (i.e. the
-don't care set, or DC-set, is empty).
-A brute force approach to this problem, involves the generation of the truth
-tables, starting from the covers, which has exponential complexity. A classic
-solution is to follow the ``Divide et Impera'' technique, that means to split
-the problem into smaller subproblems until a trivial and fast termination
-step can be applies.
+This section describes in details the data structures used for each part of the
+and gives some insights on the way the main algorithms have been coded.
 
-\subsection{Shannon Decomposition}
+\subsection{Storing the synchronous network}
 
-When no termination rule matches the current covers, the program produces
-cofactors to split the problem. The following equation shows how we can
-recover the similarity of the original functions, given the similarity of the
-cofactors:
+To store the graph we designed a class which can serve both modes of operation
+of the tool and allows for a clean and readable programming style. Also through
+a massive usage of pointers, we avoid having multiple copies of the network,
+thus reducing the memory requirements.
+This class is named \texttt{sng} and a part from a string, which stores the name
+of the circuit, it contains two main member variables: a vector of pointers to
+edge and a vector of pointers to vertex. Edge and Vertex are the name of two
+classes, which keep all the information necessary to run the algorithms of the
+tool and to print intermediate and final results.
 
-\begin{equation}
-  \label{eq:shannon}
-  FSim(F, G) = \frac{FSim(F_{x}, G_{x}) + FSim(F_{x'}, G_{x'}}{2}
-\end{equation}
-
-Notice that the function $FSim$ takes covers as input, but returns the similarity
-of the functions they represent. Variable $x$ is a generic splitting variable.
-This simple rule is always correct, because when we split the cover, with respect
-to a variable, we obtain two cofactors which no longer depend on the splitting
-variable and contain information about one half of the original cover.
-
-\subsection{Termination Rules}
-
-A handful set of termination rules is key to speed up the program and reduce
-the number of recursive calls. However, too complex rules have been discarded,
-because the cost for checking if they match is often times higher than the cost
-of an extra recursive call.
-
+{\bf Vertex} includes the following items:
 \begin{itemize}
-  \item {\bf B1}: Both covers are empty. This is the simplest rule and we just
-    return 1.
-  \item {\bf B2}: Both covers are a tautology. Again we return 1, however,
-    tautology checking can be quite expensive, therefore, we chose not to
-    implement the complete recursive algorithm. Instead, we just try to match
-    tautology checking termination rules and let our main recursion continue.
-    In fact, if one of the covers is truly a tautology, this rule should probably
-    match anyway within a few recursion, while if none of the cofactors ends
-    up being a tautology, we waste lot of time doing recursive cofactoring on
-    covers, just to prove that they are not a tautology and we cannot terminate
-    the main recursion.
-  \item {\bf B3}: One cover is empty. In this case we just need to return the
-    size of the OFF-set of the non empty cover, divided by the total number of
-    possible input patterns. To get the OFF-set cardinality, we actually count
-    the number of elements in the ON-set, because the given covers contain cubes
-    which cover the ON-set. This operation is not trivial and in the most general
-    case requires to apply again the divide and conquer technique on the non
-    empty cover. This time doing a recursion to calculate the ON-set cardinality
-    is worth the effort, because this rule terminates the main recursion.
-  \item {\bf B4}: One cover is a tautology. This rule is complimentary to rule B3
-    and we need to return the ON-set cardinality of the cover which is not a
-    tautology, divided by the number of possible input vectors.
-  \item {\bf B5}: One cover is empty and the other is a tautology. This rule gives
-    a trivial answer, which is that the similarity to be returned is 0.
-  \item {\bf B6}: Both covers have a single cube. In this case we can easily
-    calculate the cardinality of the ON-sets of the two covers, by simply
-    looking at the number of don't cares in the input part of the cubes.
-    Moreover, we can quickly calculate the intersection of the two cubes, thus
-    deriving in linear time both common zeros and common ones. The sum of common
-    zeros and common ones, divided by total number of minterms gives the similarity
-    of the covers.
-  \item {\bf B7}: One cover has a single cube and g has non intersecting cubes.
-    Assuming we can check that a cover has only non intersecting cubes, then this
-    rules extends rule B6: the size of the ON-set of the cover with multiple
-    cubes is obtained by summing up the number of minterms covered by each of
-    its cubes, while the intersection between the two covers is calculated by
-    intersecting the single cube of the first cover, with every cube of the
-    other. Notice that if the cubes in the second cover had intersections, then
-    complexity would be exponential.
-    Unfortunately, the problem of checking whether the cubes intersect or not
-    has quadratic complexity, thus we chose to let this rule as an option, which
-    can be enabled by adding the flag \texttt{--single\_disjoint} to the command
-    line when starting the tool.
-  \item {\bf B8}: Both covers have multiple non intersecting cubes. This rule
-    extends further rules B6 and B7. Intuitively this is the most powerful
-    of the three and it could save many recursive calls at the cost of two
-    quadratic checks. Again we chose to leave it as an option, enabled by
-    the flag \texttt{--multi\_disjoint}. When this rule is enabled, rule B7
-    is enabled as well.
-  \item {\bf B9}: Both covers show single input dependence with respect to
-    the same variable (same value). If this rule matches it means that the
-    covers are not tautology therefore the two covers look exactly the same,
-    but for the number of rows. Notice that there is no guarantee that the
-    initial covers or the cofactors don't have duplicated or redundant
-    cubes. In this case we obviously return 1.
-  \item {\bf B9}: Both covers show single input dependence with respect to
-    the same variable (but different value). This is complementary to rule
-    B9 and we just return 0.
-  \item {\bf B11}: Both covers show single input dependence, but with respect
-    to different variables. In this case it does not matter whether the variable
-    is shown in its positive or complemented form. The similarity of the
-    two functions is exactly 0.5, because in this special condition the two
-    covers have half of in ON-set in common and half of the OFF-set in common.
-  \item {\bf B12}: One cover shows single input dependence. This rule is not
-    trivial, but it allows early termination, by performing one last cofactoring
-    with respect to the variable on which one cover has single input dependence.
-    In fact, we obtain one empty cofactor and a tautology, thus rules B3 and
-    B4 apply on the cofactors.
+  \item {\bf in}: is a vector of pointers to edge that contains a pointer per
+    each edge connected and directed to the vertex.
+  \item {\bf out}: is a vector of pointers to edge that contains a pointer per
+    each edge departing from the vertex.
+  \item {\bf id}: is the name of the node assigned based on the input file.
+  \item {\bf delay}: is the combinnational delay of the node.
+  \item {\bf delta}: is the arrival time, including the delay of the node,
+    which is set by CP to determine the current clock cycle and which nodes
+    are late.
+  \item {\bf color}: is a flag used when walking the tree to perform Depth
+    First Search (DFS) on the graph.
+  \item {\bf c}: is the difference between the vertex in-degree and out-degree,
+    which is used to generate the objective function to minimize for the
+    \texttt{min area} mode.
 \end{itemize}
 
-A wise ordering of the rules checking can speed up the algorithm in most cases,
-because rules with a fast check and, even more important, which allow to terminate
-quickly, will match first. Also, we combine the checking of similar rules, to
-avoid repeated calculations and we chose the following ordering:
+{\bf Edge} includes the following items:
+\begin{itemize}
+  \item {\bf id}: is the name of the node, assigned based on the order in which
+    vertices are listed in the input file. Notice that the structure of the
+    produced graph does not depend on the edge ordering, however the id of the
+    edges does.
+    \item {\bf weight}: is the number of registers present on the edge.
+    \item {\bf src}: is a pointer to the source vertex of the directed edge.
+    \item {\bf dst}: is a pointer to the destination vertex of the directed
+      edge.
+\end{itemize}
+
+Among the methods available in class \texttt{sng}, it is worth to mention:
+\begin {itemize}
+  \item {\bf reset\_deltas}: this method resets the arrival time of the
+    vertices, which is necessary before running CP after the network has
+    been retimed.
+  \item {\bf retime\_sng}: this method takes as input a retiming vector
+    and applies it to the graph. All edges weigths are properly updated.
+  \item {\bf revert\_sng}: this method takes as input a retiming vector
+    and reverts the network retiming.
+    FEAS calls this step when a target clock cycle is non feasible. Also
+    we revert to the graph every time we try a new target cycle.
+    Being able to revert a retiming, allows us to avoid copying the graph
+    while running the tool.
+\end {itemize}
+
+\subsection{WD calculation}
+
+Matrices of the arrival times D and of the paths weights W contains a fixed
+number of elements, which is the square of the number of vertices. Therefore
+we choose to avoid using dynimic memory allocation ad to represent the two
+matrices as two dual dimension arrays of size n by n.
+
+The class dedicated to WD algorithm has also a vector of unsigned integers,
+which is used to store and sort all possible values to be picked as target
+clock cycle in \texttt{min cycle} mode. The values stored in this vector
+are dumped from matrix D, then we sort the vector and remove all duplicates.
+
+The methods of this class are the basic steps of the Floyd-Warshall algorithm:
+\begin{itemize}
+  \item {\bf initialize WD}: we initialize the matrix based on the \texttt{sng}
+    graph. At the beginning, we only know verteces delay and edges weight.
+    All paths not yet discovered are marked with an infinite weight and 0 delay;
+    on the other hand, all paths corresponding to an edged are marked with the
+    edge weight and the delay of the source vertex.
+  \item {\bf compute WD}: we run a single pass of Floyd-Warshall and we
+    update while the algorithm runs both paths weight and delay, thus we
+    find per each path the \texttt{min-weight - max-delay}.
+    During the last iteration of the outer loop of Floyd-Warshall we add to
+    the paths the delay of the destination vertex and we determine the
+    current minimum clock cycle of the network.
+\end{itemize}
+
+\subsection{FEAS algorithm}
+
+The class implemented for FEAS does not need any additional data structure.
+It includes: a copy of the pointer to the network of type \texttt{sng};
+a class, named \texttt{cp}, which includes the methods to run DFS on the
+graph and determine the feasible clock cycle after each retiming step; a
+set of auxiliary methods to run the kernel of FEAS.
+
+To avoid copying the network, at each iteration of FEAS, we retime the network
+starting from the graph obtained at the previous iteration. We also update the
+elements of the retiming vector, with respect to the input network, but we
+use a local retiming vector at each iteration, which represents the retiming
+between iteration $i$ and iteration $i-1$.
+Finally, if the retiming was successful, we return the global retiming vector
+along with the retimed graph, otherwise, we revert the network before retunring
+to main.
+
+\subsection{Linear programming: constraints generation}
+
+While the tool is able to generate the tableau to run SIMPLEX in a single step,
+starting from matrices WD and from the input graph, we added additional
+methods to generate and sort the list of constraints to which our linear
+program is subject to.
+
+At first we add to the list of constraints the necessary conditions to get a
+legal network, which implies that no edge has a negative weight.
+Per each constraint added, we introduce a new slack variable to the system
+and we add a row to the matrix.
+
+As a second step, we add the timing constraints, derived from WD matrices.
+This time, since from the matrices we get some redundant constraints, we
+mark the required ones, so that we can print both a complete list of
+constraints and an optimized one. However, we only add to the matrix the
+reduced list of constraints, while we skip the others.
+
+To support sorting and printing we use a vector of type \texttt{p2\_triple},
+that includes the id of the vertices involved, the coefficients of the
+disequation, the sign of the answer term and a flag to distinguish between
+redundant and necessary constraints.
+
+\subsection{Linear programming: SIMPLEX}
+
+SIMPLEX algorithm relies on the representation of the tableay, which is a
+vector of rows, where each row is a class that contains the following items:
+\begin{itemize}
+  \item {\bf label}: the variable for which the row tells the basic solution.
+  \item {\bf coeff}: a vector of integers, which are the oredered coefficients
+    of the disequation represented by the row. The first n coefficients are
+    related to the retiming vectors elements (one per each vertex of the graph),
+    while the subsequen numbers relate to the slack variables used for SIMPLEX.
+  \item {\bf ans}: is the answer term of the row.
+  \item {\bf ratio}: is a string updated at each iteration of FEAS, while
+    searching for the right pivot in the matrix. This string is useful only
+    in verbose mode to print intermediate results, while the actual ratio
+    is not stored, because we determine the pivot with a single pass across all
+    the rows.
+  \item {\bf star}: is a flag that tells if the coefficient of the variable
+    represented by the label of the row is negative. This flag is used in
+    phase 1 of FEAS to manipulate the matrix in order to obtain a feasible
+    solution for the linear program.
+\end{itemize}
+
+The class \texttt{simplex} contains a collection of methods to create the tableau,
+by adding all the rows derived from the constraints. Moreover, the last row added
+to the matrix corresponds to the objective function, determined based on the
+information stored into the graph, and in particular, the \texttt{c} value of
+each vertex.
+
+Most important methods called in \texttt{simplex} are functions to find the
+appropriate pivot columb, to determine the pivot row and to clear the column
+of the pivot with a simple row operation applied to the entire matrix.
+
+It is worth to mention that in verbose mode only, the rows in the tableau are
+ordered before starting FEAS kernel, so that each row of the initial tableau
+corresponds to the disequation in the reduced set of constraints listed in the
+same order.
+
+
+\section{Testing Methodology}
+
+Due to time shortage, we decided to design and test our program
+incrementally, running small simple intermediate tests to check the correctness
+of every algorithm or portions of them.
+
+We produced some hand solvable inputs for Floyd Warshall, CP, FEAS, network
+retiming and reverting, constraints generation step, objective function generation,
+SIMPLEX and we ran all the tests separately while coding the related algorithm.
+Notice that SIMPLEX was also tested agains a web based applet that solves
+linear programming using SIMPLEX method.
+
+Thanks to the flexible data structures and the methods interface we provide, we
+could reliably assembling the tool, starting from tested basic components,
+with a low probability of introducing new bugs.
+
+We also used compiler pragmas to enable two levels of degbug:
+\begin{itemize}
+ \item {INFO}: when defined we print all basic information of the algorithms,
+   along with some intermediate results. This level of information is easy to read
+   and allows to quickly identify at which step of the computation the error
+   occured.
+ \item {DEBUG}: when defined we print detailed information of every function
+   that makes some computation. The tool prints a huge amount of extra information,
+   which most of the time allows to identify the cause of the error. It is
+   recommended to get first the basic information using the definition INFO
+   and finally to use the DEBUG information to dig into the problem
+\end{itemize}
+
+To test the entire tool in both modes we leveraged the two given examples of
+the correlator. Also we tested the tool with a larger network, which was not
+strongly connected. This test helped us to check if the tool behaves correctly
+when WD matrices are incomplete.
+All the three examples were compared against a manual solution of the retiming
+problem.
+
+Most of the issues we faced were cause by a slighlty incorrect formulation and
+set up of the problems, rather than by the implementation of the algorithms,
+which are small and simple to code.
+
+
+\section{Additional Insights}
+
+In section \ref{sec:struct} we described in detail our choices in terms of data
+structures that makes our retiming tool fast and memory efficient.
+
+It is worth to mention a few more features of the tool, which we implemented:
+\begin{itemize}
+  \item Reduced number of loops, obtained by computing all results
+    on-the-fly, rather than iterating many times to produce incrementally
+    the information. The drawback of this optimization is that we had to step back
+    and massage the code, in order to print all the required outputs, which
+    are sometimes irrelevant to the computation of the final result.
+  \item Each vertex and each edge is ``self contained'': no need for iterating
+    over the list of edges or over the list of vertices to retrieve the
+    information needed, because each vertex has a pointer to each edge
+    which impinges it. Similarly each edge has pointers to source and destination
+    vertices.
+    \item Binary search for \texttt{min cycle} prunes the search to values which
+      are smaller than the initial clock cycle.
+    \item Tableau rows labeling for \texttt{min area} uses numbers instead of
+      strings and a member variable keeps track of each added row and slack variable,
+      thus making easier to perform row operations and to read the basic solution
+      from the tableau.
+\end{itemize}
+
+\section{Technical Issues}
+\label{sec:tech}
+
+\subsection{Floyd Warshall Algorithm}
+
 \begin{enumerate}
-  \item Check rules from B1 to B5;
-  \item Check rules from B9 to B12;
-  \item Check rules from B6 to B8 (depends on which are enabled);
-  \item Check unateness conditions for termination or pruning. This set of rules
-    is presented in the next section.
+  \item Iteration 0 $(k = 0)$: all paths not yet discovered are marked with an
+    infinite weight (Matrix W) and 0 delay (Matrix D);
+    on the other hand, all paths corresponding to an edged are marked with the
+    edge weight and the delay of the source vertex. Also, edge weights between
+    the same nodes is set to 0.
+  \item Iteration 1 $(k = 1)$: At the end of first iteration,  matrix W has the
+    following entries $wuv(1)$: $wuv(1) = min( wuv(0), wu1(0) + w1v(0) )$
+    where $wuv(0)$ is the minimum weight between u and v vertices from iteration
+    0, $wu1(0) + w1v(0)$ is the minimum weight between vertex u and vertex v,
+    if vertex 1 is an intermediate vertex of the path between u and v. The second
+    expression in the min function is again calculated from the minimum distances
+    computed during iteration 0.
+    Any entry updated in matrix W causes an update of the same entry in matrix D,
+    which keeps track of the total delay between the two vertices uv, when the path
+    with weight wuv(1) is selected.
+  \item Iteration i $(k = i)$: At the end of ith iteration, matrix W stores
+    the minimum weight between any two nodes u, v, if there exists a path from
+    u to v of length at most $i$. Matrix D stores the total delay of such a path
+    from u to v. Each element is calculated with the same expression shown
+    for step 1, in which we have $i$ in places of index 1 and $i - 1$ in place
+    of index 0.
 \end{enumerate}
 
-\subsection{Unateness Conditions}
 
-For function similarity, having simply a condition of unateness, does not help to
-improve the speed of the algorithm, however, there are a few special cases, which
-allows to prune the recursion tree.
+\subsection{Retiming: Handling too slow operators}
 
-\begin{itemize}
-  \item {\bf U13}: Both covers are positive/negative unate on the same variable with
-    no DCs. In other words, this means that both covers have either all 1's or all
-    0's on the same column. If we chose the variable bound to that column, then
-    rule B1 applies to a pair of cofactors and we can prune one branch of the
-    recursion.
-  \item {\bf U14}: Both covers are unate on the same variable with no DCs, but one
-    is positive unate, while the other is negative unate. This is a termination rule
-    because it implies that the covers do not share any ON-set minterm; thus we just
-    need to calculate the cardinality of the two ON-sets to obtain the number of
-    common zeros, which divided by the total number of combinations gives the
-    similarity of the functions.
-  \item {\bf U15}: One cover is positive/negative unate in a variable Xi with no Dcs.
-    If we pick Xi as splitting variable then rule B3 applies to a pair of cofactor
-    and we can therefore prune one branch of the recursion.
-\end{itemize}
-
-Again the ordering is important, therefore we check first if rules U14 applies,
-because it terminated the recursion.
-
-\subsection{Splitting Variable}
-
-When none of the rules above applies, we pick a binate variable as splitting
-variable, to try keeping the tree balanced. This choice aims to favor rule B6,
-which is very quick to check and requires a simple calculation: getting the
-similarity of two cubes.
-
-\section{Regression Test}
-
-To test our program we implemented a script in the \texttt{Makefile} that
-executes the program with a bunch of input PLAs and checks the result against a
-golden output, which we calculated manually for most of the inputs.
-The test suite includes also a larger example, with 20 input variables,
-which we couldn't test manually.
-
-Other trivial input files, not included in the test suite, have been used to
-test the rules on by one, right after we implemented it.
-
-The regression script allowed us to build the program in an incremental way,
-checking that any additional feature we added did not compromise the
-previous functionality.
+The timing constraints for the retiming problem  state that
+\begin{equation}
+  \forall V_{i}, V_{j} s.t. D(V_{i}, V_{j}) > \phi \ \ \ \ \  R_{i} - R_{j} \leq W(V_{i}, V_{j}) - 1
+\end{equation}
+If we have $D(V_{k}, V_{k}) (=30) > \phi (=20)$, then the following equation must be satisfied:
+\begin{equation}
+  R_{k} - R_{k} \leq W(V_{k}, V_{k}) - 1 \ \ \ \ \  W(V_{k}, V_{k}) = 0
+\end{equation}
+The above inequality will clearly never hold and therefore the system of equations  will always be unsolvable.
 
 
-\subsection{Covers with a large support}
+\subsection{Retiming: Exploring alternative retiming vectors}
 
-Our program can easily handle large input files, with covers that have many
-cubes. However, a major constraint is given with the number of variables.
-The total number of input patterns, in fact, is exponential in the number
-of variables, but the integer type, for instance, is encoded with 32 bits,
-thus we can represent numbers larger than $2^{32} - 1$.
-A second issue that could occur when we have a large number of input variables
-is that the similarity could be too close to 1 or 0, thus it can't be represented
-even using double precision floating point numbers.
+\begin{enumerate}
+  \item Legal retiming vectors $r_{x}$, larger than $r_{opt}$ are not always
+    feasible.
+    The following retiming vector gives a counter example:
+    -[1 2 2 3 1 1 0 0]. Retiming value of vertex $V_{e}$ in figure 9.8 (DM)
+    is increased from -2 to -1. Equation 9.4 is still satisfied, which implies
+    a legal vector, but equation 9.5 is not satisfied for vertices $V_{e}$ and $V_{f}$.
+    \begin{equation}
+      R_{e} - R_{f} \leq W(V_{e}, V_{f}) - 1
+    \end{equation}
+    Computing the left hand side (LHS) of the above equation we have
+    $-1 - (-1) = 0$ which is not less than or equal to $-1$. Hence the
+    retiming vector is infeasible.
 
-\section{Conclusions and Possible improvements}
+  \item Similarely we provide a counter example for smaller retiming vectors.
+    -[1 2 2 3 2 2 0 0]. Here retiming value of vertex $V_{f}$ is decreased
+    from $-1$ to $-2$. Equation 9.4 is still satisfied, indicating a legal
+    vector, but equation 9.5 is not satisfied:
+    \begin{equation}
+      R_{e} - R_{f} \leq W(V_{e}, V_{f}) - 1
+    \end{equation}
+    LHS: $-2 - (-2) = 0$, which is not less than or equal to $-1$.
 
-The tool we propose performs a fast Function Similarity Evaluation starting
-from two given covers in PLA format which share the same support.
-As a further improvement to the tool we envision to implement a function
-that performs SCC over the covers. This step could be expensive, but
-removing all redundant cubes could dramatically reduce the total
-recursive calls, thus speeding up the algorithm. Given the complexity
-of SCC, the user should be able to set a threshold on the size of the
-covers, so that the tools performs it only when the cover is small
-enough. This is a simplification rule ({\bf M1}) which was not a
-requirement for this version of the tool.
+  \item None of the smaller legal retiming vectors are feasible for the correlator
+    example. In the five relevant inequalities corresponding to equation 9.5,
+    if we reduce the retiming values of the vertices that are used in these
+    inequalities then we either get a retiming vector which is not legal or
+    it does not satisfy the feasibility constraint.
+    Looking at the variables $R_{i}$ and $R_{j}$ (corresponding to vertices in the
+    five inequalities) in equations 9.4 and 9.5. If we reduce the value of $R_{i}$
+    then we either violate the legality constraint (for vertex 1) or violate the
+    feasibility constraint. On the other hand if we reduce the value of $R_{j}$ then
+    we will always violate the feasibility constraint.
+\end{enumerate}
+
+\subsection{SIMPLEX: selecting a pivot columb}
+
+\begin{enumerate}
+  \item Choice of negative column: The goal of simplex algorithm in each iteration
+    is to reformulate the linear program so that the basic solution has a greater
+    cost (for a maximization problem). Following this principle, the pivot column
+    is selected, contains a negative number in the bottom row as the bottom row
+    represents the objective function and the negative number is actually a positive
+    coefficient of a non-basic variable in the original objective function.
+    Increasing the value of this non-basic variable will lead to an improved cost
+    during each iteration.
+  \item Other negative columns:
+    {\bf Iteration $i$ vs $i-1$}: The cost of the current iteration will be higher as compared
+    to $i-1$. This is because a non-basic variable is selected which has a
+    positive coefficient in the original objective function.
+    {\bf Iteration $i$ (alternative negative pivots)}: The objective cost for the
+    current iteration will be higher if we use greatest magnitude negative pivot
+    column. This is because the greatest magnitude negative column corresponds to
+    the greatest positive coefficient of original objective function.
+\end{enumerate}
 
 %\bibliographystyle{abbrv}
 %\bibliography{ref}
