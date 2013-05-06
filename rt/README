@@ -4,7 +4,7 @@ GROUP:
 
 PROGRAM BASIC INFO:
 	- Language is C++
-	- No special requirements. The tool can be compiled with g++.
+	- No special requirements. The tool can be compiled with g++ using our Makefile
 
 
 LIST OF FOLDERS AND INSTRUCTIONS:
