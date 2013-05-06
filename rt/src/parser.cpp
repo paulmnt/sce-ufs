@@ -53,10 +53,10 @@ sng *parser::parse_file(char* file)
 #endif
 
 
-	while (line != ".e"){
+	while (line.find(".e") == string::npos) {
 		getline(f0, line);
 
-		if (line == ".e")
+		if (line.find(".e") != string::npos)
 			break;
 
 		istringstream iss(line);
