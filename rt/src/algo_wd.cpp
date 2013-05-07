@@ -71,11 +71,11 @@ uint wd::compute_wd()
 						w[i][j] = w[i][k] + w[k][j];
 						d[i][j] = d[i][k] + d[k][j];
 					}
-				}
-				if (w[i][j] == w[i][k] + w[k][j]) {
-					if (d[i][j] < d[i][k] + d[k][j]) {
-						w[i][j] = w[i][k] + w[k][j];
-						d[i][j] = d[i][k] + d[k][j];
+					if (w[i][j] == w[i][k] + w[k][j]) {
+						if (d[i][j] < d[i][k] + d[k][j]) {
+							w[i][j] = w[i][k] + w[k][j];
+							d[i][j] = d[i][k] + d[k][j];
+						}
 					}
 				}
 				if (k == n - 1) {

@@ -168,12 +168,12 @@ int main(int argc, char **argv) {
 			ind = (max_ind + min_ind) / 2;
 		}
 		/* Step 4: Print output */
-#ifdef INFO
 		cout << "INFO: Minimum feasible cycle is " << phi << endl;
 		cout << "      Retiming vector is ";
 		for (uint i = 0; i < n; i++)
 			cout << r[i] << " ";
 		cout << endl;
+#ifdef INFO
 		for (uint i = 0; i < graph->get_num_edges(); i++)
 			graph->print_edge(i);
 #endif
@@ -216,12 +216,13 @@ int main(int argc, char **argv) {
 		graph->retime_sng(r);
 
 		/* Print output */
-#ifdef INFO
 		cout << "INFO: Target cycle is " << target_phi << endl;
 		cout << "      Retiming vector is ";
 		for (uint i = 0; i < n; i++)
 			cout << r[i] << " ";
 		cout << endl;
+		cout << "      Optimal area is " << graph->get_area() << endl;
+#ifdef INFO
 		for (uint i = 0; i < graph->get_num_edges(); i++)
 			graph->print_edge(i);
 #endif

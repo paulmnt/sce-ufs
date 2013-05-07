@@ -64,7 +64,11 @@ LIST OF FOLDERS AND INSTRUCTIONS:
 
 ./out
 	- contains the output files printed in verbose mode for both
-	  min-cycle and min-area using the two given examples.
+	  min-cycle and min-area using all input files in ./tb
 	  Notice that when running the tool, the output files
 	  are printed in the current `pwd` folder, therefore the
 	  content of out should is not overwritten.
+
+./out_old
+	- contains the output files printed during the demo
+	  before the quick hotfix to the code.

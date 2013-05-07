@@ -121,9 +121,11 @@ void p1out::it4(uint **w, uint **d, uint n)
 		else
 			p1_457 << "  v" << i << " ";
 		for (uint j = 0; j < n; j++) {
-			if (w[i][j] < UINT_MAX)
-				p1_457 << "  " << w[i][j] << "  ";
-			else
+			if (w[i][j] < UINT_MAX) {
+				if (w[i][j] < 10)
+					p1_457 << " ";
+				p1_457 << " " << w[i][j] << "  ";
+			} else
 				p1_457 << "  -  ";
 		}
 		p1_457 << "       ";
@@ -212,9 +214,11 @@ void p1out::it6(uint **w, uint **d, uint n, uint it)
 		else
 			p1_6 << "  v" << i << " ";
 		for (uint j = 0; j < n; j++) {
-			if (w[i][j] < UINT_MAX)
-				p1_6 << "  " << w[i][j] << "  ";
-			else
+			if (w[i][j] < UINT_MAX) {
+				if (w[i][j] < 10)
+					p1_6 << " ";
+				p1_6 << " " << w[i][j] << "  ";
+			} else
 				p1_6 << "  -  ";
 		}
 		p1_6 << "       ";
