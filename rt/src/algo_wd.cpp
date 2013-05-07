@@ -66,11 +66,18 @@ uint wd::compute_wd()
 	for (uint k = 0; k < n; k++) {
 		for (uint i = 0; i < n; i++)
 			for (uint j = 0; j < n; j++) {
-				if (w[i][k] < UINT_MAX && w[k][j] < UINT_MAX)
+				if (w[i][k] < UINT_MAX && w[k][j] < UINT_MAX) {
 					if (w[i][j] > w[i][k] + w[k][j]) {
 						w[i][j] = w[i][k] + w[k][j];
 						d[i][j] = d[i][k] + d[k][j];
 					}
+				}
+				if (w[i][j] == w[i][k] + w[k][j]) {
+					if (d[i][j] < d[i][k] + d[k][j]) {
+						w[i][j] = w[i][k] + w[k][j];
+						d[i][j] = d[i][k] + d[k][j];
+					}
+				}
 				if (k == n - 1) {
 					/* Add destination vertex delay */
 					d[i][j] += g->get_vertex_delay(j);
